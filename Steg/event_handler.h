@@ -57,6 +57,8 @@ enum guiEventCode
     evcUnSelectGUIComp,
     evcPressedButton,
     evcReleasedButton,
+    evcShowCanvas,
+    evcHideCanvas,
 };
 //push event macro functions
 #define PushSelectGUICompEvent(PCOMP)       \
@@ -71,6 +73,11 @@ enum guiEventCode
 #define PushReleasedButtonEvent(PCOMP)       \
         steg::PushEvent(steg::CustomEventsType[CUSTOM_GUIEVENT], steg::evcReleasedButton, PCOMP, NULL)
 
+#define PushShowCanvasEvent(PCANVAS)        \
+        steg::PushEvent(steg::CustomEventsType[CUSTOM_GUIEVENT], steg::evcShowCanvas, PCANVAS, NULL)
+
+#define PushHideCanvasEvent(PCANVAS)        \
+        steg::PushEvent(steg::CustomEventsType[CUSTOM_GUIEVENT], steg::evcHideCanvas, PCANVAS, NULL)
 
 //...
 
