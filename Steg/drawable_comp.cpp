@@ -99,6 +99,11 @@ void DrawableComp::SetMove(int dx, int dy)
 	UpdateDestRect();
 }
 
+bool DrawableComp::IsVisible()
+{
+    return visible;
+}
+
 //set and get relative coordination to attachedPlatform
 void DrawableComp::SetRelativePos(int x, int y)
 {

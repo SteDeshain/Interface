@@ -155,7 +155,7 @@ DBG_Status Scene1::InitScene()
     Label* temp2 = new Label(240, 20, LeftTop, "你好", menuFont, GetColor(White), 2, motherCanv);
 
     Button* but = new Button(25, 60, GetColor(LightGray), SDL_Point{30, 30}, canv);
-    Button* but2 = new Button(65, 60, GetColor(Cyan), SDL_Point{30, 30}, canv);
+    Button* but2 = new Button(100, 60, GetColor(LightGray), SDL_Point{60, 30}, canv);
 
     GUI* pic = new GUI(50, 300, 1, "character.png", motherCanv);
 
@@ -165,6 +165,9 @@ DBG_Status Scene1::InitScene()
           << compCount << mapInfo << character << char2 << char3 << char4;
     *this << motherCanv << canv << temp << temp2;
     *this << but << but2 << pic;
+
+//    canv->SetExtraTrans(0.8f);
+//    motherCanv->SetExtraTrans(0.8f);
 
 	mountain->SetDrawSize(64, 64);
 	mountain->SetSourceRect(SDL_Rect{64, 64, 64, 64});

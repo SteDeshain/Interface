@@ -39,6 +39,8 @@ public:
     bool IsSelectable();
     bool IsSelected();
 
+    virtual void SetExtraTrans(float extraTrans);
+
 protected:
 //    GUILayer layer; //smaller number is drawn first
     int drawIndex;  //the order to be drawn in a canvas, smaller number is drawn first
@@ -47,11 +49,15 @@ protected:
     SDL_Point entireSize;
     SDL_Point sourceStartPoint;
 
+    float extraTrans;       //extra transparency apply to RenderCopy, inner use, from 0.0 to 1.0
+    Uint8 textureAlpha;
+
     bool selectable;
     bool selected;
 
     virtual DBG_Status HandleEvent(SDL_Event event);
     virtual DBG_Status InitInScene(Scene *scene);
+    virtual DBG_Status Update(Uint32 deltTick);
     virtual SDL_Rect GetAbsDestRect(int* x = NULL, int* y = NULL, int* w = NULL, int* h = NULL);
 
     virtual SDL_Rect CutSrcRect(SDL_Rect srcRect, SDL_Point destSize);  //裁剪sourceRect以适应destRect
@@ -62,6 +68,14 @@ private:
 
 };
 
+enum SlideWay
+{
+    SlideUpDown,
+    SlideDownUp,
+    SlideLeftRight,
+    SlideRightLeft,
+};
+
 class Canvas: public GUI
 {
     friend class GUI;
@@ -70,10 +84,14 @@ public:
     Canvas(SDL_Color color, float transparency, SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas);
     Canvas(const char* imgFile, float transparency, SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas);
 
+    ~Canvas();
+
 //    void CalculateDrawRect();   //calculate the final absolute drawRect to be used in Draw finction
 
     //temp
     void SetScrollOffset(int dx, int dy);
+
+    virtual void SetExtraTrans(float extraTrans);
 
 protected:
     //Canvas* motherCanvas;     //actually it's the attached platform
@@ -91,7 +109,18 @@ protected:
     SDL_Point scrollOffset;
 
     SDL_Color color;        //if canvas has no texture, it will be drawn as a single color
-    float transparency;     //from 0.0(invisible) to 1.0(no transparency)
+    float transparency;     //from 0.0(invisible) to 1.0(no transparency), origin transparency
+
+    float originExtraTrans; //restore origin extra trans value
+
+    //show process animation
+//    SlideWay slideWay;      //slide direction when shown, the opposite direction when disappeared
+//    Uint32 slideTicks;      //slide time
+    struct SlideInfo
+    {
+        SlideWay slideWay;
+        Uint32 slideTicks;
+    }* slideInfo;
 
     virtual DBG_Status InitInScene(Scene* scene);
 

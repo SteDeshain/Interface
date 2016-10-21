@@ -12,6 +12,7 @@ GUI::GUI(int x, int y, int textureNum, const char* imgFile, Canvas* canvas)
     selectable = false;
     selected = false;
     sourceStartPoint = SDL_Point{0, 0};
+    extraTrans = 1.0f;
 }
 
 GUI::GUI(int x, int y, int drawIndex, Canvas* canvas)
@@ -20,6 +21,7 @@ GUI::GUI(int x, int y, int drawIndex, Canvas* canvas)
     selectable = false;
     selected = false;
     sourceStartPoint = SDL_Point{0, 0};
+    extraTrans = 1.0f;
 }
 
 GUI::GUI(int textureNum, const char* imgFile, Canvas* canvas)
@@ -28,6 +30,7 @@ GUI::GUI(int textureNum, const char* imgFile, Canvas* canvas)
     selectable = false;
     selected = false;
     sourceStartPoint = SDL_Point{0, 0};
+    extraTrans = 1.0f;
 }
 
 GUI::~GUI()
@@ -46,6 +49,16 @@ bool GUI::IsSelected()
         return false;
 
     return selected;
+}
+
+void GUI::SetExtraTrans(float extraTrans)
+{
+    if(extraTrans < 0)
+        this->extraTrans = 0.0f;
+    else if(extraTrans > 1)
+        this->extraTrans = 1.0f;
+    else
+        this->extraTrans = extraTrans;
 }
 
 DBG_Status GUI::HandleEvent(SDL_Event event)
@@ -91,6 +104,9 @@ DBG_Status GUI::InitInScene(Scene *scene)
 
     scene->GUIComps.push_back(this);
 
+    SDL_GetTextureAlphaMod(currentTexture, &textureAlpha);
+//    textureAlpha = 255;
+
     return status;
 }
 
@@ -98,6 +114,31 @@ DBG_Status GUI::InitInScene(Scene *scene)
 //{
 //    entireSize = SDL_Point{sourceRect.w, sourceRect.h};
 //}
+
+DBG_Status GUI::Update(Uint32 deltTick)
+{
+    DBG_Status status = DBG_OK;
+
+    status |= DrawableComp::Update(deltTick);
+
+    float finalTrans = (float)textureAlpha / 255.0f * extraTrans;
+
+    //follow canvas
+    Canvas* canvas = dynamic_cast<Canvas*>(attachedPlatform);
+    if(canvas)
+    {
+        visible = canvas->IsVisible();
+        finalTrans *= canvas->extraTrans;
+        //if this is a canvas, addapt extraTrans to motherCanvas' extraTrans
+        Canvas* canvasThis = dynamic_cast<Canvas*>(this);
+        if(canvasThis)
+            extraTrans = canvasThis->originExtraTrans * canvas->extraTrans;
+    }
+
+    SDL_SetTextureAlphaMod(currentTexture, 255.0f * finalTrans);
+
+    return status;
+}
 
 SDL_Rect GUI::GetAbsDestRect(int* x, int* y, int* w, int* h)
 {
@@ -173,6 +214,8 @@ Canvas::Canvas(SDL_Color color, float transparency, SDL_Rect viewRect, SDL_Point
     drawSize = SDL_Point{viewRect.w, viewRect.h};
     SetRelativeDrawRect(viewRect);
     scrollOffset = SDL_Point{0, 0};
+    slideInfo = NULL;
+    originExtraTrans = extraTrans;
 }
 
 Canvas::Canvas(const char* imgFile, float transparency, SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas)
@@ -183,6 +226,17 @@ Canvas::Canvas(const char* imgFile, float transparency, SDL_Rect viewRect, SDL_P
     drawSize = SDL_Point{viewRect.w, viewRect.h};
     SetRelativeDrawRect(viewRect);
     scrollOffset = SDL_Point{0, 0};
+    slideInfo = NULL;
+    originExtraTrans = extraTrans;
+}
+
+Canvas::~Canvas()
+{
+    if(slideInfo)
+    {
+        delete slideInfo;
+        slideInfo = NULL;
+    }
 }
 
 void Canvas::SetScrollOffset(int dx, int dy)
@@ -198,6 +252,13 @@ void Canvas::SetScrollOffset(int dx, int dy)
         scrollOffset.y = 0;
     else if(scrollOffset.y > entireSize.y - drawSize.y)
         scrollOffset.y = entireSize.y - drawSize.y;
+}
+
+void Canvas::SetExtraTrans(float extraTrans)
+{
+    GUI::SetExtraTrans(extraTrans);
+
+    originExtraTrans = this->extraTrans;
 }
 
 DBG_Status Canvas::InitInScene(Scene* scene)
@@ -240,6 +301,8 @@ DBG_Status Canvas::InitInScene(Scene* scene)
     scrollOffset = SDL_Point{0, 0};
 
     scene->GUIComps.push_back(this);
+
+    SDL_GetTextureAlphaMod(currentTexture, &textureAlpha);
 
     return status;
 }
@@ -305,8 +368,8 @@ DBG_Status Button::InitInScene(Scene* scene)
         //draw selected button
 //        SDL_Rect selectedRect = SDL_Rect{entireSize.x, 0, entireSize.x, entireSize.y};
         SDL_Rect rect1 = SDL_Rect{0, 0, entireSize.x - 2, entireSize.y - 2};
-        SDL_Rect rect2 = SDL_Rect{entireSize.x, 0, entireSize.x, 2};
-        SDL_Rect rect3 = SDL_Rect{entireSize.x, 0, 2, entireSize.y};
+        SDL_Rect rect2 = SDL_Rect{entireSize.x, 0, entireSize.x - 2, 2};
+        SDL_Rect rect3 = SDL_Rect{entireSize.x, 0, 2, entireSize.y - 2};
         SDL_SetRenderDrawColor(scene->render, color.r, color.g, color.b, color.a);
         SDL_RenderFillRect(scene->render, &(rect1));
         SDL_RenderFillRect(scene->render, &(rect2));
@@ -338,6 +401,8 @@ DBG_Status Button::InitInScene(Scene* scene)
     SetSourceSize(drawRect.w, drawRect.h);
 
     scene->GUIComps.push_back(this);
+
+    SDL_GetTextureAlphaMod(currentTexture, &textureAlpha);
 
     return status;
 }

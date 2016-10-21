@@ -35,6 +35,7 @@ public:
 	void ShowComp();
 	void ToggleVisiblity();
 	void SetMove(int dx = 0, int dy = 0);
+	bool IsVisible();
 
 	//set and get relative coordination to attachedPlatform
 	void SetRelativePos(int x = 0, int y = 0);

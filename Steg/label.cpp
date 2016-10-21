@@ -133,6 +133,8 @@ DBG_Status Label::InitInScene(Scene *scene)
 
     status |= LoadTexture();
 
+    SDL_GetTextureAlphaMod(currentTexture, &textureAlpha);
+
     return status;
 }
 
