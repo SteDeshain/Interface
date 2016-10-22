@@ -13,7 +13,7 @@
 	"label.h"
 	"drawable_comp.h"
 
-1476946939 /home/stedeshain/Studio/Interface/Steg/game.h
+1477133091 /home/stedeshain/Studio/Interface/Steg/game.h
 	<stack>
 	"SDL2/SDL.h"
 	"status.h"
@@ -69,7 +69,7 @@
 	"SDL2/SDL_log.h"
 	"status.h"
 
-1476948291 /home/stedeshain/Studio/Interface/Interface/scene1.h
+1477119683 /home/stedeshain/Studio/Interface/Interface/scene1.h
 	"SDL2/SDL.h"
 	"SDL2/SDL_ttf.h"
 	"scene.h"
@@ -86,7 +86,7 @@
 	"status.h"
 	"drawable_comp.h"
 
-1477052478 /home/stedeshain/Studio/Interface/Steg/drawable_comp.h
+1477142027 /home/stedeshain/Studio/Interface/Steg/drawable_comp.h
 	<vector>
 	<string>
 	"SDL2/SDL.h"
@@ -113,7 +113,7 @@
 	"SDL2/SDL_ttf.h"
 	"gui.h"
 
-1477055072 /home/stedeshain/Studio/Interface/Steg/gui.h
+1477138711 /home/stedeshain/Studio/Interface/Steg/gui.h
 	"SDL2/SDL.h"
 	"drawable_comp.h"
 
@@ -136,14 +136,14 @@
 1476946938 /home/stedeshain/Studio/Interface/Steg/character.h
 	"solid_obj.h"
 
-1476946938 /home/stedeshain/Studio/Interface/Steg/color.h
+1477114343 /home/stedeshain/Studio/Interface/Steg/color.h
 	"SDL2/SDL.h"
 
 1476948291 source:/home/stedeshain/Studio/Interface/Interface/main.cpp
 	"game.h"
 	"game1.h"
 
-1477057068 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
+1477141082 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
 	"scene1.h"
 	"SDL2/SDL_ttf.h"
 	"stdio.h"

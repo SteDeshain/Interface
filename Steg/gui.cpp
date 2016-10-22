@@ -60,6 +60,10 @@ void GUI::SetExtraTrans(float extraTrans)
     else
         this->extraTrans = extraTrans;
 }
+float GUI::GetExtraTrans()
+{
+    return extraTrans;
+}
 
 DBG_Status GUI::HandleEvent(SDL_Event event)
 {
@@ -127,15 +131,34 @@ DBG_Status GUI::Update(Uint32 deltTick)
     Canvas* canvas = dynamic_cast<Canvas*>(attachedPlatform);
     if(canvas)
     {
-        visible = canvas->IsVisible();
+//        visible = canvas->IsVisible();
         finalTrans *= canvas->extraTrans;
         //if this is a canvas, addapt extraTrans to motherCanvas' extraTrans
         Canvas* canvasThis = dynamic_cast<Canvas*>(this);
         if(canvasThis)
+        {
             extraTrans = canvasThis->originExtraTrans * canvas->extraTrans;
+            if(canvas->IsVisible())
+            {
+                visible = canvasThis->originVisible;
+            }
+            else
+            {
+                visible = false;
+            }
+        }
+        else
+        {
+            visible = canvas->IsVisible();
+        }
     }
 
     SDL_SetTextureAlphaMod(currentTexture, 255.0f * finalTrans);
+
+    if(!visible && motherScene->selectedGUIComp == this)
+    {
+        motherScene->selectedGUIComp = NULL;
+    }
 
     return status;
 }
@@ -206,6 +229,153 @@ SDL_Rect GUI::CutSrcRect(SDL_Rect srcRect, SDL_Point destSize)
     return srcRect;
 }
 
+//Canvas state machine functions
+static DBG_Status ShowUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self)
+{
+    DBG_Status status = DBG_OK;
+
+    canvas->SetVisible(true);
+    if(canvas->GetSlideInfo() == NULL)
+    {
+        canvas->SetExtraTrans(1.0f);
+        canvas->SetCanvasState(Canvas::StateEnumIdle);
+    }
+    else
+    {
+        self->totalMove += deltTick * (canvas->GetSlideInfo())->movePerTick;
+        SDL_Point newPos = canvas->GetSlideInfo()->destPos;
+        switch((canvas->GetSlideInfo())->showWay)
+        {
+        case SlideRight:
+            newPos.x += (canvas->GetSlideInfo())->slideDistance;
+            newPos.x -= self->totalMove;
+            break;
+
+        case SlideLeft:
+            newPos.x -= (canvas->GetSlideInfo())->slideDistance;
+            newPos.x += self->totalMove;
+            break;
+
+        case SlideDown:
+            newPos.y += (canvas->GetSlideInfo())->slideDistance;
+            newPos.y -= self->totalMove;
+            break;
+
+        case SlideUp:
+        default:
+            newPos.y -= (canvas->GetSlideInfo())->slideDistance;
+            newPos.y += self->totalMove;
+            break;
+        }
+        canvas->SetRelativePos(newPos);
+
+        canvas->AddExtraTrans(deltTick * (canvas->GetSlideInfo())->deltTransPerTick);
+        if(canvas->GetExtraTrans() >= 1.0f)    //temp: should judge by position rather than transparency(necessary)
+        {
+            canvas->SetExtraTrans(1.0f);
+            canvas->SetRelativePos(canvas->GetSlideInfo()->destPos);
+            canvas->SetCanvasState(Canvas::StateEnumIdle);
+
+            self->totalMove = 0.0f;
+        }
+    }
+
+    return status;
+}
+//static DBG_Status ShowHandleEvent(SDL_Event event, Canvas* canvas, CanvasState* self)
+//{
+//    return DBG_OK;
+//}
+
+//static DBG_Status IdleUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self)
+//{
+//    return DBG_OK;
+//}
+static DBG_Status IdleHandleEvent(SDL_Event event, Canvas* canvas, CanvasState* self)
+{
+    DBG_Status status = DBG_OK;
+
+    if(event.user.type == CustomEventsType[CUSTOM_GUIEVENT])
+    {
+        DrawableComp* motherCanvas = canvas->GetAttachedPlatform();
+        if(!motherCanvas ||
+           (motherCanvas && motherCanvas->IsVisible()))
+        {
+            if(event.user.code == evcShowCanvas && event.user.data1 == canvas)
+            {
+//                if(!canvas->GetOriginVisible())
+                if(!canvas->IsVisible())
+                {
+                    canvas->SetCanvasState(Canvas::StateEnumShow);
+                    canvas->SetExtraTrans(0.0f);
+                }
+            }
+            else if(event.user.code == evcHideCanvas && event.user.data1 == canvas)
+            {
+//                if(canvas->GetOriginVisible())
+                if(canvas->IsVisible())
+                {
+                    canvas->SetCanvasState(Canvas::StateEnumHide);
+                }
+            }
+        }
+    }
+
+    return status;
+}
+
+static DBG_Status HideUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self)
+{
+    DBG_Status status = DBG_OK;
+
+    if(canvas->GetSlideInfo() == NULL)
+    {
+        canvas->SetVisible(false);
+        canvas->SetCanvasState(Canvas::StateEnumIdle);
+    }
+    else
+    {
+        self->totalMove += deltTick * (canvas->GetSlideInfo())->movePerTick;
+        SDL_Point newPos = canvas->GetSlideInfo()->destPos;
+        switch((canvas->GetSlideInfo())->hideWay)
+        {
+        case SlideLeft:
+            newPos.x -= self->totalMove;
+            break;
+
+        case SlideRight:
+            newPos.x += self->totalMove;
+            break;
+
+        case SlideUp:
+            newPos.y -= self->totalMove;
+            break;
+
+        case SlideDown:
+        default:
+            newPos.y += self->totalMove;
+            break;
+        }
+        canvas->SetRelativePos(newPos);
+
+        canvas->AddExtraTrans(deltTick * (canvas->GetSlideInfo())->deltTransPerTick * -1);
+        if(canvas->GetExtraTrans() <= 0.0f)
+        {
+            canvas->SetVisible(false);
+            canvas->SetRelativePos(canvas->GetSlideInfo()->destPos);
+            canvas->SetCanvasState(Canvas::StateEnumIdle);
+
+            self->totalMove = 0.0f;
+        }
+    }
+
+    return status;
+}
+//static DBG_Status HideHandleEvent(SDL_Event event, Canvas* canvas, CanvasState* self)
+//{
+//    return DBG_OK;
+//}
+
 Canvas::Canvas(SDL_Color color, float transparency, SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas)
     :GUI(1, NULL, motherCanvas),
      color(color), transparency(transparency)
@@ -216,6 +386,22 @@ Canvas::Canvas(SDL_Color color, float transparency, SDL_Rect viewRect, SDL_Point
     scrollOffset = SDL_Point{0, 0};
     slideInfo = NULL;
     originExtraTrans = extraTrans;
+    originVisible = visible;
+
+    //state machine
+    canvasShow.HandleEvent = NULL;
+    canvasShow.Update = ShowUpdate;
+    canvasShow.totalMove = 0.0f;
+
+    canvasIdle.HandleEvent = IdleHandleEvent;
+    canvasIdle.Update = NULL;       //do nothing
+    canvasIdle.totalMove = 0.0f;
+
+    canvasHide.HandleEvent = NULL;
+    canvasHide.Update = HideUpdate;
+    canvasHide.totalMove = 0.0f;
+
+    currentState = &canvasIdle;      //default as Idle state(already shown)
 }
 
 Canvas::Canvas(const char* imgFile, float transparency, SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas)
@@ -228,6 +414,22 @@ Canvas::Canvas(const char* imgFile, float transparency, SDL_Rect viewRect, SDL_P
     scrollOffset = SDL_Point{0, 0};
     slideInfo = NULL;
     originExtraTrans = extraTrans;
+    originVisible = visible;
+
+    //state machine
+    canvasShow.HandleEvent = NULL;
+    canvasShow.Update = ShowUpdate;
+    canvasShow.totalMove = 0.0f;
+
+    canvasIdle.HandleEvent = IdleHandleEvent;
+    canvasIdle.Update = NULL;       //do nothing
+    canvasIdle.totalMove = 0.0f;
+
+    canvasHide.HandleEvent = NULL;
+    canvasHide.Update = HideUpdate;
+    canvasHide.totalMove = 0.0f;
+
+    currentState = &canvasIdle;      //default as Idle state(already shown)
 }
 
 Canvas::~Canvas()
@@ -254,11 +456,145 @@ void Canvas::SetScrollOffset(int dx, int dy)
         scrollOffset.y = entireSize.y - drawSize.y;
 }
 
+static void ResetStateDestPos(Canvas* canvas)
+{
+//    canvas->GetState(Canvas::StateEnumHide)->destPosition = canvas->GetRelativePos();
+//    canvas->GetState(Canvas::StateEnumIdle)->destPosition = canvas->GetRelativePos();
+//    canvas->GetState(Canvas::StateEnumShow)->destPosition = canvas->GetRelativePos();
+
+//    if(canvas->GetSlideInfo())
+//    {
+//        canvas->GetSlideInfo()->destPos = canvas->GetRelativePos();
+//    }
+}
+
+void Canvas::SetSlideInfo(SlideWay showWay, SlideWay hideWay, Uint32 slideTicks, unsigned int slideDistance)
+{
+    slideInfo = new SlideInfo;
+    if(slideInfo)
+    {
+        slideInfo->showWay = showWay;
+        slideInfo->hideWay = hideWay;
+        slideInfo->slideTicks = slideTicks;
+        slideInfo->slideDistance = slideDistance;
+
+        slideInfo->deltTransPerTick = 1.0f / (float)slideTicks;
+        slideInfo->movePerTick = (float)slideDistance / (float)slideTicks;
+        slideInfo->destPos = GetRelativePos();
+    }
+    else
+    {
+        ENG_LogError("Cannot allocate SlideInfo for Canvas.");
+    }
+}
+void Canvas::SetSlideInfo()
+{
+    this->SetSlideInfo(SlideUp, SlideDown, 200, 10);
+}
+Canvas::SlideInfo* Canvas::GetSlideInfo()
+{
+    return this->slideInfo;
+}
+
+void Canvas::SetCanvasState(CanvasStateEnum state)
+{
+    switch(state)
+    {
+    case StateEnumHide:
+        currentState = &canvasHide;
+        break;
+
+    case StateEnumShow:
+        currentState = &canvasShow;
+        break;
+
+    case StateEnumIdle:
+    default:
+        currentState = &canvasIdle;
+        break;
+    }
+}
+
 void Canvas::SetExtraTrans(float extraTrans)
 {
     GUI::SetExtraTrans(extraTrans);
 
     originExtraTrans = this->extraTrans;
+}
+float Canvas::GetExtraTrans()
+{
+    return originExtraTrans;
+}
+void Canvas::AddExtraTrans(float deltaTrans)
+{
+    extraTrans += deltaTrans;
+    if(extraTrans < 0)
+        extraTrans = 0.0f;
+    else if(extraTrans > 1)
+        extraTrans = 1.0f;
+
+    originExtraTrans = extraTrans;
+}
+
+//bool Canvas::IsVisible()
+//{
+////    return originVisible;
+//    return visible;
+//}
+void Canvas::SetVisible(bool visible)
+{
+    this->visible = visible;
+    this->originVisible = visible;
+}
+
+void Canvas::SetRelativePos(int x, int y)
+{
+    GUI::SetRelativePos(x, y);
+
+    ResetStateDestPos(this);
+}
+
+void Canvas::SetRelativePos(SDL_Point point)
+{
+    GUI::SetRelativePos(point);
+
+    ResetStateDestPos(this);
+}
+
+void Canvas::SetRelativeLeftTop(int x, int y)
+{
+    GUI::SetRelativeLeftTop(x, y);
+
+    ResetStateDestPos(this);
+}
+
+void Canvas::SetRelativeLeftTop(SDL_Point point)
+{
+    GUI::SetRelativeLeftTop(point);
+
+    ResetStateDestPos(this);
+}
+
+CanvasState* Canvas::GetState(CanvasStateEnum stateEnum)
+{
+    switch(stateEnum)
+    {
+    case StateEnumShow:
+        return &canvasShow;
+        break;
+    case StateEnumHide:
+        return &canvasHide;
+        break;
+    case StateEnumIdle:
+    default:
+        return &canvasIdle;
+        break;
+    }
+}
+
+bool Canvas::GetOriginVisible()
+{
+    return originVisible;
 }
 
 DBG_Status Canvas::InitInScene(Scene* scene)
@@ -303,6 +639,32 @@ DBG_Status Canvas::InitInScene(Scene* scene)
     scene->GUIComps.push_back(this);
 
     SDL_GetTextureAlphaMod(currentTexture, &textureAlpha);
+
+    return status;
+}
+
+DBG_Status Canvas::Update(Uint32 deltTick)
+{
+    DBG_Status status = DBG_OK;
+
+    status |= GUI::Update(deltTick);
+
+    //state machine update
+    if(currentState->Update)
+        currentState->Update(deltTick, this, currentState);
+
+    return status;
+}
+
+DBG_Status Canvas::HandleEvent(SDL_Event event)
+{
+    DBG_Status status = DBG_OK;
+
+    status |= GUI::HandleEvent(event);
+
+    //state machine event handling
+    if(currentState->HandleEvent)
+        currentState->HandleEvent(event, this, currentState);
 
     return status;
 }

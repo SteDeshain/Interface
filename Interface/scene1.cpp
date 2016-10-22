@@ -145,14 +145,22 @@ DBG_Status Scene1::InitScene()
 
     SDL_Rect viewRect = SDL_Rect{20, 20, 360, 400};
     SDL_Point canvasSize = SDL_Point{400, 500};
-    motherCanv = new Canvas(GetColor(Yellow), 0.5f, viewRect, canvasSize, NULL);
+    motherCanv = new Canvas(GetColor(LightGray), 0.5f, viewRect, canvasSize, NULL);
+    motherCanv->SetSlideInfo();
+    motherCanv->HideComp();
     viewRect = SDL_Rect{20, 20, 200, 200};
 //    viewRect = SDL_Rect{-80, 20, 200, 200};
     canvasSize = SDL_Point{300, 300};
 //    Canvas* canv = new Canvas(GetColor(Cyan), 0.5f, viewRect, canvasSize, motherCanv);
     canv = new Canvas("tiles.png", 0.5f, viewRect, canvasSize, motherCanv);
+    canv->SetSlideInfo();
     Label* temp = new Label(10, 10, LeftTop, "hello", menuFont, GetColor(White), 2, canv);
     Label* temp2 = new Label(240, 20, LeftTop, "你好", menuFont, GetColor(White), 2, motherCanv);
+
+    childCanv = new Canvas(GetColor(Cyan), 0.7f, SDL_Rect{10, 90, 160, 150}, SDL_Point{160, 150}, canv);
+    childCanv->SetSlideInfo();
+    Label* temp3 = new Label(20, 20, LeftTop, "画布显示测试", menuFont, GetColor(White), 2, childCanv);
+    Button* but3 = new Button(60, 70, GetColor(LightGray), SDL_Point{60, 30}, childCanv);
 
     Button* but = new Button(25, 60, GetColor(LightGray), SDL_Point{30, 30}, canv);
     Button* but2 = new Button(100, 60, GetColor(LightGray), SDL_Point{60, 30}, canv);
@@ -164,7 +172,7 @@ DBG_Status Scene1::InitScene()
           << platform
           << compCount << mapInfo << character << char2 << char3 << char4;
     *this << motherCanv << canv << temp << temp2;
-    *this << but << but2 << pic;
+    *this << but << but2 << pic << childCanv << temp3 << but3;
 
 //    canv->SetExtraTrans(0.8f);
 //    motherCanv->SetExtraTrans(0.8f);
@@ -259,6 +267,21 @@ DBG_Status Scene1::HandleInput()
     if(inputHandler->KeyPressed(SDL_SCANCODE_RIGHT) && inputHandler->KeyDown(SDL_SCANCODE_LSHIFT))
         canv->SetScrollOffset(-scrollSpeed, 0);
 
+    if(inputHandler->KeyPressed(SDL_SCANCODE_Z) && inputHandler->KeyUp(SDL_SCANCODE_LSHIFT))
+        PushHideCanvasEvent(motherCanv);
+    if(inputHandler->KeyPressed(SDL_SCANCODE_X) && inputHandler->KeyUp(SDL_SCANCODE_LSHIFT))
+        PushShowCanvasEvent(motherCanv);
+
+    if(inputHandler->KeyPressed(SDL_SCANCODE_Z) && inputHandler->KeyDown(SDL_SCANCODE_LSHIFT))
+        PushHideCanvasEvent(canv);
+    if(inputHandler->KeyPressed(SDL_SCANCODE_X) && inputHandler->KeyDown(SDL_SCANCODE_LSHIFT))
+        PushShowCanvasEvent(canv);
+
+    if(inputHandler->KeyPressed(SDL_SCANCODE_C))
+        PushHideCanvasEvent(childCanv);
+    if(inputHandler->KeyPressed(SDL_SCANCODE_V))
+        PushShowCanvasEvent(childCanv);
+
     return status;
 }
 
@@ -285,11 +308,12 @@ DBG_Status Scene1::Update(Uint32 deltTick)
                                                      char3->frontObjs.size(),
                                                      char4->frontObjs.size());
 	charsFrontObjsNum->ReloadTexture(buffer);
-	sprintf(buffer, "grounded: %s, %d, %d, %s, %d", character->IsGrounded() ? "true" : "false",
+	sprintf(buffer, "grounded: %s, %d, %d, %s, %d, %f", character->IsGrounded() ? "true" : "false",
                                                 character->GetBox().GetContactObjs().size(),
                                                 pWorld.GetParticles().size(),
                                                 inputHandler->MouseLeftDown() ? "left pressed" : "not pressed",
-                                                selectedGUIComp);
+                                                selectedGUIComp,
+                                                character->GetBox().GetMotion());
 	resortCount->ReloadTexture(buffer);
 }
 

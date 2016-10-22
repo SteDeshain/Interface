@@ -24,6 +24,7 @@ namespace steg
 {
 	enum RGBColor
 	{
+	    //datas from the Internet
 		Black = 0x000000,
 		Navy = 0x000080,
 		DarkBlue = 0x00008B,

@@ -48,6 +48,7 @@ public:
     MultiDrawSolidObj* platform;
     Canvas* motherCanv;
     Canvas* canv;
+    Canvas* childCanv;
 
     //for debug
     Label* compCount;

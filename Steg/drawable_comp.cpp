@@ -104,6 +104,11 @@ bool DrawableComp::IsVisible()
     return visible;
 }
 
+void DrawableComp::SetVisible(bool visible)
+{
+    this->visible = visible;
+}
+
 //set and get relative coordination to attachedPlatform
 void DrawableComp::SetRelativePos(int x, int y)
 {
@@ -263,6 +268,11 @@ void DrawableComp::SetDrawSize(int w, int h)
 void DrawableComp::SetAngle(double angle)
 {
     this->angle = angle;
+}
+
+DrawableComp* DrawableComp::GetAttachedPlatform()
+{
+    return attachedPlatform;
 }
 
 void DrawableComp::UpdateDestRect()

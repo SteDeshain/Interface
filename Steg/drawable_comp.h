@@ -35,14 +35,15 @@ public:
 	void ShowComp();
 	void ToggleVisiblity();
 	void SetMove(int dx = 0, int dy = 0);
-	bool IsVisible();
+	virtual bool IsVisible();
+	virtual void SetVisible(bool visible);
 
 	//set and get relative coordination to attachedPlatform
-	void SetRelativePos(int x = 0, int y = 0);
-	void SetRelativePos(SDL_Point point);
-	void SetRelativeLeftTop(int x = 0, int y = 0);
-	void SetRelativeLeftTop(SDL_Point point);
-	SDL_Point GetRelativePos(int* x = NULL, int* y = NULL);
+	virtual void SetRelativePos(int x = 0, int y = 0);
+	virtual void SetRelativePos(SDL_Point point);
+	virtual void SetRelativeLeftTop(int x = 0, int y = 0);
+	virtual void SetRelativeLeftTop(SDL_Point point);
+    SDL_Point GetRelativePos(int* x = NULL, int* y = NULL);
 
 	//set and get absolute coordination to scene map
 	void SetAbsPos(int absX = 0, int absY = 0);         //
@@ -58,6 +59,8 @@ public:
 	virtual void SetSourceSize(int w = 0, int h = 0);
 
 	void SetAngle(double angle = 0.0f);
+
+	DrawableComp* GetAttachedPlatform();
 
 protected:
     DrawableComp* attachedPlatform; //attached platform as DrawableComp, for GUI may need attachedPlatform too

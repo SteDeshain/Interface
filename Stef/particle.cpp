@@ -4,8 +4,9 @@
 namespace stef
 {
 
-real Particle::sleepEpsilon = 0.01;
-//real Particle::sleepEpsilon = 0.007;
+real Particle::sleepEpsilon = 0.03;     //works for 100fps
+//real Particle::sleepEpsilon = 0.035;     //works for 100fps where micro collision will stop
+//real Particle::sleepEpsilon = 0.01;     //works for 200fps
 
 void Particle::Integrate(real duration)
 {
@@ -33,7 +34,9 @@ void Particle::Integrate(real duration)
     {
         real currentMotion = velocity * velocity;
         if(motion == 0)
+        {
             motion = 10 * Particle::sleepEpsilon;
+        }
 
         real bias = real_pow(0.5f, duration);
         motion = bias * motion + (1 - bias) * currentMotion;

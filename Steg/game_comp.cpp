@@ -248,7 +248,8 @@ DBG_Status GUIOperateHandler::Update(Uint32 deltTick)
         g != motherScene->GUIComps.end();
         g++)
     {
-        if(!((*g)->IsSelectable()))
+        //cannot operate hidden gui
+        if(!((*g)->IsSelectable()) || !((*g)->IsVisible()))
             continue;
 
         absRect = (*g)->GetAbsDestRect();

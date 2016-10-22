@@ -40,6 +40,7 @@ public:
     bool IsSelected();
 
     virtual void SetExtraTrans(float extraTrans);
+    virtual float GetExtraTrans();
 
 protected:
 //    GUILayer layer; //smaller number is drawn first
@@ -70,10 +71,21 @@ private:
 
 enum SlideWay
 {
-    SlideUpDown,
-    SlideDownUp,
-    SlideLeftRight,
-    SlideRightLeft,
+    SlideUp,
+    SlideDown,
+    SlideLeft,
+    SlideRight,
+};
+
+struct CanvasState
+{
+    DBG_Status (* Update)(Uint32 deltTick, Canvas* canvas, CanvasState* self);
+    DBG_Status (* HandleEvent)(SDL_Event event, Canvas* canvas, CanvasState* self);
+
+    float totalMove;    //有时movePerTick太小，直接加到position中不会有影响
+//    SDL_Point destPosition; //final position when idle, no necessary
+//    float movePerTick;        //
+//    float deltTransPerTick;   //read from slideInfo
 };
 
 class Canvas: public GUI
@@ -92,6 +104,44 @@ public:
     void SetScrollOffset(int dx, int dy);
 
     virtual void SetExtraTrans(float extraTrans);
+    virtual float GetExtraTrans();
+    void AddExtraTrans(float deltaTrans);
+
+    struct SlideInfo
+    {
+        SlideWay showWay;
+        SlideWay hideWay;
+        Uint32 slideTicks;  //slide time
+        unsigned int slideDistance;
+
+        float deltTransPerTick;
+        float movePerTick;
+        SDL_Point destPos;  //final position when idel
+    };
+    void SetSlideInfo(SlideWay showWay, SlideWay hideWay, Uint32 slideTicks, unsigned int slideDistance);
+    void SetSlideInfo();
+    SlideInfo* GetSlideInfo();
+
+    enum CanvasStateEnum
+    {
+        StateEnumShow,
+        StateEnumIdle,
+        StateEnumHide,
+    };
+    void SetCanvasState(CanvasStateEnum state);
+
+//	virtual bool IsVisible();
+	virtual void SetVisible(bool visible);
+
+	//override set position functions to reset canvas state machine's dest position
+	virtual void SetRelativePos(int x = 0, int y = 0);
+	virtual void SetRelativePos(SDL_Point point);
+	virtual void SetRelativeLeftTop(int x = 0, int y = 0);
+	virtual void SetRelativeLeftTop(SDL_Point point);
+
+	CanvasState* GetState(CanvasStateEnum stateEnum);
+
+	bool GetOriginVisible();
 
 protected:
     //Canvas* motherCanvas;     //actually it's the attached platform
@@ -112,17 +162,19 @@ protected:
     float transparency;     //from 0.0(invisible) to 1.0(no transparency), origin transparency
 
     float originExtraTrans; //restore origin extra trans value
+    bool originVisible;     //restore origin visible value
 
     //show process animation
-//    SlideWay slideWay;      //slide direction when shown, the opposite direction when disappeared
-//    Uint32 slideTicks;      //slide time
-    struct SlideInfo
-    {
-        SlideWay slideWay;
-        Uint32 slideTicks;
-    }* slideInfo;
+    SlideInfo* slideInfo;
+
+    CanvasState canvasShow;
+    CanvasState canvasIdle;
+    CanvasState canvasHide;
+    CanvasState* currentState;
 
     virtual DBG_Status InitInScene(Scene* scene);
+    virtual DBG_Status Update(Uint32 deltTick);
+    virtual DBG_Status HandleEvent(SDL_Event event);
 
     virtual SDL_Rect CutSrcRect(SDL_Rect srcRect, SDL_Point destSize);
 

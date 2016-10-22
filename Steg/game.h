@@ -13,7 +13,7 @@
 #include "scene.h"
 #include "log.h"
 
-#define FPS                 200
+#define FPS                 100
 #define TICKS_PER_FRAME     (1000 / FPS)
 
 namespace steg

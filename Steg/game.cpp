@@ -10,9 +10,9 @@ namespace steg
 {
 
 SDL_Window* Game::mainWindow = NULL;
-int Game::windowWidth = 800;
-int Game::windowHeight = 480;
-const char* Game::windowName = "SteDeshain Engine Test Window";
+int Game::windowWidth = 1024;
+int Game::windowHeight = 576;
+const char* Game::windowName = "Steg Engine Test Window";
 int Game::tileWidth = 64;
 
 DBG_Status Game::EngineInit()
