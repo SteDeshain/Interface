@@ -162,7 +162,8 @@ DBG_Status Scene1::InitScene()
     Label* temp3 = new Label(20, 20, LeftTop, "画布显示测试", menuFont, GetColor(White), 2, childCanv);
     Button* but3 = new Button(60, 70, GetColor(LightGray), SDL_Point{60, 30}, childCanv);
 
-    Button* but = new Button(25, 60, GetColor(LightGray), SDL_Point{30, 30}, canv);
+//    Button* but = new Button(25, 60, GetColor(LightGray), SDL_Point{30, 30}, canv);
+    Button* but = new Button(25, 60, "button.png", canv);
     Button* but2 = new Button(100, 60, GetColor(LightGray), SDL_Point{60, 30}, canv);
 
     GUI* pic = new GUI(50, 300, 1, "character.png", motherCanv);

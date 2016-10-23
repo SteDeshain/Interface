@@ -690,6 +690,12 @@ Button::Button(int x, int y, SDL_Color color, SDL_Point buttonSize, Canvas* moth
                                  buttonSize.y});
 }
 
+Button::Button(int x, int y, const char* imgFile, Canvas* motherCanvas)
+    :GUI(x, y, 1, imgFile, motherCanvas)
+{
+    selectable = true;
+}
+
 DBG_Status Button::InitInScene(Scene* scene)
 {
     DBG_Status status = DBG_OK;
@@ -755,7 +761,7 @@ DBG_Status Button::InitInScene(Scene* scene)
         int sizeX, sizeY;
         SDL_QueryTexture(currentTexture, NULL, NULL, &sizeX, &sizeY);
         sizeX /= 2;
-        entireSize = SDL_Point{sizeX / 2, sizeY};
+        entireSize = SDL_Point{sizeX, sizeY};
         drawSize = entireSize;
     }
     SetRelativeDrawRect(originDrawRect);

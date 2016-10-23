@@ -3,7 +3,8 @@
 namespace stef
 {
 
-real ParticleContact::velocityLimit = 0.2f;
+real ParticleContact::velocityLimit = 0.23f; //works for 100fps
+//real ParticleContact::velocityLimit = 0.2f; //works for 200fps
 
 void ParticleContact::Resolve(real duration)
 {

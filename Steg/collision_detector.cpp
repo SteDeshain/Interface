@@ -91,6 +91,7 @@ CollideInfo CollisionDetect(const stef::Box& a, const stef::Box& b)
                 info.penetration = real_abs(bFront - aBack);
             }
             else if(zTime <= xTime && zTime <= yTime)
+//            else
             {
                 info.collideNormal = stef::Vector3::TOP;
                 info.penetration = real_abs(bTop - aBottom);
@@ -125,6 +126,7 @@ CollideInfo CollisionDetect(const stef::Box& a, const stef::Box& b)
                 info.penetration = real_abs(bFront - aBack);
             }
             else if(zTime <= xTime && zTime <= yTime)
+//            else
             {
                 info.collideNormal = stef::Vector3::TOP;
                 info.penetration = real_abs(bTop - aBottom);
@@ -159,6 +161,7 @@ CollideInfo CollisionDetect(const stef::Box& a, const stef::Box& b)
                 info.penetration = real_abs(aFront - bBack);
             }
             else if(zTime <= xTime && zTime <= yTime)
+//            else
             {
                 info.collideNormal = stef::Vector3::TOP;
                 info.penetration = real_abs(bTop - aBottom);
@@ -193,6 +196,7 @@ CollideInfo CollisionDetect(const stef::Box& a, const stef::Box& b)
                 info.penetration = real_abs(aFront - bBack);
             }
             else if(zTime <= xTime && zTime <= yTime)
+//            else
             {
                 info.collideNormal = stef::Vector3::TOP;
                 info.penetration = real_abs(bTop - aBottom);
@@ -227,6 +231,7 @@ CollideInfo CollisionDetect(const stef::Box& a, const stef::Box& b)
                 info.penetration = real_abs(aBack - bFront);
             }
             else if(zTime <= xTime && zTime <= yTime)
+//            else
             {
                 info.collideNormal = stef::Vector3::BOTTOM;
                 info.penetration = real_abs(aTop - bBottom);
@@ -261,6 +266,7 @@ CollideInfo CollisionDetect(const stef::Box& a, const stef::Box& b)
                 info.penetration = real_abs(aBack - bFront);
             }
             else if(zTime <= xTime && zTime <= yTime)
+//            else
             {
                 info.collideNormal = stef::Vector3::BOTTOM;
                 info.penetration = real_abs(aTop - bBottom);
@@ -295,6 +301,7 @@ CollideInfo CollisionDetect(const stef::Box& a, const stef::Box& b)
                 info.penetration = real_abs(aFront - bBack);
             }
             else if(zTime <= xTime && zTime <= yTime)
+//            else
             {
                 info.collideNormal = stef::Vector3::BOTTOM;
                 info.penetration = real_abs(aTop - bBottom);
@@ -329,6 +336,7 @@ CollideInfo CollisionDetect(const stef::Box& a, const stef::Box& b)
                 info.penetration = real_abs(aFront - bBack);
             }
             else if(zTime <= xTime && zTime <= yTime)
+//            else
             {
                 info.collideNormal = stef::Vector3::BOTTOM;
                 info.penetration = real_abs(aTop - bBottom);

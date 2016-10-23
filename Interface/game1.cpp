@@ -46,13 +46,15 @@ DBG_Status Game1::Run()
 			HandleEvent(event);
         }
 
+		Draw();
+
 		HandleInput();
 
 		Update();
 
 		UpdatePhysics();
 
-		Draw();
+//		Draw();
 
 		sprintf(buffer, "fps: %4.2f(%d)", 1000 / (float)(SDL_GetTicks() - endTime), FPS);
 		fps->ReloadTexture(buffer);

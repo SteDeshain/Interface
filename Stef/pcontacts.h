@@ -26,7 +26,8 @@ public:
     real penetration;   //相交深度(渗透穿透)
 
     //the friction
-    real friction = 0.05f;  //default friction
+//    real friction = 0.05f;  //default friction
+    real friction = 0.5f;  //default friction
 
     Vector3 particleMovement[2];
 

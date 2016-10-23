@@ -83,13 +83,15 @@ DBG_Status Game::Run()
 			HandleEvent(event);
         }
 
+		Draw();
+
 		HandleInput();
 
 		Update();
 
 		UpdatePhysics();
 
-		Draw();
+//		Draw();
 
 		endTime = SDL_GetTicks();
         if(endTime - startTime < TICKS_PER_FRAME)

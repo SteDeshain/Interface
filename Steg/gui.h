@@ -185,6 +185,7 @@ class Button: public GUI
 
 public:
     Button(int x, int y, SDL_Color color, SDL_Point buttonSize, Canvas* motherCanvas);
+    Button(int x, int y, const char* imgFile, Canvas* motherCanvas);
 
 protected:
     DBG_Status InitInScene(Scene* scene);
