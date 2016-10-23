@@ -64,7 +64,7 @@ DBG_Status Scene1::InitScene()
     sRects2[7] = SDL_Rect{3 * 64, 3 * 64, 64, 64};
     sRects2[8] = SDL_Rect{4 * 64, 3 * 64, 64, 64};
     SolidObjInfo info;
-    info.InitAsNormal(300, 128);
+    info.InitAsNormal(30, 128);
     info.SetPosition(150, 200, 0);
 //    info.gravitied = false;
 //    info.mass = REAL_MAX;
@@ -309,12 +309,13 @@ DBG_Status Scene1::Update(Uint32 deltTick)
                                                      char3->frontObjs.size(),
                                                      char4->frontObjs.size());
 	charsFrontObjsNum->ReloadTexture(buffer);
-	sprintf(buffer, "grounded: %s, %d, %d, %s, %d, %f", character->IsGrounded() ? "true" : "false",
+	sprintf(buffer, "grounded: %s, %d, %d, %s, %d, %f, %d", character->IsGrounded() ? "true" : "false",
                                                 character->GetBox().GetContactObjs().size(),
                                                 pWorld.GetParticles().size(),
                                                 inputHandler->MouseLeftDown() ? "left pressed" : "not pressed",
                                                 selectedGUIComp,
-                                                character->GetBox().GetMotion());
+                                                character->GetBox().GetMotion(),
+                                                phyStepCount);
 	resortCount->ReloadTexture(buffer);
 }
 

@@ -57,6 +57,9 @@ public:
 	int mapWidthNum, mapHeightNum;  //tiles num of the scene map size
                                     //default ground tiles' top-left should be (0, 0)
 
+    //tmp
+    unsigned int phyStepCount = 0;
+
 	Scene(int mapWidthNum, int mapHeightNum, SDL_Renderer* render);
 	virtual ~Scene();
 
@@ -64,7 +67,7 @@ public:
 	virtual DBG_Status HandleEvent(SDL_Event event);
 	virtual DBG_Status HandleInput();
 	virtual DBG_Status Update(Uint32 deltTick);
-	virtual DBG_Status UpdatePhysics();
+	virtual DBG_Status UpdatePhysics(Uint32 reminingTick);
 	virtual DBG_Status Draw(Uint32 deltTick);
 	virtual DBG_Status DrawExtra(Uint32 deltTick);
 

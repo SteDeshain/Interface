@@ -3,8 +3,8 @@
 namespace stef
 {
 
-real ParticleContact::velocityLimit = 0.23f; //works for 100fps
-//real ParticleContact::velocityLimit = 0.2f; //works for 200fps
+//real ParticleContact::velocityLimit = 0.2f;   //200fps
+real ParticleContact::velocityLimit = 0.4f;    //100fps
 
 void ParticleContact::Resolve(real duration)
 {
@@ -85,6 +85,7 @@ void ParticleContact::ResolveVelocity(real duration)
                                  impulsePerInvMass * particle[1]->GetInverseMass() * -1);
     }
 
+    microCollision = false;
     //check whether there is a friction
     //it's a micro collision, no need to awake either particle
     if(newSepVelocity == 0)
@@ -92,6 +93,8 @@ void ParticleContact::ResolveVelocity(real duration)
         //in this physics engine, only platform can product friction
         if(contactNormal == Vector3::TOP)
         {
+            microCollision = true;
+
             Vector3 planarVelocity(particle[0]->GetVelocity().x, particle[0]->GetVelocity().y, 0);
             if(particle[1])
             {
@@ -104,12 +107,25 @@ void ParticleContact::ResolveVelocity(real duration)
             frictionImpulse.Normalize();
             frictionImpulse *= impulse * friction;
 
+            Vector3 originVelocityDirection = particle[0]->GetVelocity();
+
             particle[0]->SetVelocity(particle[0]->GetVelocity() +
                                      frictionImpulse * particle[0]->GetInverseMass());
+
+            Vector3 afterVelocityDirection = particle[0]->GetVelocity();
+            if(!(afterVelocityDirection.AtOneWay(originVelocityDirection)))
+                particle[0]->SetVelocity(Vector3::ZERO);
+
             if(particle[1])
             {
+                originVelocityDirection = particle[1]->GetVelocity();
+
                 particle[1]->SetVelocity(particle[1]->GetVelocity() +
                                          frictionImpulse * particle[1]->GetInverseMass());
+
+                afterVelocityDirection = particle[1]->GetVelocity();
+                if(!(afterVelocityDirection.AtOneWay(originVelocityDirection)))
+                    particle[1]->SetVelocity(Vector3::ZERO);
             }
         }
     }
@@ -131,16 +147,55 @@ void ParticleContact::ResolveInterpenetration(real duration)
     if(totalInverseMass <= 0)
         return;
 
-    Vector3 movePerInvMass = contactNormal * (penetration / totalInverseMass);
-
-    particleMovement[0] = movePerInvMass * particle[0]->GetInverseMass();
-    if(particle[1])
+    if(microCollision)
     {
-        particleMovement[1] = movePerInvMass * particle[1]->GetInverseMass() * -1;
+#if 1
+        Vector3 totalMove = contactNormal * penetration;
+        if(particle[1])
+        {
+            if(particle[0]->GetPosition().z < particle[1]->GetPosition().z)
+            {
+                particleMovement[0].Clear();
+                particleMovement[1] = totalMove * -1;
+            }
+            else
+            {
+                particleMovement[1].Clear();
+                particleMovement[0] = totalMove;
+            }
+        }
+        else
+        {
+            particleMovement[1].Clear();
+            particleMovement[0] = totalMove;
+        }
+#else
+        Vector3 movePerInvMass = contactNormal * (penetration / totalInverseMass);
+
+        particleMovement[0] = movePerInvMass * particle[0]->GetInverseMass();
+        if(particle[1])
+        {
+            particleMovement[1] = movePerInvMass * particle[1]->GetInverseMass() * -1;
+        }
+        else
+        {
+            particleMovement[1].Clear();
+        }
+#endif // 0
     }
     else
     {
-        particleMovement[1].Clear();
+        Vector3 movePerInvMass = contactNormal * (penetration / totalInverseMass);
+
+        particleMovement[0] = movePerInvMass * particle[0]->GetInverseMass();
+        if(particle[1])
+        {
+            particleMovement[1] = movePerInvMass * particle[1]->GetInverseMass() * -1;
+        }
+        else
+        {
+            particleMovement[1].Clear();
+        }
     }
 
     particle[0]->SetPosition(particle[0]->GetPosition() + particleMovement[0]);

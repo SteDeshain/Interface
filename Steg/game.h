@@ -41,7 +41,7 @@ protected:
 	virtual DBG_Status HandleEvent(SDL_Event event);
     virtual DBG_Status HandleInput();
 	virtual DBG_Status Update();
-	virtual DBG_Status UpdatePhysics();
+	virtual DBG_Status UpdatePhysics(Uint32 reminingTick);
 	virtual DBG_Status Draw();
 
 	std::stack<Scene*> scenes;

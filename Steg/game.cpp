@@ -89,7 +89,14 @@ DBG_Status Game::Run()
 
 		Update();
 
-		UpdatePhysics();
+		//temp
+		Uint32 takingTicks = SDL_GetTicks() - startTime;
+		Uint32 reminingTicks;
+		if(takingTicks > TICKS_PER_FRAME)
+            reminingTicks = 0;
+        else
+            reminingTicks = TICKS_PER_FRAME - takingTicks;
+		UpdatePhysics(reminingTicks);
 
 //		Draw();
 
@@ -132,11 +139,11 @@ DBG_Status Game::Update()
 	return status;
 }
 
-DBG_Status Game::UpdatePhysics()
+DBG_Status Game::UpdatePhysics(Uint32 reminingTick)
 {
     DBG_Status status = DBG_OK;
 
-    status |= (scenes.top())->UpdatePhysics();
+    status |= (scenes.top())->UpdatePhysics(reminingTick);
 
     return status;
 }

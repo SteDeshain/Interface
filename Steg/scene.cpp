@@ -193,8 +193,45 @@ DBG_Status Scene::Update(Uint32 deltTick)
 	return status;
 }
 
-DBG_Status Scene::UpdatePhysics()
+DBG_Status Scene::UpdatePhysics(Uint32 reminingTick)
 {
+#if 0
+    phyStepCount = 0;
+
+    Uint32 tickA = 0;
+    int remins = reminingTick;
+
+    if(0 == phyLastStartTick)
+    {
+        phyLastStartTick = SDL_GetTicks();
+        return DBG_OK;
+    }
+
+    do
+    {
+        tickA = SDL_GetTicks();
+
+        phyStepCount++;
+
+        //temp: should be another place like at the beginning of a frame
+        pWorld.StartFrame();
+        //temp
+        for(std::list<SolidObj*>::iterator s = solidObjs.begin();
+            s != solidObjs.end();
+            s++)
+        {
+            (*s)->GetBox().GetContactObjs().clear();
+            //???...need good way
+        }
+
+        //run physics
+        stef::real duration = (stef::real)(SDL_GetTicks() - phyLastStartTick) * 0.001f;
+        phyLastStartTick = SDL_GetTicks();
+        pWorld.RunPhysics(duration);
+
+        remins -= SDL_GetTicks() - tickA;
+    } while(remins > 0);
+#else
     if(0 == phyLastStartTick)
     {
         phyLastStartTick = SDL_GetTicks();
@@ -208,9 +245,8 @@ DBG_Status Scene::UpdatePhysics()
         phyStartTick = phyLastStartTick + TICKS_PER_FRAME;
     }
 
-    //temp: should be another place like at the beginning of a frame
     pWorld.StartFrame();
-    //temp
+
     for(std::list<SolidObj*>::iterator s = solidObjs.begin();
         s != solidObjs.end();
         s++)
@@ -219,10 +255,9 @@ DBG_Status Scene::UpdatePhysics()
         //???...need good way
     }
 
-    //run physics
     stef::real duration = (stef::real)(phyStartTick - phyLastStartTick) * 0.001f;
     pWorld.RunPhysics(duration);
-
+#endif
     return DBG_OK;
 }
 

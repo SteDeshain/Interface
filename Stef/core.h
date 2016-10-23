@@ -172,6 +172,20 @@ public:
         *this = VectorProduct(v);
     }
 
+    static bool SameSignal(real a, real b)
+    {
+        if(a == 0 && b == 0)
+            return true;
+        if(a * b > 0)
+            return true;
+
+        return false;
+    }
+    bool AtOneWay(const Vector3& v) const
+    {
+        return SameSignal(x, v.x) && SameSignal(y, v.y) && SameSignal(z, v.z);
+    }
+
 };
 
 }

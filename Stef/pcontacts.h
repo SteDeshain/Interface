@@ -29,6 +29,8 @@ public:
 //    real friction = 0.05f;  //default friction
     real friction = 0.5f;  //default friction
 
+    bool microCollision = false;
+
     Vector3 particleMovement[2];
 
     static real velocityLimit;

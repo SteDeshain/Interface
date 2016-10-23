@@ -52,7 +52,15 @@ DBG_Status Game1::Run()
 
 		Update();
 
-		UpdatePhysics();
+		//temp
+		Uint32 takingTicks = SDL_GetTicks() - startTime;
+		Uint32 reminingTicks;
+		if(takingTicks > TICKS_PER_FRAME)
+            reminingTicks = 0;
+        else
+            reminingTicks = TICKS_PER_FRAME - takingTicks;
+//		UpdatePhysics(reminingTicks);
+		UpdatePhysics(0);
 
 //		Draw();
 

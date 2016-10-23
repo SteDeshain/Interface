@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1477220791 source:/home/stedeshain/Studio/Interface/Interface/game1.cpp
+1477224519 source:/home/stedeshain/Studio/Interface/Interface/game1.cpp
 	"game1.h"
 	"scene1.h"
 	"color.h"
@@ -13,7 +13,7 @@
 	"label.h"
 	"drawable_comp.h"
 
-1477220388 /home/stedeshain/Studio/Interface/Steg/game.h
+1477224864 /home/stedeshain/Studio/Interface/Steg/game.h
 	<stack>
 	"SDL2/SDL.h"
 	"status.h"
@@ -22,7 +22,7 @@
 
 1475134562 /home/stedeshain/Studio/Interface/Steg/status.h
 
-1476946939 /home/stedeshain/Studio/Interface/Steg/scene.h
+1477224872 /home/stedeshain/Studio/Interface/Steg/scene.h
 	<list>
 	"SDL2/SDL.h"
 	"status.h"
@@ -43,7 +43,7 @@
 1477198075 /home/stedeshain/Studio/Interface/Stef/particle.h
 	"core.h"
 
-1477198075 /home/stedeshain/Studio/Interface/Stef/core.h
+1477226183 /home/stedeshain/Studio/Interface/Stef/core.h
 	"precision.h"
 
 1477198075 /home/stedeshain/Studio/Interface/Stef/precision.h
@@ -55,7 +55,7 @@
 	"core.h"
 	"particle.h"
 
-1477220181 /home/stedeshain/Studio/Interface/Stef/pcontacts.h
+1477227665 /home/stedeshain/Studio/Interface/Stef/pcontacts.h
 	"core.h"
 	"particle.h"
 
@@ -143,7 +143,7 @@
 	"game.h"
 	"game1.h"
 
-1477220332 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
+1477229224 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
 	"scene1.h"
 	"SDL2/SDL_ttf.h"
 	"stdio.h"
