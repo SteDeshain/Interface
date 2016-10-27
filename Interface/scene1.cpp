@@ -66,10 +66,10 @@ DBG_Status Scene1::InitScene()
     SolidObjInfo info;
     info.InitAsNormal(30, 128);
     info.SetPosition(150, 200, 0);
-//    info.gravitied = false;
-//    info.mass = REAL_MAX;
+    info.gravitied = false;
+    info.mass = REAL_MAX;
     info.altitude = 20;
-    info.elasticity = 0.9f;
+    info.elasticity = 0.0f;
     info.collideType = CollideC | CollideA;
     platform = new MultiDrawSolidObj(info, platformHeight * platformWidth, rects2, sRects2, "tiles.png", 1);
 
