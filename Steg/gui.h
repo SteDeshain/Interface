@@ -42,6 +42,9 @@ public:
     virtual void SetExtraTrans(float extraTrans);
     virtual float GetExtraTrans();
 
+    SDL_Point GetDrawSize();
+    SDL_Point GetEntireSize();
+
 protected:
 //    GUILayer layer; //smaller number is drawn first
     int drawIndex;  //the order to be drawn in a canvas, smaller number is drawn first
@@ -65,7 +68,11 @@ protected:
 
 //    virtual DBG_Status LoadTexture();
 
+    virtual DBG_Status OnSelected();
+    virtual DBG_Status OnUnSelected();
+
 private:
+    bool lastVisible = false;
 
 };
 
@@ -133,12 +140,6 @@ public:
 //	virtual bool IsVisible();
 	virtual void SetVisible(bool visible);
 
-	//override set position functions to reset canvas state machine's dest position
-	virtual void SetRelativePos(int x = 0, int y = 0);
-	virtual void SetRelativePos(SDL_Point point);
-	virtual void SetRelativeLeftTop(int x = 0, int y = 0);
-	virtual void SetRelativeLeftTop(SDL_Point point);
-
 	CanvasState* GetState(CanvasStateEnum stateEnum);
 
 	bool GetOriginVisible();
@@ -191,10 +192,43 @@ protected:
     DBG_Status InitInScene(Scene* scene);
     DBG_Status HandleEvent(SDL_Event event);
 
-    DBG_Status OnButtonPressed();
-    DBG_Status OnButtonReleased();
+    virtual DBG_Status OnButtonPressed();
+    virtual DBG_Status OnButtonReleased();
+
+    virtual DBG_Status OnSelected();
+    virtual DBG_Status OnUnSelected();
 
     SDL_Color color;
+    bool buttonDown = false;
+
+};
+
+class DragButton: public Button
+{
+
+public:
+    DragButton(int x, int y, SDL_Color color, SDL_Point buttonSize, SDL_Rect* area, Canvas* motherCanvas);
+    DragButton(int x, int y, const char* imgFile, SDL_Rect* area, Canvas* motherCanvas);
+
+    ~DragButton();
+
+protected:
+    SDL_Rect* area;
+
+    virtual DBG_Status Update(Uint32 deltTick);
+
+    virtual DBG_Status OnButtonPressed();
+    virtual DBG_Status OnButtonReleased();
+
+    virtual DBG_Status OnSelected();
+    virtual DBG_Status OnUnSelected();
+
+    bool followMouse = false;
+
+private:
+    void RestrictPosition();
+    void RestrictVertical();
+    void RestrictHorizon();
 
 };
 

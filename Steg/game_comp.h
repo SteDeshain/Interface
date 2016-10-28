@@ -49,6 +49,7 @@ public:
     bool KeyReleased(SDL_Scancode scanCode);
 
     SDL_Point GetMousePosition(int* x = NULL, int* y = NULL);
+    SDL_Point GetMouseMove(int* x = NULL, int* y = NULL);
 
     bool MouseLeftDown(int* x = NULL, int* y = NULL);
     bool MouseLeftPressed(int* x = NULL, int* y = NULL);
@@ -71,6 +72,7 @@ private:
     int keyNum;
 
     SDL_Point mousePosition;
+    SDL_Point lastMousePosition;
     Uint32 currentMouseState;
     Uint32 lastMouseState;
 

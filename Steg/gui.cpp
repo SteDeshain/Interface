@@ -2,6 +2,7 @@
 #include "sources_load.h"
 #include "color.h"
 #include "event_handler.h"
+#include "game.h"
 
 namespace steg
 {
@@ -65,6 +66,16 @@ float GUI::GetExtraTrans()
     return extraTrans;
 }
 
+SDL_Point GUI::GetDrawSize()
+{
+    return drawSize;
+}
+
+SDL_Point GUI::GetEntireSize()
+{
+    return entireSize;
+}
+
 DBG_Status GUI::HandleEvent(SDL_Event event)
 {
     DBG_Status status = DBG_OK;
@@ -75,18 +86,12 @@ DBG_Status GUI::HandleEvent(SDL_Event event)
         {
             if(selectable)
             {
-                selected = true;
-                motherScene->selectedGUIComp = this;
-                //temp
-//                SDL_SetTextureAlphaMod(currentTexture, 200);
+                OnSelected();
             }
         }
         else if(event.user.code == evcUnSelectGUIComp && event.user.data1 == this)
         {
-            selected = false;
-            motherScene->selectedGUIComp = NULL;
-            //temp
-//            SDL_SetTextureAlphaMod(currentTexture, 255);
+            OnUnSelected();
         }
     }
 
@@ -155,10 +160,11 @@ DBG_Status GUI::Update(Uint32 deltTick)
 
     SDL_SetTextureAlphaMod(currentTexture, 255.0f * finalTrans);
 
-    if(!visible && motherScene->selectedGUIComp == this)
-    {
-        motherScene->selectedGUIComp = NULL;
-    }
+    //it's very bad
+//    if(!visible && motherScene->selectedGUIComp == this)
+//    {
+//        motherScene->selectedGUIComp = NULL;
+//    }
 
     return status;
 }
@@ -227,6 +233,26 @@ SDL_Rect GUI::GetAbsDestRect(int* x, int* y, int* w, int* h)
 SDL_Rect GUI::CutSrcRect(SDL_Rect srcRect, SDL_Point destSize)
 {
     return srcRect;
+}
+
+DBG_Status GUI::OnSelected()
+{
+    DBG_Status status = DBG_OK;
+
+    selected = true;
+    motherScene->selectedGUIComp = this;
+
+    return status;
+}
+
+DBG_Status GUI::OnUnSelected()
+{
+    DBG_Status status = DBG_OK;
+
+    selected = false;
+    motherScene->selectedGUIComp = NULL;
+
+    return status;
 }
 
 //Canvas state machine functions
@@ -547,34 +573,6 @@ void Canvas::SetVisible(bool visible)
     this->originVisible = visible;
 }
 
-void Canvas::SetRelativePos(int x, int y)
-{
-    GUI::SetRelativePos(x, y);
-
-    ResetStateDestPos(this);
-}
-
-void Canvas::SetRelativePos(SDL_Point point)
-{
-    GUI::SetRelativePos(point);
-
-    ResetStateDestPos(this);
-}
-
-void Canvas::SetRelativeLeftTop(int x, int y)
-{
-    GUI::SetRelativeLeftTop(x, y);
-
-    ResetStateDestPos(this);
-}
-
-void Canvas::SetRelativeLeftTop(SDL_Point point)
-{
-    GUI::SetRelativeLeftTop(point);
-
-    ResetStateDestPos(this);
-}
-
 CanvasState* Canvas::GetState(CanvasStateEnum stateEnum)
 {
     switch(stateEnum)
@@ -707,50 +705,7 @@ DBG_Status Button::InitInScene(Scene* scene)
     SDL_Rect originDrawRect = drawRect;
     if(imgFile == NULL)
     {
-        SDL_Texture* originTarget = SDL_GetRenderTarget(scene->render);
-        SDL_Color originDrawColor;
-        SDL_GetRenderDrawColor(scene->render,
-                               &(originDrawColor.r),
-                               &(originDrawColor.g),
-                               &(originDrawColor.b),
-                               &(originDrawColor.a));
-
-        SDL_Texture* finTexture = SDL_CreateTexture(scene->render,
-                                                    SDL_PIXELFORMAT_RGBA8888,
-                                                    SDL_TEXTUREACCESS_TARGET,
-                                                    entireSize.x * 2,
-                                                    entireSize.y);
-
-        SDL_SetTextureBlendMode(finTexture, SDL_BLENDMODE_BLEND);
-
-        SDL_SetRenderTarget(scene->render, finTexture);
-
-        //draw unselected button
-        SDL_Color selectedColor = SDL_Color{color.r < 70 ? 0 : color.r - 70,
-                                            color.g < 70 ? 0 : color.g - 70,
-                                            color.b < 70 ? 0 : color.b - 70,
-                                            color.a};
-        SDL_SetRenderDrawColor(scene->render, selectedColor.r, selectedColor.g, selectedColor.b, selectedColor.a);
-        SDL_RenderClear(scene->render);
-
-        //draw selected button
-//        SDL_Rect selectedRect = SDL_Rect{entireSize.x, 0, entireSize.x, entireSize.y};
-        SDL_Rect rect1 = SDL_Rect{0, 0, entireSize.x - 2, entireSize.y - 2};
-        SDL_Rect rect2 = SDL_Rect{entireSize.x, 0, entireSize.x - 2, 2};
-        SDL_Rect rect3 = SDL_Rect{entireSize.x, 0, 2, entireSize.y - 2};
-        SDL_SetRenderDrawColor(scene->render, color.r, color.g, color.b, color.a);
-        SDL_RenderFillRect(scene->render, &(rect1));
-        SDL_RenderFillRect(scene->render, &(rect2));
-        SDL_RenderFillRect(scene->render, &(rect3));
-
-        SDL_SetRenderDrawColor(scene->render,
-                               originDrawColor.r,
-                               originDrawColor.g,
-                               originDrawColor.b,
-                               originDrawColor.a);
-        SDL_SetRenderTarget(scene->render, originTarget);
-
-        textures[0] = finTexture;
+        textures[0] = GetButtonTexture(scene->render, entireSize, color);
         currentTexture = textures[0];
     }
     else
@@ -792,8 +747,6 @@ DBG_Status Button::HandleEvent(SDL_Event event)
         }
         else if(event.user.code == evcUnSelectGUIComp && event.user.data1 == this)
         {
-            //temp
-//            SDL_SetTextureAlphaMod(currentTexture, 255);
             sourceStartPoint.x = 0;
         }
     }
@@ -805,8 +758,7 @@ DBG_Status Button::OnButtonPressed()
 {
     DBG_Status status = DBG_OK;
 
-    //temp
-//    SDL_SetTextureAlphaMod(currentTexture, 200);
+    buttonDown = true;
     sourceStartPoint.x = entireSize.x;
 
     return status;
@@ -816,11 +768,232 @@ DBG_Status Button::OnButtonReleased()
 {
     DBG_Status status = DBG_OK;
 
-    //temp
-//    SDL_SetTextureAlphaMod(currentTexture, 255);
+    if(buttonDown)
+    {
+        //push some events
+    }
+
+    buttonDown = false;
     sourceStartPoint.x = 0;
 
-    //push some events
+    return status;
+}
+
+DBG_Status Button::OnSelected()
+{
+    DBG_Status status = DBG_OK;
+
+    status |= GUI::OnSelected();
+
+    return status;
+}
+
+DBG_Status Button::OnUnSelected()
+{
+    DBG_Status status = DBG_OK;
+
+    status |= GUI::OnUnSelected();
+
+    buttonDown = false;
+    sourceStartPoint.x = 0;
+
+    return status;
+}
+
+DragButton::DragButton(int x, int y, SDL_Color color, SDL_Point buttonSize, SDL_Rect* area, Canvas* motherCanvas)
+    :Button(x, y, color, buttonSize, motherCanvas)
+{
+    this->area = new SDL_Rect;
+    if(this->area == NULL)
+        ENG_LogError("Cannot alloc SDL_Rect for DragButton's area.");
+    else
+    {
+        if(area)
+        {
+            *(this->area) = *area;
+        }
+        else
+        {
+            if(motherCanvas)
+                *(this->area) = SDL_Rect{0, 0, motherCanvas->GetEntireSize().x, motherCanvas->GetEntireSize().y};
+            else
+            {
+                delete (this->area);
+                this->area = NULL;
+            }
+        }
+    }
+}
+
+DragButton::DragButton(int x, int y, const char* imgFile, SDL_Rect* area, Canvas* motherCanvas)
+    :Button(x, y, imgFile, motherCanvas)
+{
+    this->area = new SDL_Rect;
+    if(this->area == NULL)
+        ENG_LogError("Cannot alloc SDL_Rect for DragButton's area.");
+    else
+    {
+        if(area)
+        {
+            *(this->area) = *area;
+        }
+        else
+        {
+            if(motherCanvas)
+                *(this->area) = SDL_Rect{0, 0, motherCanvas->GetEntireSize().x, motherCanvas->GetEntireSize().y};
+            else
+            {
+                *(this->area) = SDL_Rect{0, 0, Game::windowWidth, Game::windowHeight};
+            }
+        }
+    }
+}
+
+DragButton::~DragButton()
+{
+    if(area)
+        delete area;
+}
+
+DBG_Status DragButton::Update(Uint32 deltTick)
+{
+    DBG_Status status = DBG_OK;
+
+    status |= Button::Update(deltTick);
+
+    //follow mouse
+    if(followMouse)
+    {
+        //tmp
+        SetMove(motherScene->inputHandler->GetMouseMove());
+    }
+
+    //restrict posiiton
+    RestrictPosition();
+
+    return status;
+}
+
+void DragButton::RestrictPosition()
+{
+    if(area == NULL)
+        return;
+
+    bool noRestrictVert = false;
+    bool noRestrictHorz = false;
+    SDL_Point areaCenter = SDL_Point{area->x + area->w / 2, area->y + area->h / 2};
+
+    if(drawSize.x >= area->w)
+    {
+        SetRelativePos(areaCenter.x, this->y);
+        noRestrictHorz = true;
+    }
+    if(drawSize.y >= area->h)
+    {
+        SetRelativePos(this->x, areaCenter.y);
+        noRestrictVert = true;
+    }
+    if(noRestrictVert && noRestrictHorz)
+        return;
+
+    if(!noRestrictVert)
+        RestrictVertical();
+
+    if(!noRestrictHorz)
+        RestrictHorizon();
+}
+
+void DragButton::RestrictVertical()
+{
+    int canvTop = area->y;
+    int canvBottom = area->y + area->h;
+
+    int selfTop = GetRelativeLeftTop().y;
+    int selfBottom = GetRelativeLeftTop().y + drawSize.y;
+
+    if(selfTop < canvTop)
+    {
+        SetRelativeTop(canvTop);
+    }
+    else if(selfBottom > canvBottom)
+    {
+        SetRelativeBottom(canvBottom);
+    }
+    else
+    {
+        //do nothing
+    }
+}
+
+void DragButton::RestrictHorizon()
+{
+    int canvLeft = area->x;
+    int canvRight = area->x + area->w;
+
+    int selfLeft = GetRelativeLeftTop().x;
+    int selfRight = GetRelativeLeftTop().x + drawSize.x;
+
+    if(selfLeft < canvLeft)
+    {
+        SetRelativeLeft(canvLeft);
+    }
+    else if(selfRight > canvRight)
+    {
+        SetRelativeRight(canvRight);
+    }
+    else
+    {
+        //do nothing
+    }
+}
+
+DBG_Status DragButton::OnButtonPressed()
+{
+    DBG_Status status = DBG_OK;
+
+    status |= Button::OnButtonPressed();
+
+    followMouse = true;
+
+    //temp: to remove Scene->mouseOccupiedGUIComp
+    //occupy the mouse
+    motherScene->mouseOccupiedGUIComp = this;
+    //it's not elegant, so you should try not to put a drag button in a canvas with other kinds of selectable gui
+
+    return status;
+}
+
+DBG_Status DragButton::OnButtonReleased()
+{
+    DBG_Status status = DBG_OK;
+
+    status |= Button::OnButtonReleased();
+
+    followMouse = false;
+
+    motherScene->mouseOccupiedGUIComp = NULL;
+
+    return status;
+}
+
+DBG_Status DragButton::OnSelected()
+{
+    DBG_Status status = DBG_OK;
+
+    status |= Button::OnSelected();
+
+    return status;
+}
+
+DBG_Status DragButton::OnUnSelected()
+{
+    DBG_Status status = DBG_OK;
+
+    status |= Button::OnUnSelected();
+
+    //temp: not smooth
+    followMouse = false;
+    motherScene->mouseOccupiedGUIComp = NULL;
 
     return status;
 }

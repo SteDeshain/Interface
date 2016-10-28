@@ -89,6 +89,7 @@ public:
 	std::list<DrawableComp*> drawableComps;
 	std::list<GUI*> GUIComps;
 	GUI* selectedGUIComp;
+	GUI* mouseOccupiedGUIComp;
 	std::list<SolidObj*> solidObjs;
 
 private:

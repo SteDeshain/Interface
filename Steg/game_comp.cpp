@@ -108,6 +108,7 @@ InputHandler::InputHandler()
     }
 
     mousePosition = SDL_Point{0, 0};
+    lastMousePosition = SDL_Point{0, 0};
     currentMouseState = 0;
     lastMouseState = 0;
 }
@@ -133,6 +134,7 @@ DBG_Status InputHandler::Update(Uint32 deltTick)
     memcpy(currentKeyState, tmpKeyState, keyNum * sizeof(Uint8));
 
     lastMouseState = currentMouseState;
+    lastMousePosition = mousePosition;
     currentMouseState = SDL_GetMouseState(&(mousePosition.x), &(mousePosition.y));
 
     return status;
@@ -178,6 +180,19 @@ SDL_Point InputHandler::GetMousePosition(int* x, int* y)
         *y = mousePosition.y;
 
     return mousePosition;
+}
+
+SDL_Point InputHandler::GetMouseMove(int* x, int* y)
+{
+    SDL_Point mouseMove = SDL_Point{mousePosition.x - lastMousePosition.x,
+                                    mousePosition.y - lastMousePosition.y};
+
+    if(x)
+        *x = mouseMove.x;
+    if(y)
+        *y = mouseMove.y;
+
+    return mouseMove;
 }
 
 bool InputHandler::MouseLeftDown(int* x, int* y)
@@ -249,8 +264,19 @@ DBG_Status GUIOperateHandler::Update(Uint32 deltTick)
         g++)
     {
         //cannot operate hidden gui
-        if(!((*g)->IsSelectable()) || !((*g)->IsVisible()))
+        if(!((*g)->IsSelectable()))
             continue;
+
+        if(motherScene->mouseOccupiedGUIComp != NULL &&
+           motherScene->mouseOccupiedGUIComp != (*g))
+            continue;
+
+        if(!((*g)->IsVisible()))
+        {
+            if(motherScene->selectedGUIComp == (*g))
+                PushUnSelectGUICompEvent(*g);
+            continue;
+        }
 
         absRect = (*g)->GetAbsDestRect();
         mousePos = motherScene->inputHandler->GetMousePosition();

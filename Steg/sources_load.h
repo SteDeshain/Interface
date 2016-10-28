@@ -24,6 +24,7 @@ SDL_Texture* GetTargetTexture(SDL_Renderer* render, int w, int h, SDL_Window* wi
 SDL_Texture* GetTargetTexture(SDL_Renderer* render, SDL_Window* window);	//get a texture having the same size with the MainWindow
 
 SDL_Texture* GetColorTexture(SDL_Renderer* render, SDL_Point textureSize, SDL_Color color, float transparency);
+SDL_Texture* GetButtonTexture(SDL_Renderer* render, SDL_Point buttonSize, SDL_Color color);
 
 }
 

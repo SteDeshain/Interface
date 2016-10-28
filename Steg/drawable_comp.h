@@ -35,15 +35,21 @@ public:
 	void ShowComp();
 	void ToggleVisiblity();
 	void SetMove(int dx = 0, int dy = 0);
+	void SetMove(SDL_Point mov = SDL_Point{0, 0});
 	virtual bool IsVisible();
 	virtual void SetVisible(bool visible);
 
 	//set and get relative coordination to attachedPlatform
-	virtual void SetRelativePos(int x = 0, int y = 0);
-	virtual void SetRelativePos(SDL_Point point);
-	virtual void SetRelativeLeftTop(int x = 0, int y = 0);
-	virtual void SetRelativeLeftTop(SDL_Point point);
+	void SetRelativePos(int x = 0, int y = 0);
+	void SetRelativePos(SDL_Point point);
+    void SetRelativeLeftTop(int x = 0, int y = 0);
+    void SetRelativeLeftTop(SDL_Point point);
+	void SetRelativeLeft(int left);
+	void SetRelativeRight(int right);
+	void SetRelativeTop(int top);
+	void SetRelativeBottom(int bottom);
     SDL_Point GetRelativePos(int* x = NULL, int* y = NULL);
+    SDL_Point GetRelativeLeftTop(int* x = NULL, int* y = NULL);
 
 	//set and get absolute coordination to scene map
 	void SetAbsPos(int absX = 0, int absY = 0);         //

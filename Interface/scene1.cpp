@@ -164,7 +164,9 @@ DBG_Status Scene1::InitScene()
 
 //    Button* but = new Button(25, 60, GetColor(LightGray), SDL_Point{30, 30}, canv);
     Button* but = new Button(25, 60, "button.png", canv);
-    Button* but2 = new Button(100, 60, GetColor(LightGray), SDL_Point{60, 30}, canv);
+    SDL_Rect sizeArea = SDL_Rect{30, 25, 200, 0};
+    DragButton* but2 = new DragButton(100, 60, GetColor(LightGray), SDL_Point{60, 30}, &sizeArea, canv);
+//    DragButton* but2 = new DragButton(100, 60, GetColor(LightGray), SDL_Point{60, 30}, NULL, NULL);
 
     GUI* pic = new GUI(50, 300, 1, "character.png", motherCanv);
 
@@ -173,7 +175,8 @@ DBG_Status Scene1::InitScene()
           << platform
           << compCount << mapInfo << character << char2 << char3 << char4;
     *this << motherCanv << canv << temp << temp2;
-    *this << but << but2 << pic << childCanv << temp3 << but3;
+    *this << but << pic << childCanv << temp3 << but3;
+    *this << but2;
 
 //    canv->SetExtraTrans(0.8f);
 //    motherCanv->SetExtraTrans(0.8f);

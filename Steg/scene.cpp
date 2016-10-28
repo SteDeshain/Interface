@@ -130,6 +130,7 @@ Scene::Scene(int mapWidthNum, int mapHeightNum, SDL_Renderer* render)
     pWorld.GetContactGenerators().push_back(&collisionDetector);
 
     selectedGUIComp = NULL;
+    mouseOccupiedGUIComp = NULL;
 }
 
 Scene::~Scene()

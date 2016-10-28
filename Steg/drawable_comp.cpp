@@ -99,6 +99,11 @@ void DrawableComp::SetMove(int dx, int dy)
 	UpdateDestRect();
 }
 
+void DrawableComp::SetMove(SDL_Point mov)
+{
+    SetMove(mov.x, mov.y);
+}
+
 bool DrawableComp::IsVisible()
 {
     return visible;
@@ -139,6 +144,26 @@ void DrawableComp::SetRelativeLeftTop(SDL_Point point)
     SetRelativeLeftTop(point.x, point.y);
 }
 
+void DrawableComp::SetRelativeLeft(int left)
+{
+    SetRelativeLeftTop(left, this->y - drawRect.h / 2);
+}
+
+void DrawableComp::SetRelativeRight(int right)
+{
+    SetRelativeLeftTop(right - drawRect.w, this->y - drawRect.h / 2);
+}
+
+void DrawableComp::SetRelativeTop(int top)
+{
+    SetRelativeLeftTop(this->x - drawRect.w / 2, top);
+}
+
+void DrawableComp::SetRelativeBottom(int bottom)
+{
+    SetRelativeLeftTop(this->x - drawRect.w / 2, bottom - drawRect.h);
+}
+
 SDL_Point DrawableComp::GetRelativePos(int *x, int* y)
 {
     if(x)
@@ -147,6 +172,19 @@ SDL_Point DrawableComp::GetRelativePos(int *x, int* y)
         *y = this->y;
 
 	return (SDL_Point){this->x, this->y};
+}
+
+SDL_Point DrawableComp::GetRelativeLeftTop(int* x, int* y)
+{
+    int left = this->x - drawRect.w / 2;
+    int top = this->y - drawRect.h / 2;
+
+    if(x)
+        *x = left;
+    if(y)
+        *y = top;
+
+    return (SDL_Point){left, top};
 }
 
 //set and get absolute coordination to scene map
