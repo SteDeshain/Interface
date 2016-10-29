@@ -89,7 +89,8 @@ public:
 	std::list<DrawableComp*> drawableComps;
 	std::list<GUI*> GUIComps;
 	GUI* selectedGUIComp;
-	GUI* mouseOccupiedGUIComp;
+//	GUI* mouseOccupiedGUIComp;
+	GUI* pressedGUIComp;    //this should be handled by guiOperateHandler
 	std::list<SolidObj*> solidObjs;
 
 private:

@@ -109,6 +109,7 @@ public:
 
     //temp
     void SetScrollOffset(int dx, int dy);
+    SDL_Point GetScrollOffset(int* x = NULL, int* y = NULL);
 
     virtual void SetExtraTrans(float extraTrans);
     virtual float GetExtraTrans();
@@ -224,6 +225,8 @@ protected:
     virtual DBG_Status OnUnSelected();
 
     bool followMouse = false;
+
+    SDL_Point sizeAnchor;
 
 private:
     void RestrictPosition();

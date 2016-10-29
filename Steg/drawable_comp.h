@@ -56,6 +56,10 @@ public:
 	void SetAbsPos(SDL_Point absPoint);                 //they actualy set the relative x and y
 	SDL_Point GetAbsPos(int* absX = NULL, int* absY = NULL);    //return SDL_point value as absPos, and assign it to *x and *y
 
+    void SetAbsLeftTop(int absLeft = 0, int absTop = 0);
+    void SetAbsLeftTop(SDL_Point absLeftTop);
+    SDL_Point GetAbsLeftTop(int* absLeft = NULL, int* absTop = NULL);
+
 	//set source and draw rect
 	void SetRelativeDrawRect(SDL_Rect drawRect);    //not usually used actually, often use SetRelativePos() and SetDrawSize() instead
 	SDL_Rect GetRelativeDrawRect();

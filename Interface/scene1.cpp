@@ -165,7 +165,8 @@ DBG_Status Scene1::InitScene()
 //    Button* but = new Button(25, 60, GetColor(LightGray), SDL_Point{30, 30}, canv);
     Button* but = new Button(25, 60, "button.png", canv);
     SDL_Rect sizeArea = SDL_Rect{30, 25, 200, 0};
-    DragButton* but2 = new DragButton(100, 60, GetColor(LightGray), SDL_Point{60, 30}, &sizeArea, canv);
+//    DragButton* but2 = new DragButton(100, 60, GetColor(LightGray), SDL_Point{60, 30}, &sizeArea, canv);
+    DragButton* but2 = new DragButton(100, 60, GetColor(LightGray), SDL_Point{60, 30}, NULL, canv);
 //    DragButton* but2 = new DragButton(100, 60, GetColor(LightGray), SDL_Point{60, 30}, NULL, NULL);
 
     GUI* pic = new GUI(50, 300, 1, "character.png", motherCanv);
@@ -312,10 +313,11 @@ DBG_Status Scene1::Update(Uint32 deltTick)
                                                      char3->frontObjs.size(),
                                                      char4->frontObjs.size());
 	charsFrontObjsNum->ReloadTexture(buffer);
-	sprintf(buffer, "grounded: %s, %d, %d, %s, %d, %f, %d", character->IsGrounded() ? "true" : "false",
+	sprintf(buffer, "grounded: %s, %d, %d, %s, %d, %d, %f, %d", character->IsGrounded() ? "true" : "false",
                                                 character->GetBox().GetContactObjs().size(),
                                                 pWorld.GetParticles().size(),
                                                 inputHandler->MouseLeftDown() ? "left pressed" : "not pressed",
+                                                pressedGUIComp,
                                                 selectedGUIComp,
                                                 character->GetBox().GetMotion(),
                                                 phyStepCount);

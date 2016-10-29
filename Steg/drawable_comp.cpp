@@ -1,6 +1,7 @@
 #include "drawable_comp.h"
 #include "color.h"
 #include <iostream>
+#include "gui.h"
 
 namespace steg
 {
@@ -191,12 +192,19 @@ SDL_Point DrawableComp::GetRelativeLeftTop(int* x, int* y)
 void DrawableComp::SetAbsPos(int absX, int absY)
 {
     //temp
-    if(NULL == attachedPlatform)
-        SetRelativePos(absX, absY);
-    else
-    {
-        //temp
-    }
+    SetAbsPos(SDL_Point{absX, absY});
+
+//    //temp
+//    if(NULL == attachedPlatform)
+//        SetRelativePos(absX, absY);
+//    else
+//    {
+//        //temp: need a better way?
+////        SDL_Point originAbsPos = GetAbsPos();
+////        int dy = originAbsPos.y - absY;
+////        int dx = originAbsPos.x - absX;
+////        SetRelativePos(x - dx, y - dy);
+//    }
 }
 
 void DrawableComp::SetAbsPos(SDL_Point absPoint)
@@ -206,7 +214,43 @@ void DrawableComp::SetAbsPos(SDL_Point absPoint)
         SetRelativePos(absPoint.x, absPoint.y);
     else
     {
-        //temp
+#if 0
+        //temp: need a better way?
+        SDL_Point originAbsPos = GetAbsPos();
+        int dy = originAbsPos.y - absPoint.y;
+        int dx = originAbsPos.x - absPoint.x;
+        SetRelativePos(x - dx, y - dy);
+#else
+        //a better way
+        DrawableComp* currentPlatform = attachedPlatform;
+        std::list<DrawableComp*> platformsList;
+        while(currentPlatform)
+        {
+            platformsList.push_front(currentPlatform);
+            currentPlatform = currentPlatform->attachedPlatform;
+        }
+        SDL_Point currentPos = absPoint;
+        SDL_Point platformLeftTop;
+        Canvas* currentCanv = NULL;
+        for(std::list<DrawableComp*>::iterator p = platformsList.begin();
+            p != platformsList.end();
+            p++)
+        {
+            //apply to each platform
+            platformLeftTop = (*p)->GetRelativeLeftTop();
+            if(currentCanv = dynamic_cast<Canvas*>(*p))
+            {
+                //apply the scroll effect
+                SDL_Point canvScroll = currentCanv->GetScrollOffset();
+                platformLeftTop.x -= canvScroll.x;
+                platformLeftTop.y -= canvScroll.y;
+            }
+            currentPos.x -= platformLeftTop.x;
+            currentPos.y -= platformLeftTop.y;
+        }
+        //get the final relative position
+        SetRelativePos(currentPos);
+#endif // 0
     }
 }
 
@@ -229,6 +273,33 @@ SDL_Point DrawableComp::GetAbsPos(int* absX, int* absY)
         *absY = currentY;
 
     return SDL_Point{currentX, currentY};
+}
+
+void DrawableComp::SetAbsLeftTop(int absLeft, int absTop)
+{
+    int absX = absLeft + drawRect.w / 2;
+    int absY = absTop + drawRect.h / 2;
+    SetAbsPos(absX, absY);
+}
+
+void DrawableComp::SetAbsLeftTop(SDL_Point absLeftTop)
+{
+    int absX = absLeftTop.x + drawRect.w / 2;
+    int absY = absLeftTop.y + drawRect.h / 2;
+    SetAbsPos(absX, absY);
+}
+
+SDL_Point DrawableComp::GetAbsLeftTop(int* absLeft, int* absTop)
+{
+    SDL_Point center = GetAbsPos();
+    int left = center.x - drawRect.w / 2;
+    int top = center.y - drawRect.h / 2;
+    if(absLeft)
+        *absLeft = left;
+    if(absTop)
+        *absTop = top;
+
+    return SDL_Point{left, top};
 }
 
 //GetAbsDestRect() should use the destRect to calculate

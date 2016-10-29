@@ -329,7 +329,6 @@ static DBG_Status IdleHandleEvent(SDL_Event event, Canvas* canvas, CanvasState* 
         {
             if(event.user.code == evcShowCanvas && event.user.data1 == canvas)
             {
-//                if(!canvas->GetOriginVisible())
                 if(!canvas->IsVisible())
                 {
                     canvas->SetCanvasState(Canvas::StateEnumShow);
@@ -338,7 +337,6 @@ static DBG_Status IdleHandleEvent(SDL_Event event, Canvas* canvas, CanvasState* 
             }
             else if(event.user.code == evcHideCanvas && event.user.data1 == canvas)
             {
-//                if(canvas->GetOriginVisible())
                 if(canvas->IsVisible())
                 {
                     canvas->SetCanvasState(Canvas::StateEnumHide);
@@ -427,7 +425,7 @@ Canvas::Canvas(SDL_Color color, float transparency, SDL_Rect viewRect, SDL_Point
     canvasHide.Update = HideUpdate;
     canvasHide.totalMove = 0.0f;
 
-    currentState = &canvasIdle;      //default as Idle state(already shown)
+    currentState = &canvasIdle;      //default as Idle state(already shown or already hidden)
 }
 
 Canvas::Canvas(const char* imgFile, float transparency, SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas)
@@ -480,6 +478,15 @@ void Canvas::SetScrollOffset(int dx, int dy)
         scrollOffset.y = 0;
     else if(scrollOffset.y > entireSize.y - drawSize.y)
         scrollOffset.y = entireSize.y - drawSize.y;
+}
+
+SDL_Point Canvas::GetScrollOffset(int* x, int* y)
+{
+    if(x)
+        *x = scrollOffset.x;
+    if(y)
+        *y = scrollOffset.y;
+    return scrollOffset;
 }
 
 static void ResetStateDestPos(Canvas* canvas)
@@ -761,6 +768,9 @@ DBG_Status Button::OnButtonPressed()
     buttonDown = true;
     sourceStartPoint.x = entireSize.x;
 
+    //when to set pressedGUIComp to NULL, should be handled by guiOperatHandler
+    motherScene->pressedGUIComp = this;
+
     return status;
 }
 
@@ -768,10 +778,14 @@ DBG_Status Button::OnButtonReleased()
 {
     DBG_Status status = DBG_OK;
 
-    if(buttonDown)
-    {
-        //push some events
-    }
+//    if(buttonDown)    //no more need
+//    {
+//    }
+
+//    motherScene->pressedGUIComp = NULL;   //now it's handled by guiOperatHandler
+
+    //push some events
+    //...
 
     buttonDown = false;
     sourceStartPoint.x = 0;
@@ -796,6 +810,11 @@ DBG_Status Button::OnUnSelected()
 
     buttonDown = false;
     sourceStartPoint.x = 0;
+
+//    if(motherScene->pressedGUIComp == this)
+//    {
+//        motherScene->pressedGUIComp = NULL;
+//    }
 
     return status;
 }
@@ -823,6 +842,8 @@ DragButton::DragButton(int x, int y, SDL_Color color, SDL_Point buttonSize, SDL_
             }
         }
     }
+
+    sizeAnchor = SDL_Point{0, 0};
 }
 
 DragButton::DragButton(int x, int y, const char* imgFile, SDL_Rect* area, Canvas* motherCanvas)
@@ -847,6 +868,8 @@ DragButton::DragButton(int x, int y, const char* imgFile, SDL_Rect* area, Canvas
             }
         }
     }
+
+    sizeAnchor = SDL_Point{0, 0};
 }
 
 DragButton::~DragButton()
@@ -862,10 +885,12 @@ DBG_Status DragButton::Update(Uint32 deltTick)
     status |= Button::Update(deltTick);
 
     //follow mouse
-    if(followMouse)
+//    if(followMouse)
+    if(motherScene->pressedGUIComp == this)
     {
-        //tmp
-        SetMove(motherScene->inputHandler->GetMouseMove());
+//        SetAbsPos(motherScene->inputHandler->GetMousePosition());
+        SetAbsLeftTop(motherScene->inputHandler->GetMousePosition().x - sizeAnchor.x,
+                      motherScene->inputHandler->GetMousePosition().y - sizeAnchor.y);
     }
 
     //restrict posiiton
@@ -955,9 +980,15 @@ DBG_Status DragButton::OnButtonPressed()
 
     followMouse = true;
 
+    //set the size anchor
+    SDL_Rect absDestRect = GetAbsDestRect();    //temp: 待优化
+    sizeAnchor = SDL_Point{absDestRect.x, absDestRect.y};
+    sizeAnchor.x = motherScene->inputHandler->GetMousePosition().x - sizeAnchor.x;
+    sizeAnchor.y = motherScene->inputHandler->GetMousePosition().y - sizeAnchor.y;
+
     //temp: to remove Scene->mouseOccupiedGUIComp
     //occupy the mouse
-    motherScene->mouseOccupiedGUIComp = this;
+//    motherScene->mouseOccupiedGUIComp = this;
     //it's not elegant, so you should try not to put a drag button in a canvas with other kinds of selectable gui
 
     return status;
@@ -971,7 +1002,7 @@ DBG_Status DragButton::OnButtonReleased()
 
     followMouse = false;
 
-    motherScene->mouseOccupiedGUIComp = NULL;
+//    motherScene->mouseOccupiedGUIComp = NULL;
 
     return status;
 }
@@ -991,9 +1022,10 @@ DBG_Status DragButton::OnUnSelected()
 
     status |= Button::OnUnSelected();
 
-    //temp: not smooth
+    //temp!: not smooth
+    //try to use Scene's pressedButton(no implementation yet)
     followMouse = false;
-    motherScene->mouseOccupiedGUIComp = NULL;
+//    motherScene->mouseOccupiedGUIComp = NULL;
 
     return status;
 }

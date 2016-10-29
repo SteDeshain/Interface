@@ -258,7 +258,7 @@ DBG_Status GUIOperateHandler::Update(Uint32 deltTick)
     DBG_Status status = DBG_OK;
 
     SDL_Rect absRect;
-    SDL_Point mousePos;
+    SDL_Point mousePos = motherScene->inputHandler->GetMousePosition();
     for(std::list<GUI*>::iterator g = motherScene->GUIComps.begin();
         g != motherScene->GUIComps.end();
         g++)
@@ -267,8 +267,12 @@ DBG_Status GUIOperateHandler::Update(Uint32 deltTick)
         if(!((*g)->IsSelectable()))
             continue;
 
-        if(motherScene->mouseOccupiedGUIComp != NULL &&
-           motherScene->mouseOccupiedGUIComp != (*g))
+//        if(motherScene->mouseOccupiedGUIComp != NULL &&
+//           motherScene->mouseOccupiedGUIComp != (*g))
+//            continue;
+
+        if(motherScene->pressedGUIComp != NULL &&
+           motherScene->pressedGUIComp != (*g))
             continue;
 
         if(!((*g)->IsVisible()))
@@ -279,16 +283,17 @@ DBG_Status GUIOperateHandler::Update(Uint32 deltTick)
         }
 
         absRect = (*g)->GetAbsDestRect();
-        mousePos = motherScene->inputHandler->GetMousePosition();
         if(SDL_PointInRect(&mousePos, &absRect) == SDL_TRUE &&
-           motherScene->selectedGUIComp != (*g))
+           motherScene->selectedGUIComp == NULL)    //when two gui overlaps, use it will avoid unsteablitition
+//           motherScene->selectedGUIComp != (*g))
         {
             PushSelectGUICompEvent(*g);
         }
         else if(SDL_PointInRect(&mousePos, &absRect) == SDL_FALSE &&
                 motherScene->selectedGUIComp == (*g))
         {
-            PushUnSelectGUICompEvent(*g);
+            if(motherScene->pressedGUIComp != *g)
+                PushUnSelectGUICompEvent(*g);
         }
     }
 
@@ -296,9 +301,23 @@ DBG_Status GUIOperateHandler::Update(Uint32 deltTick)
     if(motherScene->selectedGUIComp != NULL)
     {
         if(motherScene->inputHandler->MouseLeftPressed())
+        {
             PushPressedButtonEvent(motherScene->selectedGUIComp);
+//            motherScene->pressedGUIComp = motherScene->selectedGUIComp;   //now it's handled by gui's OnButtonPressed
+        }
         else if(motherScene->inputHandler->MouseLeftReleased())
-            PushReleasedButtonEvent(motherScene->selectedGUIComp);
+        {
+            absRect = motherScene->selectedGUIComp->GetAbsDestRect();
+            if(SDL_PointInRect(&mousePos, &absRect) == SDL_TRUE)
+            {
+                PushReleasedButtonEvent(motherScene->selectedGUIComp);
+            }
+        }
+    }
+
+    if(motherScene->inputHandler->MouseLeftReleased())
+    {
+        motherScene->pressedGUIComp = NULL;
     }
 
     return status;
