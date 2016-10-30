@@ -34,6 +34,10 @@ public:
     GUI(int x, int y, int textureNum, const char* imgFile = NULL, Canvas* canvas = NULL);
     GUI(int x, int y, int drawIndex, Canvas* canvas = NULL);    //for textureNum == 1
     GUI(int textureNum, const char* imgFile = NULL, Canvas* canvas = NULL);
+
+    //get color picture
+    GUI(int x, int y, SDL_Point picSize, SDL_Color color, Canvas* canvas = NULL);
+
     ~GUI();
 
     bool IsSelectable();
@@ -44,6 +48,8 @@ public:
 
     SDL_Point GetDrawSize();
     SDL_Point GetEntireSize();
+
+    void ResetFollowingCanvas(Canvas* newFollowingCanvas);
 
 protected:
 //    GUILayer layer; //smaller number is drawn first
@@ -74,6 +80,12 @@ protected:
 private:
     bool lastVisible = false;
 
+    //this followingCanvas is used in Update() to set extra transparency
+    //by default, the followingCanvas is the attachedPlatform
+    //but for scroll bar's components, their followingCanvas should be the canvas controled by the scroll bar
+    //rather than their attachedPlatform
+    DrawableComp* followingCanvas = NULL;
+
 };
 
 enum SlideWay
@@ -95,6 +107,8 @@ struct CanvasState
 //    float deltTransPerTick;   //read from slideInfo
 };
 
+class ScrollBar;
+
 class Canvas: public GUI
 {
     friend class GUI;
@@ -109,6 +123,8 @@ public:
 
     //temp
     void SetScrollOffset(int dx, int dy);
+    void SetScrollHorizon(float xRatio);
+    void SetScrollVerticle(float yRatio);
     SDL_Point GetScrollOffset(int* x = NULL, int* y = NULL);
 
     virtual void SetExtraTrans(float extraTrans);
@@ -145,6 +161,9 @@ public:
 
 	bool GetOriginVisible();
 
+	ScrollBar* GetHorizonScrollBar();
+	ScrollBar* GetVerticleScrollBar();
+
 protected:
     //Canvas* motherCanvas;     //actually it's the attached platform
 //    SDL_Rect viewRect;      //view rect to be drawn relative to mother canvas' left-top
@@ -174,9 +193,15 @@ protected:
     CanvasState canvasHide;
     CanvasState* currentState;
 
-    virtual DBG_Status InitInScene(Scene* scene);
+    ScrollBar* horizonScrollBar = NULL;
+    ScrollBar* verticleScrollBar = NULL;
+
+    virtual DBG_Status InitInScene(Scene* scene);   //check whether need to add or remove scroll bar
     virtual DBG_Status Update(Uint32 deltTick);
     virtual DBG_Status HandleEvent(SDL_Event event);
+
+    DBG_Status ResetTexture(const char* newImg = NULL);             //check whether need to add or remove or reset scroll bar
+    DBG_Status ResetTexture(SDL_Point newSize = SDL_Point{0, 0});   //check whether need to add or remove or reset scroll bar
 
     virtual SDL_Rect CutSrcRect(SDL_Rect srcRect, SDL_Point destSize);
 
@@ -195,6 +220,7 @@ protected:
 
     virtual DBG_Status OnButtonPressed();
     virtual DBG_Status OnButtonReleased();
+    virtual DBG_Status OnButtonDumped();
 
     virtual DBG_Status OnSelected();
     virtual DBG_Status OnUnSelected();
@@ -213,6 +239,9 @@ public:
 
     ~DragButton();
 
+    float ReportHorizonRatio();
+    float ReportVerticleRatio();
+
 protected:
     SDL_Rect* area;
 
@@ -224,7 +253,7 @@ protected:
     virtual DBG_Status OnSelected();
     virtual DBG_Status OnUnSelected();
 
-    bool followMouse = false;
+//    bool followMouse = false;
 
     SDL_Point sizeAnchor;
 
@@ -232,6 +261,37 @@ private:
     void RestrictPosition();
     void RestrictVertical();
     void RestrictHorizon();
+
+};
+
+enum ScrollBarWay
+{
+    scrHorizon,
+    scrVerticle,
+};
+
+class ScrollBar: public GameComp
+{
+
+public:
+    static int scrollBarSize;
+
+public:
+    ScrollBar(Canvas* attachedCanvas, ScrollBarWay way);    //default look
+
+    ~ScrollBar();
+
+protected:
+    SDL_Color color;
+    DragButton* rollBar;
+    Button* minusButton;
+    Button* addButton;
+    GUI* rollBackground;
+    const ScrollBarWay way;
+    Canvas* attachedCanvas;
+
+    virtual DBG_Status InitInScene(Scene* scene);
+    virtual DBG_Status Update(Uint32 deltTick);     //where control the canvas show and scroll bar update
 
 };
 

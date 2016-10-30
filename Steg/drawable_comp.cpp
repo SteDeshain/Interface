@@ -188,6 +188,19 @@ SDL_Point DrawableComp::GetRelativeLeftTop(int* x, int* y)
     return (SDL_Point){left, top};
 }
 
+SDL_Point DrawableComp::GetRelativeRightBottom(int* x, int* y)
+{
+    int right = this->x + drawRect.w / 2;
+    int bottom = this->y + drawRect.h / 2;
+
+    if(x)
+        *x = right;
+    if(y)
+        *y = bottom;
+
+    return (SDL_Point){right, bottom};
+}
+
 //set and get absolute coordination to scene map
 void DrawableComp::SetAbsPos(int absX, int absY)
 {

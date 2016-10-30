@@ -14,6 +14,7 @@ GUI::GUI(int x, int y, int textureNum, const char* imgFile, Canvas* canvas)
     selected = false;
     sourceStartPoint = SDL_Point{0, 0};
     extraTrans = 1.0f;
+    followingCanvas = canvas;
 }
 
 GUI::GUI(int x, int y, int drawIndex, Canvas* canvas)
@@ -23,6 +24,7 @@ GUI::GUI(int x, int y, int drawIndex, Canvas* canvas)
     selected = false;
     sourceStartPoint = SDL_Point{0, 0};
     extraTrans = 1.0f;
+    followingCanvas = canvas;
 }
 
 GUI::GUI(int textureNum, const char* imgFile, Canvas* canvas)
@@ -32,6 +34,18 @@ GUI::GUI(int textureNum, const char* imgFile, Canvas* canvas)
     selected = false;
     sourceStartPoint = SDL_Point{0, 0};
     extraTrans = 1.0f;
+    followingCanvas = canvas;
+}
+
+//color texture
+GUI::GUI(int x, int y, SDL_Point picSize, SDL_Color color, Canvas* canvas)
+    :DrawableComp(x, y, 1, NULL, canvas)
+{
+    selectable = false;
+    selected = false;
+    sourceStartPoint = SDL_Point{0, 0};
+    extraTrans = 1.0f;
+    followingCanvas = canvas;
 }
 
 GUI::~GUI()
@@ -114,7 +128,6 @@ DBG_Status GUI::InitInScene(Scene *scene)
     scene->GUIComps.push_back(this);
 
     SDL_GetTextureAlphaMod(currentTexture, &textureAlpha);
-//    textureAlpha = 255;
 
     return status;
 }
@@ -133,7 +146,8 @@ DBG_Status GUI::Update(Uint32 deltTick)
     float finalTrans = (float)textureAlpha / 255.0f * extraTrans;
 
     //follow canvas
-    Canvas* canvas = dynamic_cast<Canvas*>(attachedPlatform);
+//    Canvas* canvas = dynamic_cast<Canvas*>(attachedPlatform);
+    Canvas* canvas = dynamic_cast<Canvas*>(followingCanvas);
     if(canvas)
     {
 //        visible = canvas->IsVisible();
@@ -159,12 +173,6 @@ DBG_Status GUI::Update(Uint32 deltTick)
     }
 
     SDL_SetTextureAlphaMod(currentTexture, 255.0f * finalTrans);
-
-    //it's very bad
-//    if(!visible && motherScene->selectedGUIComp == this)
-//    {
-//        motherScene->selectedGUIComp = NULL;
-//    }
 
     return status;
 }
@@ -253,6 +261,11 @@ DBG_Status GUI::OnUnSelected()
     motherScene->selectedGUIComp = NULL;
 
     return status;
+}
+
+void GUI::ResetFollowingCanvas(Canvas* newFollowingCanvas)
+{
+    this->followingCanvas = newFollowingCanvas;
 }
 
 //Canvas state machine functions
@@ -480,6 +493,20 @@ void Canvas::SetScrollOffset(int dx, int dy)
         scrollOffset.y = entireSize.y - drawSize.y;
 }
 
+void Canvas::SetScrollHorizon(float xRatio)
+{
+    int width = entireSize.x - drawSize.x;
+    width *= xRatio;
+    scrollOffset.x = width;
+}
+
+void Canvas::SetScrollVerticle(float yRatio)
+{
+    int height = entireSize.y - drawSize.y;
+    height *= yRatio;
+    scrollOffset.y = height;
+}
+
 SDL_Point Canvas::GetScrollOffset(int* x, int* y)
 {
     if(x)
@@ -602,6 +629,16 @@ bool Canvas::GetOriginVisible()
     return originVisible;
 }
 
+ScrollBar* Canvas::GetHorizonScrollBar()
+{
+    return horizonScrollBar;
+}
+
+ScrollBar* Canvas::GetVerticleScrollBar()
+{
+    return verticleScrollBar;
+}
+
 DBG_Status Canvas::InitInScene(Scene* scene)
 {
     DBG_Status status = DBG_OK;
@@ -671,7 +708,55 @@ DBG_Status Canvas::HandleEvent(SDL_Event event)
     if(currentState->HandleEvent)
         currentState->HandleEvent(event, this, currentState);
 
+    if(event.user.type == CustomEventsType[CUSTOM_GUIEVENT])
+    {
+        if(event.user.code == evcResizeCanvas && event.user.data1 == this)
+        {
+            SDL_Point* pNewSize = (SDL_Point*)(event.user.data2);   //danger!
+            if(pNewSize)
+            {
+                ResetTexture(*pNewSize);
+            }
+        }
+    }
+
     return status;
+}
+
+DBG_Status Canvas::ResetTexture(const char* newImg)
+{
+}
+
+DBG_Status Canvas::ResetTexture(SDL_Point newSize)
+{
+    if(imgFile != NULL)
+    {
+        ENG_LogError("Cannot resize canvas with picture texture.");
+        return DBG_ARG_ERR;
+    }
+
+    if(newSize.x == entireSize.x && newSize.y == entireSize.y)
+        return DBG_OK;
+
+    if(newSize.x < drawSize.x)
+        newSize.x = drawSize.x;
+    if(newSize.y < drawSize.y)
+        newSize.y = drawSize.y;
+
+    SDL_Texture* newTex = GetColorTexture(motherScene->render, newSize, color, transparency);
+    if(newTex)
+    {
+        SDL_DestroyTexture(textures[0]);
+        textures[0] = newTex;
+        currentTexture = textures[0];
+        entireSize = newSize;
+        return DBG_OK;
+    }
+    else
+    {
+        //do no change
+        return DBG_SDL_ERR;
+    }
 }
 
 SDL_Rect Canvas::CutSrcRect(SDL_Rect srcRect, SDL_Point destSize)
@@ -752,6 +837,10 @@ DBG_Status Button::HandleEvent(SDL_Event event)
         {
             OnButtonReleased();
         }
+        else if(event.user.code == evcDumpButton && event.user.data1 == this)
+        {
+            OnButtonDumped();
+        }
         else if(event.user.code == evcUnSelectGUIComp && event.user.data1 == this)
         {
             sourceStartPoint.x = 0;
@@ -789,6 +878,18 @@ DBG_Status Button::OnButtonReleased()
 
     buttonDown = false;
     sourceStartPoint.x = 0;
+
+    return status;
+}
+
+DBG_Status Button::OnButtonDumped()
+{
+    DBG_Status status = DBG_OK;
+
+    buttonDown = false;
+    sourceStartPoint.x = 0;
+
+    motherScene->pressedGUIComp = NULL;
 
     return status;
 }
@@ -876,6 +977,16 @@ DragButton::~DragButton()
 {
     if(area)
         delete area;
+}
+
+float DragButton::ReportHorizonRatio()
+{
+    return float(GetRelativeLeftTop().x - area->x) / float(area->w - drawSize.x);
+}
+
+float DragButton::ReportVerticleRatio()
+{
+    return float(GetRelativeLeftTop().y - area->y) / float(area->h - drawSize.y);
 }
 
 DBG_Status DragButton::Update(Uint32 deltTick)
@@ -978,7 +1089,7 @@ DBG_Status DragButton::OnButtonPressed()
 
     status |= Button::OnButtonPressed();
 
-    followMouse = true;
+//    followMouse = true;
 
     //set the size anchor
     SDL_Rect absDestRect = GetAbsDestRect();    //temp: 待优化
@@ -1000,7 +1111,7 @@ DBG_Status DragButton::OnButtonReleased()
 
     status |= Button::OnButtonReleased();
 
-    followMouse = false;
+//    followMouse = false;
 
 //    motherScene->mouseOccupiedGUIComp = NULL;
 
@@ -1024,8 +1135,135 @@ DBG_Status DragButton::OnUnSelected()
 
     //temp!: not smooth
     //try to use Scene's pressedButton(no implementation yet)
-    followMouse = false;
+//    followMouse = false;
 //    motherScene->mouseOccupiedGUIComp = NULL;
+
+    return status;
+}
+
+int ScrollBar::scrollBarSize = 16;
+
+ScrollBar::ScrollBar(Canvas* attachedCanvas, ScrollBarWay way)
+    :GameComp(), way(way)
+{
+    color = GetColor(LightGray);    //default color
+    rollBar = NULL;
+    minusButton = NULL;
+    addButton = NULL;
+    rollBackground = NULL;
+//    this->way = way;
+    this->attachedCanvas = attachedCanvas;
+    if(attachedCanvas == NULL)
+    {
+        ENG_LogError("attachedCanvas for ScrollBar can't be NULL!");
+    }
+    else
+    {
+        int canvasLeft, canvasTop, canvasRight, canvasBottom;
+        attachedCanvas->GetRelativeLeftTop(&canvasLeft, &canvasTop);
+        attachedCanvas->GetRelativeRightBottom(&canvasRight, &canvasBottom);
+        Canvas* motherCanvas = dynamic_cast<Canvas*>(attachedCanvas->GetAttachedPlatform());
+        SDL_Color backgroundColor = SDL_Color{color.r < 70 ? 0 : color.r - 70,
+                                              color.g < 70 ? 0 : color.g - 70,
+                                              color.b < 70 ? 0 : color.b - 70,
+                                              color.a};
+        SDL_Rect moveArea;
+        //malloc
+        switch(way)
+        {
+        case scrVerticle:
+
+            moveArea = SDL_Rect{canvasRight + ScrollBar::scrollBarSize / 2, canvasTop + ScrollBar::scrollBarSize,
+                                         0, canvasBottom - canvasTop - ScrollBar::scrollBarSize * 2};
+            rollBar = new DragButton(canvasRight + ScrollBar::scrollBarSize / 2, canvasTop + ScrollBar::scrollBarSize,
+                                     color, SDL_Point{ScrollBar::scrollBarSize, ScrollBar::scrollBarSize * 3},  //temp
+                                     &moveArea, motherCanvas);
+            minusButton = new Button(canvasRight + ScrollBar::scrollBarSize / 2, canvasTop + ScrollBar::scrollBarSize / 2,
+                                     color, SDL_Point{ScrollBar::scrollBarSize, ScrollBar::scrollBarSize}, motherCanvas);
+            addButton = new Button(canvasRight + ScrollBar::scrollBarSize / 2, canvasBottom - ScrollBar::scrollBarSize / 2,
+                                   color, SDL_Point{ScrollBar::scrollBarSize, ScrollBar::scrollBarSize}, motherCanvas);
+
+            break;
+
+        case scrHorizon:
+        default:
+
+            moveArea = SDL_Rect{canvasLeft + ScrollBar::scrollBarSize, canvasBottom + ScrollBar::scrollBarSize / 2,
+                                         canvasRight - canvasLeft - ScrollBar::scrollBarSize * 2, 0};
+            rollBar = new DragButton(canvasLeft + ScrollBar::scrollBarSize, canvasBottom + ScrollBar::scrollBarSize / 2,
+                                     color, SDL_Point{ScrollBar::scrollBarSize * 3, ScrollBar::scrollBarSize},    //temp
+                                     &moveArea, motherCanvas);
+            minusButton = new Button(canvasLeft + ScrollBar::scrollBarSize / 2, canvasBottom + ScrollBar::scrollBarSize / 2,
+                                     color, SDL_Point{ScrollBar::scrollBarSize, ScrollBar::scrollBarSize}, motherCanvas);
+            addButton = new Button(canvasRight - ScrollBar::scrollBarSize / 2, canvasBottom + ScrollBar::scrollBarSize / 2,
+                                   color, SDL_Point{ScrollBar::scrollBarSize, ScrollBar::scrollBarSize}, motherCanvas);
+
+            break;
+        }
+        if(rollBar && minusButton && addButton)
+        {
+            rollBar->ResetFollowingCanvas(attachedCanvas);
+            minusButton->ResetFollowingCanvas(attachedCanvas);
+            addButton->ResetFollowingCanvas(attachedCanvas);
+        }
+        else
+        {
+            ENG_LogError("Cannot malloc sub-components for ScrollBar.");
+        }
+    }
+}
+
+ScrollBar::~ScrollBar()
+{
+    if(rollBar)
+        delete rollBar;
+
+    if(minusButton)
+        delete minusButton;
+
+    if(addButton)
+        delete addButton;
+
+    if(rollBackground)
+        delete rollBackground;
+}
+
+DBG_Status ScrollBar::InitInScene(Scene* scene)
+{
+    DBG_Status status = DBG_OK;
+
+    status |= GameComp::InitInScene(scene);
+    if(status & DBG_REP_OPR)
+        return status;
+
+    *scene << rollBar;
+    *scene << minusButton;
+    *scene << addButton;
+
+    return status;
+}
+
+DBG_Status ScrollBar::Update(Uint32 deltTick)
+{
+    DBG_Status status = DBG_OK;
+
+    status |= GameComp::Update(deltTick);
+
+    switch(way)
+    {
+    case scrVerticle:
+
+        attachedCanvas->SetScrollVerticle(rollBar->ReportVerticleRatio());
+
+        break;
+
+    case scrHorizon:
+    default:
+
+        attachedCanvas->SetScrollHorizon(rollBar->ReportHorizonRatio());
+
+        break;
+    }
 
     return status;
 }

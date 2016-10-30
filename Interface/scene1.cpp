@@ -164,12 +164,18 @@ DBG_Status Scene1::InitScene()
 
 //    Button* but = new Button(25, 60, GetColor(LightGray), SDL_Point{30, 30}, canv);
     Button* but = new Button(25, 60, "button.png", canv);
-    SDL_Rect sizeArea = SDL_Rect{30, 25, 200, 0};
-//    DragButton* but2 = new DragButton(100, 60, GetColor(LightGray), SDL_Point{60, 30}, &sizeArea, canv);
-    DragButton* but2 = new DragButton(100, 60, GetColor(LightGray), SDL_Point{60, 30}, NULL, canv);
+    SDL_Rect sizeArea = SDL_Rect{30, 25, 200, 100};
+    but2 = new DragButton(100, 60, GetColor(LightGray), SDL_Point{60, 30}, &sizeArea, canv);
+//    DragButton* but2 = new DragButton(100, 60, GetColor(LightGray), SDL_Point{60, 30}, NULL, canv);
 //    DragButton* but2 = new DragButton(100, 60, GetColor(LightGray), SDL_Point{60, 30}, NULL, NULL);
 
     GUI* pic = new GUI(50, 300, 1, "character.png", motherCanv);
+
+    ScrollBar* horzScrollBar = new ScrollBar(canv, scrHorizon);
+    ScrollBar* vertScrollBar = new ScrollBar(canv, scrVerticle);
+
+    ScrollBar* horzScrollBar1 = new ScrollBar(motherCanv, scrHorizon);
+    ScrollBar* vertScrollBar1 = new ScrollBar(motherCanv, scrVerticle);
 
 	*this << ground << mountain << camPos << drawableCount << GUICount << SolidCount << posValue << charsFrontObjsNum
           << resortCount
@@ -178,6 +184,8 @@ DBG_Status Scene1::InitScene()
     *this << motherCanv << canv << temp << temp2;
     *this << but << pic << childCanv << temp3 << but3;
     *this << but2;
+    *this << horzScrollBar << vertScrollBar;
+    *this << horzScrollBar1 << vertScrollBar1;
 
 //    canv->SetExtraTrans(0.8f);
 //    motherCanv->SetExtraTrans(0.8f);
@@ -214,6 +222,9 @@ DBG_Status Scene1::InitScene()
 
 	return status;
 }
+
+//temp
+SDL_Point newSize = SDL_Point{500, 800};
 
 DBG_Status Scene1::HandleInput()
 {
@@ -253,25 +264,6 @@ DBG_Status Scene1::HandleInput()
     else if(inputHandler->KeyDown(SDL_SCANCODE_D))
         camera->SetMove(camSpeed, 0);
 
-    int scrollSpeed = 20;
-    if(inputHandler->KeyPressed(SDL_SCANCODE_UP) && inputHandler->KeyUp(SDL_SCANCODE_LSHIFT))
-        motherCanv->SetScrollOffset(0, scrollSpeed);
-    if(inputHandler->KeyPressed(SDL_SCANCODE_DOWN) && inputHandler->KeyUp(SDL_SCANCODE_LSHIFT))
-        motherCanv->SetScrollOffset(0, -scrollSpeed);
-    if(inputHandler->KeyPressed(SDL_SCANCODE_LEFT) && inputHandler->KeyUp(SDL_SCANCODE_LSHIFT))
-        motherCanv->SetScrollOffset(scrollSpeed, 0);
-    if(inputHandler->KeyPressed(SDL_SCANCODE_RIGHT) && inputHandler->KeyUp(SDL_SCANCODE_LSHIFT))
-        motherCanv->SetScrollOffset(-scrollSpeed, 0);
-
-    if(inputHandler->KeyPressed(SDL_SCANCODE_UP) && inputHandler->KeyDown(SDL_SCANCODE_LSHIFT))
-        canv->SetScrollOffset(0, scrollSpeed);
-    if(inputHandler->KeyPressed(SDL_SCANCODE_DOWN) && inputHandler->KeyDown(SDL_SCANCODE_LSHIFT))
-        canv->SetScrollOffset(0, -scrollSpeed);
-    if(inputHandler->KeyPressed(SDL_SCANCODE_LEFT) && inputHandler->KeyDown(SDL_SCANCODE_LSHIFT))
-        canv->SetScrollOffset(scrollSpeed, 0);
-    if(inputHandler->KeyPressed(SDL_SCANCODE_RIGHT) && inputHandler->KeyDown(SDL_SCANCODE_LSHIFT))
-        canv->SetScrollOffset(-scrollSpeed, 0);
-
     if(inputHandler->KeyPressed(SDL_SCANCODE_Z) && inputHandler->KeyUp(SDL_SCANCODE_LSHIFT))
         PushHideCanvasEvent(motherCanv);
     if(inputHandler->KeyPressed(SDL_SCANCODE_X) && inputHandler->KeyUp(SDL_SCANCODE_LSHIFT))
@@ -286,6 +278,9 @@ DBG_Status Scene1::HandleInput()
         PushHideCanvasEvent(childCanv);
     if(inputHandler->KeyPressed(SDL_SCANCODE_V))
         PushShowCanvasEvent(childCanv);
+
+    if(inputHandler->KeyPressed(SDL_SCANCODE_F))
+        PushResizeCanvasEvent(motherCanv, &newSize);
 
     return status;
 }
@@ -313,14 +308,15 @@ DBG_Status Scene1::Update(Uint32 deltTick)
                                                      char3->frontObjs.size(),
                                                      char4->frontObjs.size());
 	charsFrontObjsNum->ReloadTexture(buffer);
-	sprintf(buffer, "grounded: %s, %d, %d, %s, %d, %d, %f, %d", character->IsGrounded() ? "true" : "false",
-                                                character->GetBox().GetContactObjs().size(),
-                                                pWorld.GetParticles().size(),
-                                                inputHandler->MouseLeftDown() ? "left pressed" : "not pressed",
-                                                pressedGUIComp,
-                                                selectedGUIComp,
-                                                character->GetBox().GetMotion(),
-                                                phyStepCount);
+	sprintf(buffer, "grounded: %s, %d, %d, %d, %f, %f, %f",
+             character->IsGrounded() ? "true" : "false",
+             character->GetBox().GetContactObjs().size(),
+             pressedGUIComp,
+             selectedGUIComp,
+             character->GetBox().GetMotion(),
+             but2->ReportHorizonRatio(),
+             but2->ReportVerticleRatio());
+
 	resortCount->ReloadTexture(buffer);
 }
 

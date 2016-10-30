@@ -50,6 +50,7 @@ public:
 	void SetRelativeBottom(int bottom);
     SDL_Point GetRelativePos(int* x = NULL, int* y = NULL);
     SDL_Point GetRelativeLeftTop(int* x = NULL, int* y = NULL);
+    SDL_Point GetRelativeRightBottom(int* x = NULL, int* y = NULL);
 
 	//set and get absolute coordination to scene map
 	void SetAbsPos(int absX = 0, int absY = 0);         //

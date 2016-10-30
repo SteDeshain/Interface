@@ -279,6 +279,10 @@ DBG_Status GUIOperateHandler::Update(Uint32 deltTick)
         {
             if(motherScene->selectedGUIComp == (*g))
                 PushUnSelectGUICompEvent(*g);
+            if(motherScene->pressedGUIComp == (*g))
+            {
+                PushDumpButtonEvent(*g);
+            }
             continue;
         }
 

@@ -49,6 +49,7 @@ public:
     Canvas* motherCanv;
     Canvas* canv;
     Canvas* childCanv;
+    DragButton* but2;
 
     //for debug
     Label* compCount;
