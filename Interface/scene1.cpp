@@ -153,7 +153,7 @@ DBG_Status Scene1::InitScene()
     canvasSize = SDL_Point{300, 300};
 //    Canvas* canv = new Canvas(GetColor(Cyan), 0.5f, viewRect, canvasSize, motherCanv);
     canv = new Canvas("tiles.png", 0.5f, viewRect, canvasSize, motherCanv);
-    canv->SetSlideInfo();
+    canv->SetSlideInfo(SlideLeft, SlideRight);
     Label* temp = new Label(10, 10, LeftTop, "hello", menuFont, GetColor(White), 2, canv);
     Label* temp2 = new Label(240, 20, LeftTop, "你好", menuFont, GetColor(White), 2, motherCanv);
 
@@ -169,7 +169,8 @@ DBG_Status Scene1::InitScene()
 //    DragButton* but2 = new DragButton(100, 60, GetColor(LightGray), SDL_Point{60, 30}, NULL, canv);
 //    DragButton* but2 = new DragButton(100, 60, GetColor(LightGray), SDL_Point{60, 30}, NULL, NULL);
 
-    GUI* pic = new GUI(50, 300, 1, "character.png", motherCanv);
+//    GUI* pic = new GUI(50, 300, 1, "character.png", motherCanv);
+    GUI* pic = new GUI(50, 300, SDL_Point{30, 30}, GetColor(Cyan), 0.5f, motherCanv);
 
     ScrollBar* horzScrollBar = new ScrollBar(canv, scrHorizon);
     ScrollBar* vertScrollBar = new ScrollBar(canv, scrVerticle);

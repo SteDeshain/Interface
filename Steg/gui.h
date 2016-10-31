@@ -1,9 +1,3 @@
-//gui.h
-//created by SteDeshain
-//created on 2016/08/14
-//latest updated on 2016/08/14
-//GUI class inherited from DrawableComp, as a abstract class, to create other UI classes
-
 #ifndef __GUI_H__
 #define __GUI_H__
 
@@ -36,7 +30,7 @@ public:
     GUI(int textureNum, const char* imgFile = NULL, Canvas* canvas = NULL);
 
     //get color picture
-    GUI(int x, int y, SDL_Point picSize, SDL_Color color, Canvas* canvas = NULL);
+    GUI(int x, int y, SDL_Point picSize, SDL_Color color, float transparency, Canvas* canvas = NULL);
 
     ~GUI();
 
@@ -54,6 +48,10 @@ public:
 protected:
 //    GUILayer layer; //smaller number is drawn first
     int drawIndex;  //the order to be drawn in a canvas, smaller number is drawn first
+
+    SDL_Color* color = NULL;    //是否为NULL,以和无texture的gui区别开来
+    SDL_Point colorTextureSize = SDL_Point{0, 0};
+    float colorTextureTransparency = 1.0f;
 
     SDL_Point drawSize;
     SDL_Point entireSize;
@@ -112,6 +110,9 @@ class ScrollBar;
 class Canvas: public GUI
 {
     friend class GUI;
+    friend class ScrollBar;
+    friend DBG_Status IdleHandleEvent(SDL_Event event, Canvas* canvas, CanvasState* self);
+    friend DBG_Status ShowUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self);
 
 public:
     Canvas(SDL_Color color, float transparency, SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas);
@@ -142,7 +143,7 @@ public:
         float movePerTick;
         SDL_Point destPos;  //final position when idel
     };
-    void SetSlideInfo(SlideWay showWay, SlideWay hideWay, Uint32 slideTicks, unsigned int slideDistance);
+    void SetSlideInfo(SlideWay showWay, SlideWay hideWay, Uint32 slideTicks = 200, unsigned int slideDistance = 10);
     void SetSlideInfo();
     SlideInfo* GetSlideInfo();
 
@@ -205,6 +206,12 @@ protected:
 
     virtual SDL_Rect CutSrcRect(SDL_Rect srcRect, SDL_Point destSize);
 
+private:
+    float horzScrollBarOriginRatio; //abandoned
+    float vertScrollBarOriginRatio;
+    int horzScrollBarPos = 0; //retsored before animation state
+    int vertScrollBarPos = 0;
+
 };
 
 class Button: public GUI
@@ -232,6 +239,7 @@ protected:
 
 class DragButton: public Button
 {
+    friend DBG_Status ShowUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self);
 
 public:
     DragButton(int x, int y, SDL_Color color, SDL_Point buttonSize, SDL_Rect* area, Canvas* motherCanvas);
@@ -241,6 +249,9 @@ public:
 
     float ReportHorizonRatio();
     float ReportVerticleRatio();
+
+    void SetAreaPos(int x, int y);
+    void SetAreaLeftTop(int left, int top);
 
 protected:
     SDL_Rect* area;
@@ -262,6 +273,9 @@ private:
     void RestrictVertical();
     void RestrictHorizon();
 
+    void SetXRatio(float xRatio);
+    void SetYRatio(float yRatio);
+
 };
 
 enum ScrollBarWay
@@ -272,6 +286,9 @@ enum ScrollBarWay
 
 class ScrollBar: public GameComp
 {
+
+    friend DBG_Status IdleHandleEvent(SDL_Event event, Canvas* canvas, CanvasState* self);
+    friend DBG_Status ShowUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self);
 
 public:
     static int scrollBarSize;

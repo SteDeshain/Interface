@@ -38,19 +38,33 @@ GUI::GUI(int textureNum, const char* imgFile, Canvas* canvas)
 }
 
 //color texture
-GUI::GUI(int x, int y, SDL_Point picSize, SDL_Color color, Canvas* canvas)
-    :DrawableComp(x, y, 1, NULL, canvas)
+GUI::GUI(int x, int y, SDL_Point picSize, SDL_Color color, float transparency, Canvas* canvas)
+    :DrawableComp(x, y, 1, NULL, canvas), colorTextureSize(picSize), colorTextureTransparency(transparency)
 {
     selectable = false;
     selected = false;
     sourceStartPoint = SDL_Point{0, 0};
     extraTrans = 1.0f;
     followingCanvas = canvas;
+
+    this->color = new SDL_Color;
+    if(this->color == NULL)
+    {
+        ENG_LogError("Cannot malloc SDL_Color structure for GUI in color texture mode.");
+    }
+    else
+    {
+        *(this->color) = color;
+    }
 }
 
 GUI::~GUI()
 {
-
+    if(color)
+    {
+        delete color;
+        color = NULL;
+    }
 }
 
 bool GUI::IsSelectable()
@@ -120,7 +134,34 @@ DBG_Status GUI::InitInScene(Scene *scene)
     if(status & DBG_REP_OPR)
         return status;
 
-    scene->drawableComps.remove(this);
+    scene->drawableComps.remove(this);  //temp: remove scene's drawableComps list
+
+    //color texture mode
+    if(color)
+    {
+//        if(currentTexture)
+//        {
+//            //already has a texture, do nothing
+//        }
+//        else
+//        {
+//            //
+//            if(textures[0]) //color mode constructor has only 1 textureNum
+//            {
+//                SDL_DestroyTexture(textures[0]);
+//            }
+//            textures[0] = GetColorTexture(motherScene->render, colorTextureSize, *color, colorTextureTransparency);
+//            currentTexture = textures[0];
+//        }
+        textures[0] = GetColorTexture(motherScene->render, colorTextureSize, *color, colorTextureTransparency);
+        currentTexture = textures[0];
+
+//        entireSize = colorTextureSize;
+//        drawSize = colorTextureSize;
+        SetDrawSize(colorTextureSize.x, colorTextureSize.y);
+        sourceRect.x = sourceRect.y = 0;
+        SetSourceSize(colorTextureSize.x, colorTextureSize.y);
+    }
 
     entireSize = SDL_Point{sourceRect.w, sourceRect.h};
     drawSize = SDL_Point{drawRect.w, drawRect.h};
@@ -269,7 +310,7 @@ void GUI::ResetFollowingCanvas(Canvas* newFollowingCanvas)
 }
 
 //Canvas state machine functions
-static DBG_Status ShowUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self)
+DBG_Status ShowUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self)
 {
     DBG_Status status = DBG_OK;
 
@@ -309,7 +350,7 @@ static DBG_Status ShowUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self)
         canvas->SetRelativePos(newPos);
 
         canvas->AddExtraTrans(deltTick * (canvas->GetSlideInfo())->deltTransPerTick);
-        if(canvas->GetExtraTrans() >= 1.0f)    //temp: should judge by position rather than transparency(necessary)
+        if(canvas->GetExtraTrans() >= 1.0f)    //temp: should judge by position rather than transparency(necessary ???)
         {
             canvas->SetExtraTrans(1.0f);
             canvas->SetRelativePos(canvas->GetSlideInfo()->destPos);
@@ -317,6 +358,21 @@ static DBG_Status ShowUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self)
 
             self->totalMove = 0.0f;
         }
+
+        //resume the origin scroll bar state
+        //and should do this at every frame in animation
+        //to avoid the animation influencing the origin state of the scroll bars
+        if(canvas->verticleScrollBar)
+        {
+//            canvas->verticleScrollBar->rollBar->SetYRatio(canvas->vertScrollBarOriginRatio);
+            canvas->verticleScrollBar->rollBar->SetRelativeTop(canvas->vertScrollBarPos);
+        }
+        if(canvas->horizonScrollBar)
+        {
+//            canvas->horizonScrollBar->rollBar->SetXRatio(canvas->horzScrollBarOriginRatio);
+            canvas->horizonScrollBar->rollBar->SetRelativeLeft(canvas->horzScrollBarPos);
+        }
+
     }
 
     return status;
@@ -330,7 +386,7 @@ static DBG_Status ShowUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self)
 //{
 //    return DBG_OK;
 //}
-static DBG_Status IdleHandleEvent(SDL_Event event, Canvas* canvas, CanvasState* self)
+DBG_Status IdleHandleEvent(SDL_Event event, Canvas* canvas, CanvasState* self)
 {
     DBG_Status status = DBG_OK;
 
@@ -353,6 +409,17 @@ static DBG_Status IdleHandleEvent(SDL_Event event, Canvas* canvas, CanvasState* 
                 if(canvas->IsVisible())
                 {
                     canvas->SetCanvasState(Canvas::StateEnumHide);
+                    //avoid the animation influences the origin state of the scroll bars
+                    if(canvas->verticleScrollBar)
+                    {
+                        canvas->vertScrollBarOriginRatio = canvas->verticleScrollBar->rollBar->ReportVerticleRatio();
+                        canvas->vertScrollBarPos = canvas->verticleScrollBar->rollBar->GetRelativeLeftTop().y;
+                    }
+                    if(canvas->horizonScrollBar)
+                    {
+                        canvas->horzScrollBarOriginRatio = canvas->horizonScrollBar->rollBar->ReportHorizonRatio();
+                        canvas->horzScrollBarPos = canvas->horizonScrollBar->rollBar->GetRelativeLeftTop().x;
+                    }
                 }
             }
         }
@@ -989,6 +1056,24 @@ float DragButton::ReportVerticleRatio()
     return float(GetRelativeLeftTop().y - area->y) / float(area->h - drawSize.y);
 }
 
+void DragButton::SetAreaPos(int x, int y)
+{
+    if(area)
+    {
+        area->x = x - area->w / 2;
+        area->y = y - area->h / 2;
+    }
+}
+
+void DragButton::SetAreaLeftTop(int left, int top)
+{
+    if(area)
+    {
+        area->x = left;
+        area->y = top;
+    }
+}
+
 DBG_Status DragButton::Update(Uint32 deltTick)
 {
     DBG_Status status = DBG_OK;
@@ -1081,6 +1166,17 @@ void DragButton::RestrictHorizon()
     {
         //do nothing
     }
+}
+
+void DragButton::SetXRatio(float xRatio)
+{
+    SetRelativeLeft((area->w - drawSize.x) * xRatio + area->x);
+//    float tmp = ReportHorizonRatio();
+}
+void DragButton::SetYRatio(float yRatio)
+{
+    SetRelativeTop((area->h - drawSize.y) * yRatio + area->y);
+//    float tmp = ReportVerticleRatio();
 }
 
 DBG_Status DragButton::OnButtonPressed()
@@ -1182,6 +1278,11 @@ ScrollBar::ScrollBar(Canvas* attachedCanvas, ScrollBarWay way)
                                      color, SDL_Point{ScrollBar::scrollBarSize, ScrollBar::scrollBarSize}, motherCanvas);
             addButton = new Button(canvasRight + ScrollBar::scrollBarSize / 2, canvasBottom - ScrollBar::scrollBarSize / 2,
                                    color, SDL_Point{ScrollBar::scrollBarSize, ScrollBar::scrollBarSize}, motherCanvas);
+            rollBackground = new GUI(canvasRight + ScrollBar::scrollBarSize / 2, (canvasTop + canvasBottom) / 2,
+                                     SDL_Point{ScrollBar::scrollBarSize, canvasBottom - canvasTop}, backgroundColor,
+                                     0.5f, motherCanvas);
+
+            attachedCanvas->verticleScrollBar = this;
 
             break;
 
@@ -1197,14 +1298,20 @@ ScrollBar::ScrollBar(Canvas* attachedCanvas, ScrollBarWay way)
                                      color, SDL_Point{ScrollBar::scrollBarSize, ScrollBar::scrollBarSize}, motherCanvas);
             addButton = new Button(canvasRight - ScrollBar::scrollBarSize / 2, canvasBottom + ScrollBar::scrollBarSize / 2,
                                    color, SDL_Point{ScrollBar::scrollBarSize, ScrollBar::scrollBarSize}, motherCanvas);
+            rollBackground = new GUI((canvasLeft + canvasRight) / 2, canvasBottom + ScrollBar::scrollBarSize / 2,
+                                     SDL_Point{canvasRight - canvasLeft, ScrollBar::scrollBarSize}, backgroundColor,
+                                     0.5f, motherCanvas);
+
+            attachedCanvas->horizonScrollBar = this;
 
             break;
         }
-        if(rollBar && minusButton && addButton)
+        if(rollBar && minusButton && addButton && rollBackground)
         {
             rollBar->ResetFollowingCanvas(attachedCanvas);
             minusButton->ResetFollowingCanvas(attachedCanvas);
             addButton->ResetFollowingCanvas(attachedCanvas);
+            rollBackground->ResetFollowingCanvas(attachedCanvas);
         }
         else
         {
@@ -1236,6 +1343,7 @@ DBG_Status ScrollBar::InitInScene(Scene* scene)
     if(status & DBG_REP_OPR)
         return status;
 
+    *scene << rollBackground;
     *scene << rollBar;
     *scene << minusButton;
     *scene << addButton;
@@ -1249,11 +1357,20 @@ DBG_Status ScrollBar::Update(Uint32 deltTick)
 
     status |= GameComp::Update(deltTick);
 
+    int canvasLeft, canvasTop, canvasRight, canvasBottom;
+    attachedCanvas->GetRelativeLeftTop(&canvasLeft, &canvasTop);
+    attachedCanvas->GetRelativeRightBottom(&canvasRight, &canvasBottom);
     switch(way)
     {
     case scrVerticle:
 
         attachedCanvas->SetScrollVerticle(rollBar->ReportVerticleRatio());
+        //follow the attached canvas (temp: necessary ???)
+        rollBar->SetAreaLeftTop(canvasRight + ScrollBar::scrollBarSize / 2,
+                                canvasTop + ScrollBar::scrollBarSize);
+        rollBackground->SetRelativeLeftTop(canvasRight, canvasTop);
+        minusButton->SetRelativeLeftTop(canvasRight, canvasTop);
+        addButton->SetRelativeLeftTop(canvasRight, canvasBottom - ScrollBar::scrollBarSize);
 
         break;
 
@@ -1261,6 +1378,12 @@ DBG_Status ScrollBar::Update(Uint32 deltTick)
     default:
 
         attachedCanvas->SetScrollHorizon(rollBar->ReportHorizonRatio());
+        //follow the attached canvas (temp: necessary ???)
+        rollBar->SetAreaLeftTop(canvasLeft + ScrollBar::scrollBarSize,
+                                canvasBottom + ScrollBar::scrollBarSize / 2);
+        rollBackground->SetRelativeLeftTop(canvasLeft, canvasBottom);
+        minusButton->SetRelativeLeftTop(canvasLeft, canvasBottom);
+        addButton->SetRelativeLeftTop(canvasRight - ScrollBar::scrollBarSize, canvasBottom);
 
         break;
     }

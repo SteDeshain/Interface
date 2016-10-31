@@ -1,8 +1,3 @@
-////solid_h.h
-//created by SteDeshain
-//created on 2016/08/16
-//latest updated on 2016/08/16
-
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_ttf.h"
 #include "game.h"
