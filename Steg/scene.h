@@ -97,6 +97,9 @@ private:
     int phyLastStartTick;
     int phyStartTick;
 
+    void OnCreateScrollBar(void* canvas, void* way);
+    void OnDeleteScrollBar(void* canvas, void* way);
+
 };
 
 }

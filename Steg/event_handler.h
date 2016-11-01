@@ -43,10 +43,20 @@ enum gameEventCode
 enum sceneEventCode
 {
     evcResortSolidObjs,
+
+    evcCreateScrollBar,
+    evcDeleteScrollBar,
 };
 //push event macro functions
 #define PushResortSolidObjsEvent(PSCENE)    \
         steg::PushEvent(steg::CustomEventsType[CUSTOM_SCENEEVENT], steg::evcResortSolidObjs, PSCENE, NULL)
+
+                                          //NULL for horizon, not NULL for verticle
+#define PushCreateScrollBarEvent(PCANVAS, SCROLLWAY)    \
+        steg::PushEvent(steg::CustomEventsType[CUSTOM_SCENEEVENT], steg::evcCreateScrollBar, PCANVAS, SCROLLWAY)
+
+#define PushDeleteScrollBarEvent(PCANVAS, SCROLLWAY)    \
+        steg::PushEvent(steg::CustomEventsType[CUSTOM_SCENEEVENT], steg::evcDeleteScrollBar, PCANVAS, SCROLLWAY)
 
 
 //>>************************ ENGINE  EVENT ************************<<//
@@ -74,10 +84,10 @@ enum guiEventCode
 #define PushPressedButtonEvent(PCOMP)       \
         steg::PushEvent(steg::CustomEventsType[CUSTOM_GUIEVENT], steg::evcPressedButton, PCOMP, NULL)
 
-#define PushReleasedButtonEvent(PCOMP)       \
+#define PushReleasedButtonEvent(PCOMP)      \
         steg::PushEvent(steg::CustomEventsType[CUSTOM_GUIEVENT], steg::evcReleasedButton, PCOMP, NULL)
 
-#define PushDumpButtonEvent(PCOMP)       \
+#define PushDumpButtonEvent(PCOMP)          \
         steg::PushEvent(steg::CustomEventsType[CUSTOM_GUIEVENT], steg::evcDumpButton, PCOMP, NULL)
 
 #define PushShowCanvasEvent(PCANVAS)        \

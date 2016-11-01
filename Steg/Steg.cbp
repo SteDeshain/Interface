@@ -56,10 +56,13 @@
 		<Unit filename="collision_detector.h" />
 		<Unit filename="color.cpp" />
 		<Unit filename="color.h" />
+		<Unit filename="config.h" />
 		<Unit filename="drawable_comp.cpp" />
 		<Unit filename="drawable_comp.h" />
 		<Unit filename="event_handler.cpp" />
 		<Unit filename="event_handler.h" />
+		<Unit filename="font.cpp" />
+		<Unit filename="font.h" />
 		<Unit filename="game.cpp" />
 		<Unit filename="game.h" />
 		<Unit filename="game_comp.cpp" />

@@ -153,6 +153,41 @@ Scene::~Scene()
     }
 }
 
+void Scene::OnCreateScrollBar(void* canvas, void* way)
+{
+    if(way == (void*)scrHorizon)    //NULL
+    {
+        if(((Canvas*)canvas)->GetHorizonScrollBar())
+        {
+            //already has a horizon scroll bar
+            //do nothing
+        }
+        else
+        {
+            //create the scroll bar
+            ScrollBar* horzBar = new ScrollBar((Canvas*)canvas, scrHorizon);
+            (*this) << horzBar;
+        }
+    }
+    else
+    {
+        if(((Canvas*)canvas)->GetVerticleScrollBar())
+        {
+            //already has a verticle scroll bar
+            //do nothing
+        }
+        else
+        {
+            //create the scroll bar
+            ScrollBar* vertBar = new ScrollBar((Canvas*)canvas, scrVerticle);
+            (*this) << vertBar;
+        }
+    }
+}
+void Scene::OnDeleteScrollBar(void* canvas, void* way)
+{
+}
+
 DBG_Status Scene::HandleEvent(SDL_Event event)
 {
 	DBG_Status status = DBG_OK;
@@ -162,6 +197,14 @@ DBG_Status Scene::HandleEvent(SDL_Event event)
         if(event.user.code == evcResortSolidObjs && event.user.data1 == this)
         {
             return ResortSolidObjs();
+        }
+        else if(event.user.code == evcCreateScrollBar)
+        {
+            OnCreateScrollBar(event.user.data1, event.user.data2);
+        }
+        else if(event.user.code == evcDeleteScrollBar)
+        {
+            OnDeleteScrollBar(event.user.data1, event.user.data2);
         }
     }
 
@@ -482,6 +525,7 @@ Scene& Scene::operator<<(GameComp* comp)
 Scene& Scene::operator>>(GameComp* comp)
 {
     comps.remove(comp);
+    comp->DumpOutOfScene();
 
     GUI* gComp = NULL;
 	SolidObj* sComp = NULL;
@@ -504,7 +548,7 @@ Scene& Scene::operator>>(GameComp* comp)
 	}
 	else
 	{
-        ENG_LogError("Unsupproted GameComp class attempts to be removed out of Scene!");
+//        ENG_LogError("Unsupproted GameComp class attempts to be removed out of Scene!");
 	}
 
 	comp->DumpOutOfScene();

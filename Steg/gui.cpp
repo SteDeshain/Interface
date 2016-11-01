@@ -362,16 +362,14 @@ DBG_Status ShowUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self)
         //resume the origin scroll bar state
         //and should do this at every frame in animation
         //to avoid the animation influencing the origin state of the scroll bars
-        if(canvas->verticleScrollBar)
-        {
-//            canvas->verticleScrollBar->rollBar->SetYRatio(canvas->vertScrollBarOriginRatio);
-            canvas->verticleScrollBar->rollBar->SetRelativeTop(canvas->vertScrollBarPos);
-        }
-        if(canvas->horizonScrollBar)
-        {
-//            canvas->horizonScrollBar->rollBar->SetXRatio(canvas->horzScrollBarOriginRatio);
-            canvas->horizonScrollBar->rollBar->SetRelativeLeft(canvas->horzScrollBarPos);
-        }
+//        if(canvas->verticleScrollBar)
+//        {
+//            canvas->verticleScrollBar->rollBar->SetRelativeTop(canvas->vertScrollBarPos);
+//        }
+//        if(canvas->horizonScrollBar)
+//        {
+//            canvas->horizonScrollBar->rollBar->SetRelativeLeft(canvas->horzScrollBarPos);
+//        }
 
     }
 
@@ -410,16 +408,14 @@ DBG_Status IdleHandleEvent(SDL_Event event, Canvas* canvas, CanvasState* self)
                 {
                     canvas->SetCanvasState(Canvas::StateEnumHide);
                     //avoid the animation influences the origin state of the scroll bars
-                    if(canvas->verticleScrollBar)
-                    {
-                        canvas->vertScrollBarOriginRatio = canvas->verticleScrollBar->rollBar->ReportVerticleRatio();
-                        canvas->vertScrollBarPos = canvas->verticleScrollBar->rollBar->GetRelativeLeftTop().y;
-                    }
-                    if(canvas->horizonScrollBar)
-                    {
-                        canvas->horzScrollBarOriginRatio = canvas->horizonScrollBar->rollBar->ReportHorizonRatio();
-                        canvas->horzScrollBarPos = canvas->horizonScrollBar->rollBar->GetRelativeLeftTop().x;
-                    }
+//                    if(canvas->verticleScrollBar)
+//                    {
+//                        canvas->vertScrollBarPos = canvas->verticleScrollBar->rollBar->GetRelativeLeftTop().y;
+//                    }
+//                    if(canvas->horizonScrollBar)
+//                    {
+//                        canvas->horzScrollBarPos = canvas->horizonScrollBar->rollBar->GetRelativeLeftTop().x;
+//                    }
                 }
             }
         }
@@ -745,6 +741,22 @@ DBG_Status Canvas::InitInScene(Scene* scene)
     //to set the scroll bars
     scrollOffset = SDL_Point{0, 0};
 
+    //whether need scroll bars
+    if(entireSize.x > drawSize.x)
+    {
+        if(horizonScrollBar == NULL)
+        {
+            PushCreateScrollBarEvent(this, (void*)scrHorizon);
+        }
+    }
+    if(entireSize.y > drawSize.y)
+    {
+        if(verticleScrollBar == NULL)
+        {
+            PushCreateScrollBarEvent(this, (void*)scrVerticle);
+        }
+    }
+
     scene->GUIComps.push_back(this);
 
     SDL_GetTextureAlphaMod(currentTexture, &textureAlpha);
@@ -796,19 +808,24 @@ DBG_Status Canvas::ResetTexture(const char* newImg)
 
 DBG_Status Canvas::ResetTexture(SDL_Point newSize)
 {
+    DBG_Status status = DBG_OK;
+
     if(imgFile != NULL)
     {
         ENG_LogError("Cannot resize canvas with picture texture.");
         return DBG_ARG_ERR;
     }
 
-    if(newSize.x == entireSize.x && newSize.y == entireSize.y)
-        return DBG_OK;
-
     if(newSize.x < drawSize.x)
         newSize.x = drawSize.x;
     if(newSize.y < drawSize.y)
         newSize.y = drawSize.y;
+
+    if(newSize.x == entireSize.x && newSize.y == entireSize.y)
+    {
+//        ENG_LogInfo("same size!");
+        return DBG_OK;
+    }
 
     SDL_Texture* newTex = GetColorTexture(motherScene->render, newSize, color, transparency);
     if(newTex)
@@ -817,13 +834,46 @@ DBG_Status Canvas::ResetTexture(SDL_Point newSize)
         textures[0] = newTex;
         currentTexture = textures[0];
         entireSize = newSize;
-        return DBG_OK;
+        status |= DBG_OK;
     }
     else
     {
         //do no change
-        return DBG_SDL_ERR;
+        status |= DBG_SDL_ERR;
     }
+
+    //whether need scroll bars
+    if(entireSize.x > drawSize.x)
+    {
+        if(horizonScrollBar == NULL)
+        {
+            PushCreateScrollBarEvent(this, (void*)scrHorizon);
+        }
+    }
+    //whether need to remove scroll bars
+    else if(entireSize.x <= drawSize.x)
+    {
+        if(horizonScrollBar != NULL)
+        {
+            PushDeleteScrollBarEvent(this, (void*)scrHorizon);
+        }
+    }
+    if(entireSize.y > drawSize.y)
+    {
+        if(verticleScrollBar == NULL)
+        {
+            PushCreateScrollBarEvent(this, (void*)scrVerticle);
+        }
+    }
+    else if(entireSize.y <= drawSize.y)
+    {
+        if(verticleScrollBar != NULL)
+        {
+            PushDeleteScrollBarEvent(this, (void*)scrVerticle);
+        }
+    }
+
+    return status;
 }
 
 SDL_Rect Canvas::CutSrcRect(SDL_Rect srcRect, SDL_Point destSize)
@@ -1284,6 +1334,9 @@ ScrollBar::ScrollBar(Canvas* attachedCanvas, ScrollBarWay way)
 
             attachedCanvas->verticleScrollBar = this;
 
+            //temp
+            ENG_LogInfo("Create a verticle scroll bar");
+
             break;
 
         case scrHorizon:
@@ -1303,6 +1356,9 @@ ScrollBar::ScrollBar(Canvas* attachedCanvas, ScrollBarWay way)
                                      0.5f, motherCanvas);
 
             attachedCanvas->horizonScrollBar = this;
+
+            //temp
+            ENG_LogInfo("Create a horizon scroll bar");
 
             break;
         }
@@ -1333,6 +1389,22 @@ ScrollBar::~ScrollBar()
 
     if(rollBackground)
         delete rollBackground;
+
+    switch(way)
+    {
+    case scrVerticle:
+        attachedCanvas->verticleScrollBar = NULL;
+        //temp
+        ENG_LogInfo("Delete a verticle scroll bar");
+        break;
+
+    case scrHorizon:
+    default:
+        attachedCanvas->horizonScrollBar = NULL;
+        //temp
+        ENG_LogInfo("Delete a verticle scroll bar");
+        break;
+    }
 }
 
 DBG_Status ScrollBar::InitInScene(Scene* scene)
@@ -1366,11 +1438,13 @@ DBG_Status ScrollBar::Update(Uint32 deltTick)
 
         attachedCanvas->SetScrollVerticle(rollBar->ReportVerticleRatio());
         //follow the attached canvas (temp: necessary ???)
+#ifdef SCROLLBAR_FOLLOW_CANVAS
         rollBar->SetAreaLeftTop(canvasRight + ScrollBar::scrollBarSize / 2,
                                 canvasTop + ScrollBar::scrollBarSize);
         rollBackground->SetRelativeLeftTop(canvasRight, canvasTop);
         minusButton->SetRelativeLeftTop(canvasRight, canvasTop);
         addButton->SetRelativeLeftTop(canvasRight, canvasBottom - ScrollBar::scrollBarSize);
+#endif // SCROLLBAR_FOLLOW_CANVAS
 
         break;
 
@@ -1379,11 +1453,13 @@ DBG_Status ScrollBar::Update(Uint32 deltTick)
 
         attachedCanvas->SetScrollHorizon(rollBar->ReportHorizonRatio());
         //follow the attached canvas (temp: necessary ???)
+#ifdef SCROLLBAR_FOLLOW_CANVAS
         rollBar->SetAreaLeftTop(canvasLeft + ScrollBar::scrollBarSize,
                                 canvasBottom + ScrollBar::scrollBarSize / 2);
         rollBackground->SetRelativeLeftTop(canvasLeft, canvasBottom);
         minusButton->SetRelativeLeftTop(canvasLeft, canvasBottom);
         addButton->SetRelativeLeftTop(canvasRight - ScrollBar::scrollBarSize, canvasBottom);
+#endif // SCROLLBAR_FOLLOW_CANVAS
 
         break;
     }

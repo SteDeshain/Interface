@@ -51,6 +51,8 @@ public:
     Canvas* childCanv;
     DragButton* but2;
 
+    GameComp* tempComp;
+
     //for debug
     Label* compCount;
     Label* drawableCount;

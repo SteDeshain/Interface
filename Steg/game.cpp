@@ -5,6 +5,7 @@
 #include "event_handler.h"
 #include "color.h"
 #include "collide_type.h"
+#include "font.h"
 
 namespace steg
 {
@@ -19,13 +20,9 @@ DBG_Status Game::EngineInit()
 {
     //temp
 	SDL_Init(SDL_INIT_EVERYTHING);
-	TTF_Init();
-//	if(!TTF_WasInit() && TTF_Init()==-1)
-//	{
-//        exit(EXIT_FAILURE);
-//	}
 	//...
 	LogInit();
+	FontInit();
 	EveInit();
 	CollideInit();
 }
@@ -34,9 +31,9 @@ DBG_Status Game::EngineQuit()
 {
     CollideQuit();
 	EveQuit();
+	FontQuit();
 	LogQuit();
 	//...
-	TTF_Quit();
 	SDL_Quit();
 }
 

@@ -111,8 +111,8 @@ class Canvas: public GUI
 {
     friend class GUI;
     friend class ScrollBar;
-    friend DBG_Status IdleHandleEvent(SDL_Event event, Canvas* canvas, CanvasState* self);
-    friend DBG_Status ShowUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self);
+//    friend DBG_Status IdleHandleEvent(SDL_Event event, Canvas* canvas, CanvasState* self);
+//    friend DBG_Status ShowUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self);
 
 public:
     Canvas(SDL_Color color, float transparency, SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas);
@@ -207,8 +207,6 @@ protected:
     virtual SDL_Rect CutSrcRect(SDL_Rect srcRect, SDL_Point destSize);
 
 private:
-    float horzScrollBarOriginRatio; //abandoned
-    float vertScrollBarOriginRatio;
     int horzScrollBarPos = 0; //retsored before animation state
     int vertScrollBarPos = 0;
 
@@ -278,17 +276,17 @@ private:
 
 };
 
-enum ScrollBarWay
+enum ScrollBarWay: int
 {
-    scrHorizon,
-    scrVerticle,
+    scrHorizon = 0,     //NULL for horizon
+    scrVerticle = 1,
 };
 
 class ScrollBar: public GameComp
 {
 
-    friend DBG_Status IdleHandleEvent(SDL_Event event, Canvas* canvas, CanvasState* self);
-    friend DBG_Status ShowUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self);
+//    friend DBG_Status IdleHandleEvent(SDL_Event event, Canvas* canvas, CanvasState* self);
+//    friend DBG_Status ShowUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self);
 
 public:
     static int scrollBarSize;

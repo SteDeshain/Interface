@@ -4,6 +4,7 @@
 #include "game.h"
 #include "color.h"
 #include "event_handler.h"
+#include "font.h"
 
 namespace gameTest
 {
@@ -25,7 +26,8 @@ DBG_Status Scene1::InitScene()
 
     DBG_Status status = DBG_OK;
 
-    menuFont = TTF_OpenFont("LanTing.ttf", 24);
+//    menuFont = TTF_OpenFont("LanTing.ttf", 24);
+    Font* menuFonts = new Font("LanTing.ttf");
 
     rects = new SDL_Rect[mapHeightNum * mapWidthNum];
     sRects = new SDL_Rect[mapHeightNum * mapWidthNum];
@@ -144,7 +146,7 @@ DBG_Status Scene1::InitScene()
                             RightTop, "resorted: ", debugFont, GetColor(Black), 2);
 
     SDL_Rect viewRect = SDL_Rect{20, 20, 360, 400};
-    SDL_Point canvasSize = SDL_Point{400, 500};
+    SDL_Point canvasSize = SDL_Point{360, 500};
     motherCanv = new Canvas(GetColor(LightGray), 0.5f, viewRect, canvasSize, NULL);
     motherCanv->SetSlideInfo();
     motherCanv->HideComp();
@@ -154,12 +156,13 @@ DBG_Status Scene1::InitScene()
 //    Canvas* canv = new Canvas(GetColor(Cyan), 0.5f, viewRect, canvasSize, motherCanv);
     canv = new Canvas("tiles.png", 0.5f, viewRect, canvasSize, motherCanv);
     canv->SetSlideInfo(SlideLeft, SlideRight);
-    Label* temp = new Label(10, 10, LeftTop, "hello", menuFont, GetColor(White), 2, canv);
-    Label* temp2 = new Label(240, 20, LeftTop, "你好", menuFont, GetColor(White), 2, motherCanv);
+//    Label* temp = new Label(10, 10, LeftTop, "hello", menuFont, GetColor(White), 2, canv);
+    Label* temp = new Label(10, 10, LeftTop, "hello", (*menuFonts)[24], GetColor(White), 2, canv);
+    Label* temp2 = new Label(240, 20, LeftTop, "你好", (*menuFonts)[24], GetColor(White), 2, motherCanv);
 
-    childCanv = new Canvas(GetColor(Cyan), 0.7f, SDL_Rect{10, 90, 160, 150}, SDL_Point{160, 150}, canv);
+    childCanv = new Canvas(GetColor(Cyan), 0.7f, SDL_Rect{10, 90, 160, 150}, SDL_Point{180, 150}, canv);
     childCanv->SetSlideInfo();
-    Label* temp3 = new Label(20, 20, LeftTop, "画布显示测试", menuFont, GetColor(White), 2, childCanv);
+    Label* temp3 = new Label(20, 20, LeftTop, "画布显示测试", (*menuFonts)[24], GetColor(White), 2, childCanv);
     Button* but3 = new Button(60, 70, GetColor(LightGray), SDL_Point{60, 30}, childCanv);
 
 //    Button* but = new Button(25, 60, GetColor(LightGray), SDL_Point{30, 30}, canv);
@@ -172,11 +175,13 @@ DBG_Status Scene1::InitScene()
 //    GUI* pic = new GUI(50, 300, 1, "character.png", motherCanv);
     GUI* pic = new GUI(50, 300, SDL_Point{30, 30}, GetColor(Cyan), 0.5f, motherCanv);
 
-    ScrollBar* horzScrollBar = new ScrollBar(canv, scrHorizon);
-    ScrollBar* vertScrollBar = new ScrollBar(canv, scrVerticle);
+//    ScrollBar* horzScrollBar = new ScrollBar(canv, scrHorizon);
+//    ScrollBar* vertScrollBar = new ScrollBar(canv, scrVerticle);
+//
+//    ScrollBar* horzScrollBar1 = new ScrollBar(motherCanv, scrHorizon);
+//    ScrollBar* vertScrollBar1 = new ScrollBar(motherCanv, scrVerticle);
 
-    ScrollBar* horzScrollBar1 = new ScrollBar(motherCanv, scrHorizon);
-    ScrollBar* vertScrollBar1 = new ScrollBar(motherCanv, scrVerticle);
+    tempComp = new GameComp();
 
 	*this << ground << mountain << camPos << drawableCount << GUICount << SolidCount << posValue << charsFrontObjsNum
           << resortCount
@@ -185,8 +190,8 @@ DBG_Status Scene1::InitScene()
     *this << motherCanv << canv << temp << temp2;
     *this << but << pic << childCanv << temp3 << but3;
     *this << but2;
-    *this << horzScrollBar << vertScrollBar;
-    *this << horzScrollBar1 << vertScrollBar1;
+//    *this << horzScrollBar << vertScrollBar;
+//    *this << horzScrollBar1 << vertScrollBar1;
 
 //    canv->SetExtraTrans(0.8f);
 //    motherCanv->SetExtraTrans(0.8f);
@@ -225,7 +230,7 @@ DBG_Status Scene1::InitScene()
 }
 
 //temp
-SDL_Point newSize = SDL_Point{500, 800};
+SDL_Point newSize = SDL_Point{400, 500};
 
 DBG_Status Scene1::HandleInput()
 {
@@ -280,8 +285,25 @@ DBG_Status Scene1::HandleInput()
     if(inputHandler->KeyPressed(SDL_SCANCODE_V))
         PushShowCanvasEvent(childCanv);
 
-    if(inputHandler->KeyPressed(SDL_SCANCODE_F))
+    if(inputHandler->KeyPressed(SDL_SCANCODE_G))
+    {
+        newSize.x += 10;
         PushResizeCanvasEvent(motherCanv, &newSize);
+    }
+    else if(inputHandler->KeyPressed(SDL_SCANCODE_F))
+    {
+        newSize.x -= 10;
+        PushResizeCanvasEvent(motherCanv, &newSize);
+    }
+
+    if(inputHandler->KeyPressed(SDL_SCANCODE_P))
+    {
+        *this << tempComp;
+    }
+    else if(inputHandler->KeyPressed(SDL_SCANCODE_O))
+    {
+        *this >> tempComp;
+    }
 
     return status;
 }

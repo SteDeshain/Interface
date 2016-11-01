@@ -82,7 +82,9 @@ DBG_Status GameComp::InitInScene(Scene *scene)
 DBG_Status GameComp::DumpOutOfScene()
 {
 	DBG_Status status = DBG_OK;
+
 	motherScene = NULL;
+
 	return status;
 }
 
