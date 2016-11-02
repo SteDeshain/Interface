@@ -20,6 +20,7 @@ class MultiDrawComp: virtual public DrawableComp
 {
 
 public:
+    //make a copy of destRects and sourceRects
     MultiDrawComp(int x, int y, int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects, int textureNum, const char* imgFiles, DrawableComp* attachedPlatform = NULL);
     virtual ~MultiDrawComp();
 
@@ -28,9 +29,9 @@ public:
 
 protected:
     int destNum;
-    SDL_Rect* destRects;    //bunch of destRects, which is static, cannot be changed
+    SDL_Rect* destRects = NULL;    //bunch of destRects, which is static, cannot be changed
                             //the destRects all are relative to drawRect's left-top
-    SDL_Rect* sourceRects;
+    SDL_Rect* sourceRects = NULL;
 
     //the original x, y is meaningless for this class
     //so I set x, y to the center of all destRects, and as well as the center of drawRect
@@ -38,7 +39,7 @@ protected:
     virtual DBG_Status Draw(Uint32 deltTick, Camera* camera);
 
 	virtual DBG_Status InitInScene(Scene *scene);	//called after inserted into a Scene
-//	virtual DBG_Status DumpOutOfScene();			//called after thrown out by a Scene
+	virtual DBG_Status DumpOutOfScene();			//called after thrown out by a Scene
 
     virtual void UpdateDestRect();  //don't need to update destRect, so I override it with a funvtion that does nothing
 

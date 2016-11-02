@@ -12,6 +12,7 @@ class SenseComp: public SolidObj
 
 public:
     SenseComp(SolidObjInfo info, SolidObj* fatherObj);
+    ~SenseComp();
 
     SolidObj* GetFatherObj();
 //    void SetFatherObj(SolidObj* obj);
@@ -23,6 +24,7 @@ protected:
     stef::Vector3 centerOffset = stef::Vector3::ZERO; //offset from fatherObj's center
 
     virtual DBG_Status InitInScene(Scene* scene);
+    virtual DBG_Status DumpOutOfScene();
     virtual DBG_Status Update(Uint32 deltTick);
 
     virtual void DrawGroundTouch(Camera* camera);
@@ -37,6 +39,7 @@ public:
 
 public:
     Character(SolidObjInfo info, const char* imgFile, int textureNum);
+    ~Character();
 
     SenseComp* GetGroundDetector();
 
@@ -47,6 +50,7 @@ protected:
     bool grounded;
 
     virtual DBG_Status InitInScene(Scene* scene);
+    virtual DBG_Status DumpOutOfScene();
     virtual DBG_Status Update(Uint32 deltTick);
 
 };

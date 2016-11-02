@@ -70,7 +70,7 @@
 	"SDL2/SDL_log.h"
 	"status.h"
 
-1477991845 /home/stedeshain/Studio/Interface/Interface/scene1.h
+1478076662 /home/stedeshain/Studio/Interface/Interface/scene1.h
 	"SDL2/SDL.h"
 	"SDL2/SDL_ttf.h"
 	"scene.h"
@@ -82,7 +82,7 @@
 	"multi_draw_solid_obj.h"
 	"character.h"
 
-1476946938 /home/stedeshain/Studio/Interface/Steg/multi_draw_comp.h
+1478068381 /home/stedeshain/Studio/Interface/Steg/multi_draw_comp.h
 	"SDL2/SDL.h"
 	"status.h"
 	"drawable_comp.h"
@@ -108,17 +108,17 @@
 	"status.h"
 	"log.h"
 
-1476946937 /home/stedeshain/Studio/Interface/Steg/label.h
+1478075770 /home/stedeshain/Studio/Interface/Steg/label.h
 	<string>
 	"SDL2/SDL.h"
 	"SDL2/SDL_ttf.h"
 	"gui.h"
 
-1477990409 /home/stedeshain/Studio/Interface/Steg/gui.h
+1478075501 /home/stedeshain/Studio/Interface/Steg/gui.h
 	"SDL2/SDL.h"
 	"drawable_comp.h"
 
-1476946938 /home/stedeshain/Studio/Interface/Steg/solid_obj.h
+1478068791 /home/stedeshain/Studio/Interface/Steg/solid_obj.h
 	"SDL2/SDL.h"
 	"drawable_comp.h"
 	"collide_type.h"
@@ -130,11 +130,11 @@
 	"SDL2/SDL.h"
 	"status.h"
 
-1476946938 /home/stedeshain/Studio/Interface/Steg/multi_draw_solid_obj.h
+1478068902 /home/stedeshain/Studio/Interface/Steg/multi_draw_solid_obj.h
 	"multi_draw_comp.h"
 	"solid_obj.h"
 
-1476946938 /home/stedeshain/Studio/Interface/Steg/character.h
+1478070933 /home/stedeshain/Studio/Interface/Steg/character.h
 	"solid_obj.h"
 
 1477114343 /home/stedeshain/Studio/Interface/Steg/color.h
@@ -144,7 +144,7 @@
 	"game.h"
 	"game1.h"
 
-1477991942 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
+1478076969 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
 	"scene1.h"
 	"SDL2/SDL_ttf.h"
 	"stdio.h"

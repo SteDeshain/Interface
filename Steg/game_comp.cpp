@@ -83,6 +83,8 @@ DBG_Status GameComp::DumpOutOfScene()
 {
 	DBG_Status status = DBG_OK;
 
+	if(motherScene)
+        motherScene->comps.remove(this);
 	motherScene = NULL;
 
 	return status;

@@ -45,6 +45,14 @@ DBG_Status MultiDrawSolidObj::InitInScene(Scene* scene)
     return status;
 }
 
+DBG_Status MultiDrawSolidObj::DumpOutOfScene()
+{
+    DBG_Status status = DBG_OK;
+
+    status |= SolidObj::DumpOutOfScene();
+    return status;
+}
+
 DBG_Status MultiDrawSolidObj::Draw(Uint32 deltTick, Camera* camera)
 {
     DBG_Status status = DBG_OK;

@@ -99,6 +99,7 @@ public:
 
 protected:
     virtual DBG_Status InitInScene(Scene *scene);
+    virtual DBG_Status DumpOutOfScene();
 
     virtual DBG_Status Update(Uint32 deltTick);
     virtual DBG_Status Draw(Uint32 deltTick, Camera* camera);

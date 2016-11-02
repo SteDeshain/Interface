@@ -139,20 +139,6 @@ DBG_Status GUI::InitInScene(Scene *scene)
     //color texture mode
     if(color)
     {
-//        if(currentTexture)
-//        {
-//            //already has a texture, do nothing
-//        }
-//        else
-//        {
-//            //
-//            if(textures[0]) //color mode constructor has only 1 textureNum
-//            {
-//                SDL_DestroyTexture(textures[0]);
-//            }
-//            textures[0] = GetColorTexture(motherScene->render, colorTextureSize, *color, colorTextureTransparency);
-//            currentTexture = textures[0];
-//        }
         textures[0] = GetColorTexture(motherScene->render, colorTextureSize, *color, colorTextureTransparency);
         currentTexture = textures[0];
 
@@ -170,6 +156,17 @@ DBG_Status GUI::InitInScene(Scene *scene)
 
     SDL_GetTextureAlphaMod(currentTexture, &textureAlpha);
 
+    return status;
+}
+
+DBG_Status GUI::DumpOutOfScene()
+{
+    DBG_Status status = DBG_OK;
+
+    if(motherScene)
+        motherScene->GUIComps.remove(this);
+
+    status |= DrawableComp::DumpOutOfScene();
     return status;
 }
 
@@ -539,6 +536,18 @@ Canvas::~Canvas()
         delete slideInfo;
         slideInfo = NULL;
     }
+    if(horizonScrollBar)
+    {
+        //delete horizonScrollBar
+        (*motherScene) >> horizonScrollBar;
+        delete horizonScrollBar;
+    }
+    if(verticleScrollBar)
+    {
+        //delete verticleScrollBar
+        (*motherScene) >> verticleScrollBar;
+        delete verticleScrollBar;
+    }
 }
 
 void Canvas::SetScrollOffset(int dx, int dy)
@@ -757,10 +766,38 @@ DBG_Status Canvas::InitInScene(Scene* scene)
         }
     }
 
+    if(horizonScrollBar)
+    {
+        (*motherScene) << horizonScrollBar;
+    }
+    if(verticleScrollBar)
+    {
+        (*motherScene) << verticleScrollBar;
+    }
+
     scene->GUIComps.push_back(this);
 
     SDL_GetTextureAlphaMod(currentTexture, &textureAlpha);
 
+    return status;
+}
+
+DBG_Status Canvas::DumpOutOfScene()
+{
+    DBG_Status status = DBG_OK;
+
+    if(horizonScrollBar)
+    {
+//        horizonScrollBar->DumpOutOfScene();
+        (*motherScene) >> horizonScrollBar;
+    }
+    if(verticleScrollBar)
+    {
+//        verticleScrollBar->DumpOutOfScene();
+        (*motherScene) >> verticleScrollBar;
+    }
+
+    status |= GUI::DumpOutOfScene();
     return status;
 }
 
@@ -903,6 +940,10 @@ Button::Button(int x, int y, const char* imgFile, Canvas* motherCanvas)
     selectable = true;
 }
 
+Button::~Button()
+{
+}
+
 DBG_Status Button::InitInScene(Scene* scene)
 {
     DBG_Status status = DBG_OK;
@@ -936,6 +977,14 @@ DBG_Status Button::InitInScene(Scene* scene)
 
     SDL_GetTextureAlphaMod(currentTexture, &textureAlpha);
 
+    return status;
+}
+
+DBG_Status Button::DumpOutOfScene()
+{
+    DBG_Status status = DBG_OK;
+
+    status |= GUI::DumpOutOfScene();
     return status;
 }
 
@@ -1420,6 +1469,19 @@ DBG_Status ScrollBar::InitInScene(Scene* scene)
     *scene << minusButton;
     *scene << addButton;
 
+    return status;
+}
+
+DBG_Status ScrollBar::DumpOutOfScene()
+{
+    DBG_Status status = DBG_OK;
+
+    *motherScene >> rollBackground;
+    *motherScene >> rollBar;
+    *motherScene >> minusButton;
+    *motherScene >> addButton;
+
+    status |= GameComp::DumpOutOfScene();
     return status;
 }
 

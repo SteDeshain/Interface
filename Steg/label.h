@@ -40,7 +40,7 @@ protected:
     SDL_Point anchorPoint;
 
 	virtual DBG_Status InitInScene(Scene *scene);	//called after inserted into a Scene
-	//virtual DBG_Status DumpOutOfScene();			//called after thrown out by a Scene
+	virtual DBG_Status DumpOutOfScene();			//called after thrown out by a Scene
 
     virtual DBG_Status LoadTexture();
 

@@ -43,6 +43,8 @@ DBG_Status Scene1::InitScene()
                                mapHeightNum * Game::tileWidth / 2,
                                mapWidthNum * mapHeightNum,
                                rects, sRects, 1, "tiles.png");
+    delete[] rects;
+    delete[] sRects;
 
     int platformWidth = 3;
     int platformHeight = 3;
@@ -230,7 +232,8 @@ DBG_Status Scene1::InitScene()
 }
 
 //temp
-SDL_Point newSize = SDL_Point{400, 500};
+//SDL_Point newSize = SDL_Point{400, 500};
+SDL_Point newSize = SDL_Point{180, 150};
 
 DBG_Status Scene1::HandleInput()
 {
@@ -285,25 +288,27 @@ DBG_Status Scene1::HandleInput()
     if(inputHandler->KeyPressed(SDL_SCANCODE_V))
         PushShowCanvasEvent(childCanv);
 
+    //temp: unknown bugs here
     if(inputHandler->KeyPressed(SDL_SCANCODE_G))
     {
         newSize.x += 10;
-        PushResizeCanvasEvent(motherCanv, &newSize);
+        PushResizeCanvasEvent(childCanv, &newSize);
     }
     else if(inputHandler->KeyPressed(SDL_SCANCODE_F))
     {
         newSize.x -= 10;
-        PushResizeCanvasEvent(motherCanv, &newSize);
+        PushResizeCanvasEvent(childCanv, &newSize);
     }
 
-    if(inputHandler->KeyPressed(SDL_SCANCODE_P))
-    {
-        *this << tempComp;
-    }
-    else if(inputHandler->KeyPressed(SDL_SCANCODE_O))
-    {
-        *this >> tempComp;
-    }
+    //temp: unknown bugs here
+//    if(inputHandler->KeyPressed(SDL_SCANCODE_P))
+//    {
+//        *this << childCanv;
+//    }
+//    else if(inputHandler->KeyPressed(SDL_SCANCODE_O))
+//    {
+//        *this >> childCanv;
+//    }
 
     return status;
 }

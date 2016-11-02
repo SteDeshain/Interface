@@ -30,7 +30,7 @@ public:
     GUI(int textureNum, const char* imgFile = NULL, Canvas* canvas = NULL);
 
     //get color picture
-    GUI(int x, int y, SDL_Point picSize, SDL_Color color, float transparency, Canvas* canvas = NULL);
+    GUI(int x, int y, SDL_Point picSize, SDL_Color color, float transparency, Canvas* canvas = NULL);   //make a copy of color
 
     ~GUI();
 
@@ -65,6 +65,7 @@ protected:
 
     virtual DBG_Status HandleEvent(SDL_Event event);
     virtual DBG_Status InitInScene(Scene *scene);
+    virtual DBG_Status DumpOutOfScene();
     virtual DBG_Status Update(Uint32 deltTick);
     virtual SDL_Rect GetAbsDestRect(int* x = NULL, int* y = NULL, int* w = NULL, int* h = NULL);
 
@@ -198,6 +199,7 @@ protected:
     ScrollBar* verticleScrollBar = NULL;
 
     virtual DBG_Status InitInScene(Scene* scene);   //check whether need to add or remove scroll bar
+    virtual DBG_Status DumpOutOfScene();
     virtual DBG_Status Update(Uint32 deltTick);
     virtual DBG_Status HandleEvent(SDL_Event event);
 
@@ -219,9 +221,12 @@ public:
     Button(int x, int y, SDL_Color color, SDL_Point buttonSize, Canvas* motherCanvas);
     Button(int x, int y, const char* imgFile, Canvas* motherCanvas);
 
+    ~Button();
+
 protected:
-    DBG_Status InitInScene(Scene* scene);
-    DBG_Status HandleEvent(SDL_Event event);
+    virtual DBG_Status InitInScene(Scene* scene);
+    virtual DBG_Status DumpOutOfScene();
+    virtual DBG_Status HandleEvent(SDL_Event event);
 
     virtual DBG_Status OnButtonPressed();
     virtual DBG_Status OnButtonReleased();
@@ -306,6 +311,7 @@ protected:
     Canvas* attachedCanvas;
 
     virtual DBG_Status InitInScene(Scene* scene);
+    virtual DBG_Status DumpOutOfScene();
     virtual DBG_Status Update(Uint32 deltTick);     //where control the canvas show and scroll bar update
 
 };

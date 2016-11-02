@@ -175,6 +175,20 @@ DBG_Status SolidObj::InitInScene(Scene *scene)
     return status;
 }
 
+DBG_Status SolidObj::DumpOutOfScene()
+{
+    DBG_Status status = DBG_OK;
+
+    if(motherScene)
+    {
+        motherScene->solidObjs.remove(this);
+        motherScene->pWorld.GetParticles().remove(&box);
+    }
+
+    status |= DrawableComp::DumpOutOfScene();
+    return status;
+}
+
 DBG_Status SolidObj::Update(Uint32 deltTick)
 {
     DBG_Status status = DBG_OK;

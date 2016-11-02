@@ -186,6 +186,24 @@ void Scene::OnCreateScrollBar(void* canvas, void* way)
 }
 void Scene::OnDeleteScrollBar(void* canvas, void* way)
 {
+    if(way == (void*)scrHorizon)
+    {
+        ScrollBar* horzScrollBar = ((Canvas*)canvas)->GetHorizonScrollBar();
+        if(horzScrollBar)
+        {
+            (*this) >> horzScrollBar;
+            delete horzScrollBar;
+        }
+    }
+    else
+    {
+        ScrollBar* vertScrollBar = ((Canvas*)canvas)->GetVerticleScrollBar();
+        if(vertScrollBar)
+        {
+            (*this) >> vertScrollBar;
+            delete vertScrollBar;
+        }
+    }
 }
 
 DBG_Status Scene::HandleEvent(SDL_Event event)
@@ -519,39 +537,14 @@ Scene& Scene::operator<<(GameComp* comp)
 {
 	comp->InitInScene(this);
 
+	PushResortSolidObjsEvent(this);
+
 	return *this;
 }
 
 Scene& Scene::operator>>(GameComp* comp)
 {
-    comps.remove(comp);
     comp->DumpOutOfScene();
-
-    GUI* gComp = NULL;
-	SolidObj* sComp = NULL;
-    DrawableComp* dComp = NULL;
-    if(gComp = dynamic_cast<GUI*>(comp))
-	{
-        GUIComps.remove(gComp);
-	}
-	else if(sComp = dynamic_cast<SolidObj*>(comp))
-	{
-        solidObjs.remove(sComp);
-        //temp
-        //need to remove body from world
-        pWorld.GetParticles().remove(&sComp->GetBox());
-	}
-	//temp
-	else if(dComp = dynamic_cast<DrawableComp*>(comp))
-	{
-        drawableComps.remove(dComp);
-	}
-	else
-	{
-//        ENG_LogError("Unsupproted GameComp class attempts to be removed out of Scene!");
-	}
-
-	comp->DumpOutOfScene();
 
 	return *this;
 }

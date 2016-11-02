@@ -543,10 +543,14 @@ DBG_Status DrawableComp::DumpOutOfScene()
 
 	SetSourceSize();
 	SetDrawSize();
-	SetRelativePos();
+//	SetRelativePos();
+
+    if(motherScene)
+    {
+        motherScene->drawableComps.remove(this);
+    }
 
 	status |= GameComp::DumpOutOfScene();
-
     return status;
 }
 

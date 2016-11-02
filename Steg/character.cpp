@@ -17,6 +17,10 @@ SenseComp::SenseComp(SolidObjInfo info, SolidObj* fatherObj)
     tag = tagSenseBox;
 }
 
+SenseComp::~SenseComp()
+{
+}
+
 SolidObj* SenseComp::GetFatherObj()
 {
     return fatherObj;
@@ -32,7 +36,8 @@ DBG_Status SenseComp::InitInScene(Scene* scene)
 {
     DBG_Status status = DBG_OK;
 
-    status |= GameComp::InitInScene(scene);
+//    status |= GameComp::InitInScene(scene);
+    status |= DrawableComp::InitInScene(scene);
     if(status & DBG_REP_OPR)
         return status;
 
@@ -46,6 +51,19 @@ DBG_Status SenseComp::InitInScene(Scene* scene)
     //do not push box into the physics world
 //    scene->pWorld.GetParticles().push_back(&box);
 
+    return status;
+}
+
+DBG_Status SenseComp::DumpOutOfScene()
+{
+    DBG_Status status = DBG_OK;
+
+    if(motherScene)
+    {
+        motherScene->solidObjs.remove(this);
+    }
+
+    status |= DrawableComp::DumpOutOfScene();
     return status;
 }
 
@@ -75,6 +93,11 @@ Character::Character(SolidObjInfo info, const char* imgFile, int textureNum)
     groundDetector = new SenseComp(info, this);
 }
 
+Character::~Character()
+{
+    delete groundDetector;
+}
+
 SenseComp* Character::GetGroundDetector()
 {
     return groundDetector;
@@ -98,6 +121,15 @@ DBG_Status Character::InitInScene(Scene* scene)
                                                   box.GetHalfSize().y * 0.9,
                                                   ToMeter(groundDetectorThinckness) / 2));
 
+    return status;
+}
+
+DBG_Status Character::DumpOutOfScene()
+{
+    DBG_Status status = DBG_OK;
+
+    status |= groundDetector->DumpOutOfScene();
+    status |= SolidObj::DumpOutOfScene();
     return status;
 }
 

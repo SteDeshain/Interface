@@ -4,17 +4,38 @@ namespace steg
 {
 
 MultiDrawComp::MultiDrawComp(int x, int y, int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects, int textureNum, const char* imgFiles, DrawableComp* attachedPlatform)
-    :DrawableComp(textureNum, imgFiles, attachedPlatform), destNum(destNum), destRects(destRects), sourceRects(sourceRects)
+    :DrawableComp(textureNum, imgFiles, attachedPlatform), destNum(destNum)
 {
     SetRelativePos(x, y);
 
-    if(NULL == destRects || NULL ==sourceRects)
+    if(NULL == destRects || NULL == sourceRects)
     {
         ENG_LogError("bad argument: destRects or sourceRects can't be NULL!");
         drawWidth = drawHeight = 0;
     }
     else
     {
+        bool copyDest = false;
+        this->destRects = new SDL_Rect[destNum];
+        if(this->destRects)
+        {
+            copyDest = true;
+        }
+        else
+        {
+            ENG_LogError("Cannot malloc destRects SDL_Rect structure for MultiDrawComp.");
+        }
+        bool copySource = false;
+        this->sourceRects = new SDL_Rect[destNum];
+        if(this->sourceRects)
+        {
+            copySource = true;
+        }
+        else
+        {
+            ENG_LogError("Cannot malloc sourceRects SDL_Rect structure for MultiDrawComp.");
+        }
+
         int minX = destRects[0].x;
         int maxX = destRects[0].x + destRects[0].w;
         int minY = destRects[0].y;
@@ -32,6 +53,15 @@ MultiDrawComp::MultiDrawComp(int x, int y, int destNum, SDL_Rect* destRects, SDL
 
             if(destRects[i].y + destRects[i].h > maxY)
                 maxY = destRects[i].y + destRects[i].h;
+
+            if(copyDest)
+            {
+                this->destRects[i] = destRects[i];
+            }
+            if(copySource)
+            {
+                this->sourceRects[i] = sourceRects[i];
+            }
         }
         drawWidth = maxX - minX;
         drawHeight = maxY - minY;
@@ -40,7 +70,10 @@ MultiDrawComp::MultiDrawComp(int x, int y, int destNum, SDL_Rect* destRects, SDL
 
 MultiDrawComp::~MultiDrawComp()
 {
-
+    if(destRects)
+        delete[] destRects;
+    if(sourceRects)
+        delete[] sourceRects;
 }
 
 void MultiDrawComp::SetSourceRect(SDL_Rect sourceRect)
@@ -78,6 +111,14 @@ DBG_Status MultiDrawComp::InitInScene(Scene *scene)
 	SetDrawSize(drawWidth, drawHeight);
 
 	return status;
+}
+
+DBG_Status MultiDrawComp::DumpOutOfScene()
+{
+    DBG_Status status = DBG_OK;
+
+    status |= DrawableComp::DumpOutOfScene();
+    return status;
 }
 
 void MultiDrawComp::UpdateDestRect()

@@ -138,4 +138,12 @@ DBG_Status Label::InitInScene(Scene *scene)
     return status;
 }
 
+DBG_Status Label::DumpOutOfScene()
+{
+    DBG_Status status = DBG_OK;
+
+    status |= GUI::DumpOutOfScene();
+    return status;
+}
+
 }
