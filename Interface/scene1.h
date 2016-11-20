@@ -50,6 +50,7 @@ public:
     Canvas* canv;
     Canvas* childCanv;
     DragButton* but2;
+    Button* but;
 
     GameComp* tempComp;
 

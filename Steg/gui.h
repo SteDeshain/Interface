@@ -112,6 +112,7 @@ class Canvas: public GUI
 {
     friend class GUI;
     friend class ScrollBar;
+    friend class Scene;
 //    friend DBG_Status IdleHandleEvent(SDL_Event event, Canvas* canvas, CanvasState* self);
 //    friend DBG_Status ShowUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self);
 
@@ -259,6 +260,8 @@ public:
 protected:
     SDL_Rect* area;
 
+    virtual DBG_Status InitInScene(Scene* scene);
+    virtual DBG_Status DumpOutOfScene();
     virtual DBG_Status Update(Uint32 deltTick);
 
     virtual DBG_Status OnButtonPressed();

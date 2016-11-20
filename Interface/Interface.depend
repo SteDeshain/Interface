@@ -70,7 +70,7 @@
 	"SDL2/SDL_log.h"
 	"status.h"
 
-1478076662 /home/stedeshain/Studio/Interface/Interface/scene1.h
+1479625756 /home/stedeshain/Studio/Interface/Interface/scene1.h
 	"SDL2/SDL.h"
 	"SDL2/SDL_ttf.h"
 	"scene.h"
@@ -114,7 +114,7 @@
 	"SDL2/SDL_ttf.h"
 	"gui.h"
 
-1478075501 /home/stedeshain/Studio/Interface/Steg/gui.h
+1479614622 /home/stedeshain/Studio/Interface/Steg/gui.h
 	"SDL2/SDL.h"
 	"drawable_comp.h"
 
@@ -144,7 +144,7 @@
 	"game.h"
 	"game1.h"
 
-1478076969 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
+1479625787 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
 	"scene1.h"
 	"SDL2/SDL_ttf.h"
 	"stdio.h"

@@ -541,9 +541,8 @@ DBG_Status DrawableComp::DumpOutOfScene()
         }
 	}
 
-	SetSourceSize();
-	SetDrawSize();
-//	SetRelativePos();
+//	SetSourceSize();
+//	SetDrawSize();
 
     if(motherScene)
     {

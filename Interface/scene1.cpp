@@ -162,13 +162,13 @@ DBG_Status Scene1::InitScene()
     Label* temp = new Label(10, 10, LeftTop, "hello", (*menuFonts)[24], GetColor(White), 2, canv);
     Label* temp2 = new Label(240, 20, LeftTop, "你好", (*menuFonts)[24], GetColor(White), 2, motherCanv);
 
-    childCanv = new Canvas(GetColor(Cyan), 0.7f, SDL_Rect{10, 90, 160, 150}, SDL_Point{180, 150}, canv);
+    childCanv = new Canvas(GetColor(Cyan), 0.7f, SDL_Rect{10, 30, 160, 150}, SDL_Point{160, 150}, canv);
     childCanv->SetSlideInfo();
     Label* temp3 = new Label(20, 20, LeftTop, "画布显示测试", (*menuFonts)[24], GetColor(White), 2, childCanv);
     Button* but3 = new Button(60, 70, GetColor(LightGray), SDL_Point{60, 30}, childCanv);
 
 //    Button* but = new Button(25, 60, GetColor(LightGray), SDL_Point{30, 30}, canv);
-    Button* but = new Button(25, 60, "button.png", canv);
+    but = new Button(25, 60, "button.png", canv);
     SDL_Rect sizeArea = SDL_Rect{30, 25, 200, 100};
     but2 = new DragButton(100, 60, GetColor(LightGray), SDL_Point{60, 30}, &sizeArea, canv);
 //    DragButton* but2 = new DragButton(100, 60, GetColor(LightGray), SDL_Point{60, 30}, NULL, canv);
@@ -233,7 +233,7 @@ DBG_Status Scene1::InitScene()
 
 //temp
 //SDL_Point newSize = SDL_Point{400, 500};
-SDL_Point newSize = SDL_Point{180, 150};
+SDL_Point newSize = SDL_Point{160, 150};
 
 DBG_Status Scene1::HandleInput()
 {
@@ -301,14 +301,15 @@ DBG_Status Scene1::HandleInput()
     }
 
     //temp: unknown bugs here
-//    if(inputHandler->KeyPressed(SDL_SCANCODE_P))
-//    {
-//        *this << childCanv;
-//    }
-//    else if(inputHandler->KeyPressed(SDL_SCANCODE_O))
-//    {
-//        *this >> childCanv;
-//    }
+    //bug fixed
+    if(inputHandler->KeyPressed(SDL_SCANCODE_P))
+    {
+        *this << but;
+    }
+    else if(inputHandler->KeyPressed(SDL_SCANCODE_O))
+    {
+        *this >> but;
+    }
 
     return status;
 }

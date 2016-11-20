@@ -166,6 +166,7 @@ void Scene::OnCreateScrollBar(void* canvas, void* way)
         {
             //create the scroll bar
             ScrollBar* horzBar = new ScrollBar((Canvas*)canvas, scrHorizon);
+            ((Canvas*)canvas)->horizonScrollBar = horzBar;
             (*this) << horzBar;
         }
     }
@@ -180,6 +181,7 @@ void Scene::OnCreateScrollBar(void* canvas, void* way)
         {
             //create the scroll bar
             ScrollBar* vertBar = new ScrollBar((Canvas*)canvas, scrVerticle);
+            ((Canvas*)canvas)->verticleScrollBar = vertBar;
             (*this) << vertBar;
         }
     }
@@ -192,6 +194,7 @@ void Scene::OnDeleteScrollBar(void* canvas, void* way)
         if(horzScrollBar)
         {
             (*this) >> horzScrollBar;
+            ((Canvas*)canvas)->horizonScrollBar = NULL;
             delete horzScrollBar;
         }
     }
@@ -201,6 +204,7 @@ void Scene::OnDeleteScrollBar(void* canvas, void* way)
         if(vertScrollBar)
         {
             (*this) >> vertScrollBar;
+            ((Canvas*)canvas)->verticleScrollBar = NULL;
             delete vertScrollBar;
         }
     }

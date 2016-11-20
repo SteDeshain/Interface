@@ -164,7 +164,19 @@ DBG_Status GUI::DumpOutOfScene()
     DBG_Status status = DBG_OK;
 
     if(motherScene)
+    {
         motherScene->GUIComps.remove(this);
+
+        if(motherScene->selectedGUIComp == this)
+        {
+            motherScene->selectedGUIComp = NULL;
+        }
+
+        if(motherScene->pressedGUIComp == this)
+        {
+            motherScene->pressedGUIComp = NULL;
+        }
+    }
 
     status |= DrawableComp::DumpOutOfScene();
     return status;
@@ -750,6 +762,31 @@ DBG_Status Canvas::InitInScene(Scene* scene)
     //to set the scroll bars
     scrollOffset = SDL_Point{0, 0};
 
+#if 1
+    if(horizonScrollBar == NULL)
+    {
+        if(entireSize.x > drawSize.x)
+        {
+            PushCreateScrollBarEvent(this, (void*)scrHorizon);
+        }
+    }
+    else
+    {
+        (*motherScene) << horizonScrollBar;
+    }
+
+    if(verticleScrollBar == NULL)
+    {
+        if(entireSize.y > drawSize.y)
+        {
+            PushCreateScrollBarEvent(this, (void*)scrVerticle);
+        }
+    }
+    else
+    {
+        (*motherScene) << verticleScrollBar;
+    }
+#else
     //whether need scroll bars
     if(entireSize.x > drawSize.x)
     {
@@ -766,6 +803,7 @@ DBG_Status Canvas::InitInScene(Scene* scene)
         }
     }
 
+    //if it aleardy has scroll bars
     if(horizonScrollBar)
     {
         (*motherScene) << horizonScrollBar;
@@ -774,6 +812,7 @@ DBG_Status Canvas::InitInScene(Scene* scene)
     {
         (*motherScene) << verticleScrollBar;
     }
+#endif
 
     scene->GUIComps.push_back(this);
 
@@ -895,6 +934,7 @@ DBG_Status Canvas::ResetTexture(SDL_Point newSize)
             PushDeleteScrollBarEvent(this, (void*)scrHorizon);
         }
     }
+
     if(entireSize.y > drawSize.y)
     {
         if(verticleScrollBar == NULL)
@@ -983,6 +1023,9 @@ DBG_Status Button::InitInScene(Scene* scene)
 DBG_Status Button::DumpOutOfScene()
 {
     DBG_Status status = DBG_OK;
+
+    buttonDown = false;
+    sourceStartPoint.x = 0;
 
     status |= GUI::DumpOutOfScene();
     return status;
@@ -1173,11 +1216,33 @@ void DragButton::SetAreaLeftTop(int left, int top)
     }
 }
 
+DBG_Status DragButton::InitInScene(Scene* scene)
+{
+    DBG_Status status = DBG_OK;
+    status |= Button::InitInScene(scene);
+    if(status & DBG_REP_OPR)
+        return status;
+
+    //...
+
+    return status;
+}
+
+DBG_Status DragButton::DumpOutOfScene()
+{
+    DBG_Status status = DBG_OK;
+
+    //...
+
+    status |= Button::DumpOutOfScene();
+    return status;
+}
+
 DBG_Status DragButton::Update(Uint32 deltTick)
 {
     DBG_Status status = DBG_OK;
 
-    status |= Button::Update(deltTick);
+    status |= GUI::Update(deltTick);
 
     //follow mouse
 //    if(followMouse)
@@ -1247,6 +1312,9 @@ void DragButton::RestrictVertical()
 
 void DragButton::RestrictHorizon()
 {
+    //tmp
+//    return;
+
     int canvLeft = area->x;
     int canvRight = area->x + area->w;
 
@@ -1381,7 +1449,7 @@ ScrollBar::ScrollBar(Canvas* attachedCanvas, ScrollBarWay way)
                                      SDL_Point{ScrollBar::scrollBarSize, canvasBottom - canvasTop}, backgroundColor,
                                      0.5f, motherCanvas);
 
-            attachedCanvas->verticleScrollBar = this;
+//            attachedCanvas->verticleScrollBar = this;
 
             //temp
             ENG_LogInfo("Create a verticle scroll bar");
@@ -1404,7 +1472,7 @@ ScrollBar::ScrollBar(Canvas* attachedCanvas, ScrollBarWay way)
                                      SDL_Point{canvasRight - canvasLeft, ScrollBar::scrollBarSize}, backgroundColor,
                                      0.5f, motherCanvas);
 
-            attachedCanvas->horizonScrollBar = this;
+//            attachedCanvas->horizonScrollBar = this;
 
             //temp
             ENG_LogInfo("Create a horizon scroll bar");
@@ -1427,6 +1495,22 @@ ScrollBar::ScrollBar(Canvas* attachedCanvas, ScrollBarWay way)
 
 ScrollBar::~ScrollBar()
 {
+    switch(way)
+    {
+    case scrVerticle:
+//        attachedCanvas->verticleScrollBar = NULL;     //handled by scene event handler
+        //temp
+        ENG_LogInfo("Delete a verticle scroll bar");
+        break;
+
+    case scrHorizon:
+    default:
+//        attachedCanvas->horizonScrollBar = NULL;
+        //temp
+        ENG_LogInfo("Delete a verticle scroll bar");
+        break;
+    }
+
     if(rollBar)
         delete rollBar;
 
@@ -1438,22 +1522,6 @@ ScrollBar::~ScrollBar()
 
     if(rollBackground)
         delete rollBackground;
-
-    switch(way)
-    {
-    case scrVerticle:
-        attachedCanvas->verticleScrollBar = NULL;
-        //temp
-        ENG_LogInfo("Delete a verticle scroll bar");
-        break;
-
-    case scrHorizon:
-    default:
-        attachedCanvas->horizonScrollBar = NULL;
-        //temp
-        ENG_LogInfo("Delete a verticle scroll bar");
-        break;
-    }
 }
 
 DBG_Status ScrollBar::InitInScene(Scene* scene)
