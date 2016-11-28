@@ -6,14 +6,17 @@
 #include "color.h"
 #include "collide_type.h"
 #include "font.h"
+#include "stel.h"
 
 namespace steg
 {
 
+int FPS = 100;
+
 SDL_Window* Game::mainWindow = NULL;
-int Game::windowWidth = 1024;
-int Game::windowHeight = 576;
-const char* Game::windowName = "Steg Engine Test Window";
+int Game::windowWidth = 800;
+int Game::windowHeight = 480;
+const char* Game::windowName = "Steg Engine from SteDeshain";
 int Game::tileWidth = 64;
 
 DBG_Status Game::EngineInit()
@@ -22,6 +25,7 @@ DBG_Status Game::EngineInit()
 	SDL_Init(SDL_INIT_EVERYTHING);
 	//...
 	LogInit();
+	LuaInit();
 	FontInit();
 	EveInit();
 	CollideInit();
@@ -32,6 +36,7 @@ DBG_Status Game::EngineQuit()
     CollideQuit();
 	EveQuit();
 	FontQuit();
+	LuaQuit();
 	LogQuit();
 	//...
 	SDL_Quit();

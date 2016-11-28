@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1477224519 source:/home/stedeshain/Studio/Interface/Interface/game1.cpp
+1480314449 source:/home/stedeshain/Studio/Interface/Interface/game1.cpp
 	"game1.h"
 	"scene1.h"
 	"color.h"
@@ -13,7 +13,7 @@
 	"label.h"
 	"drawable_comp.h"
 
-1477988294 /home/stedeshain/Studio/Interface/Steg/game.h
+1480314382 /home/stedeshain/Studio/Interface/Steg/game.h
 	<stack>
 	"SDL2/SDL.h"
 	"status.h"
@@ -21,9 +21,10 @@
 	"log.h"
 	"config.h"
 
-1475134562 /home/stedeshain/Studio/Interface/Steg/status.h
+1480314180 /home/stedeshain/Studio/Interface/Steg/status.h
+	"SDL2/SDL.h"
 
-1477990801 /home/stedeshain/Studio/Interface/Steg/scene.h
+1480317550 /home/stedeshain/Studio/Interface/Steg/scene.h
 	<list>
 	"SDL2/SDL.h"
 	"status.h"
@@ -64,7 +65,7 @@
 	"core.h"
 	"particle.h"
 
-1476946938 /home/stedeshain/Studio/Interface/Steg/log.h
+1480315072 /home/stedeshain/Studio/Interface/Steg/log.h
 	<time.h>
 	"SDL2/SDL.h"
 	"SDL2/SDL_log.h"
@@ -144,7 +145,7 @@
 	"game.h"
 	"game1.h"
 
-1479625787 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
+1480338472 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
 	"scene1.h"
 	"SDL2/SDL_ttf.h"
 	"stdio.h"
@@ -152,6 +153,9 @@
 	"color.h"
 	"event_handler.h"
 	"font.h"
+	"stel.h"
+	<string>
+	<iostream>
 
 1477989396 /home/stedeshain/Studio/Interface/Steg/event_handler.h
 	"SDL2/SDL.h"
@@ -164,4 +168,11 @@
 	"status.h"
 
 1477988317 /home/stedeshain/Studio/Interface/Steg/config.h
+
+1480340183 /home/stedeshain/Studio/Interface/Steg/stel.h
+	<string>
+	"status.h"
+	"lua5.1/lua.h"
+	"lua5.1/lauxlib.h"
+	"lua5.1/lualib.h"
 

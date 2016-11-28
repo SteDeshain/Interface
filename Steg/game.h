@@ -14,11 +14,13 @@
 #include "log.h"
 #include "config.h"
 
-#define FPS                 100
-#define TICKS_PER_FRAME     (1000 / FPS)
+//#define FPS                 100
+#define TICKS_PER_FRAME     (1000 / steg::FPS)
 
 namespace steg
 {
+
+extern int FPS;
 
 class Game
 {

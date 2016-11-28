@@ -5,6 +5,9 @@
 #include "color.h"
 #include "event_handler.h"
 #include "font.h"
+#include "stel.h"
+#include <string>
+#include <iostream>
 
 namespace gameTest
 {
@@ -228,6 +231,24 @@ DBG_Status Scene1::InitScene()
 	sprintf(buffer, "resorted: %d", resortCt);
 	resortCount->ReloadTexture(buffer);
 
+	PLuaDoScript("script.lua");
+	//PLuaDoScript("./scripts/interface.lua");
+	std::string s;
+	PLuaGetGlobal("s", &s);
+	std::cout << s << std::endl;
+
+	int a;
+	PLuaGetGlobal("a", &a);
+	std::cout << "a = " << a << std::endl;
+
+	double b;
+	PLuaGetGlobal("b", &b);
+	std::cout << "b = " << b << std::endl;
+
+	bool t;
+	PLuaGetGlobal("t", &t);
+	std::cout << "t = " << (t ? "true" : "false") << std::endl;
+
 	return status;
 }
 
@@ -289,6 +310,7 @@ DBG_Status Scene1::HandleInput()
         PushShowCanvasEvent(childCanv);
 
     //temp: unknown bugs here
+    //bug fixed
     if(inputHandler->KeyPressed(SDL_SCANCODE_G))
     {
         newSize.x += 10;

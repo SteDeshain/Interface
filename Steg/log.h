@@ -61,6 +61,15 @@
         SDL_LogCritical(LUA_LOG_CATEGORY,							\
                         MESSAGE)
 
+#define LUA_LogErrors(MESSAGE1, MESSAGE2)							\
+        SDL_LogCritical(LUA_LOG_CATEGORY,			        		\
+                        "%s. %s (File: %s, Function: %s, Line: %d)",\
+                        MESSAGE1,				        			\
+                        MESSAGE2,				        			\
+                        __FILE__,				        			\
+                        __FUNCTION__,								\
+                        __LINE__)
+
 #define GAME_LogError(MESSAGE)										\
         SDL_LogCritical(GAME_LOG_CATEGORY,							\
                         "%s (File: %s, Function: %s, Line: %d)",	\

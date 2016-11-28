@@ -84,6 +84,8 @@
 		<Unit filename="sources_load.cpp" />
 		<Unit filename="sources_load.h" />
 		<Unit filename="status.h" />
+		<Unit filename="stel.cpp" />
+		<Unit filename="stel.h" />
 		<Unit filename="version.h" />
 		<Extensions>
 			<code_completion />

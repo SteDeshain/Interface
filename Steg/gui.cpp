@@ -1452,7 +1452,7 @@ ScrollBar::ScrollBar(Canvas* attachedCanvas, ScrollBarWay way)
 //            attachedCanvas->verticleScrollBar = this;
 
             //temp
-            ENG_LogInfo("Create a verticle scroll bar");
+            //ENG_LogInfo("Create a verticle scroll bar");
 
             break;
 
@@ -1475,7 +1475,7 @@ ScrollBar::ScrollBar(Canvas* attachedCanvas, ScrollBarWay way)
 //            attachedCanvas->horizonScrollBar = this;
 
             //temp
-            ENG_LogInfo("Create a horizon scroll bar");
+            //ENG_LogInfo("Create a horizon scroll bar");
 
             break;
         }
@@ -1500,14 +1500,14 @@ ScrollBar::~ScrollBar()
     case scrVerticle:
 //        attachedCanvas->verticleScrollBar = NULL;     //handled by scene event handler
         //temp
-        ENG_LogInfo("Delete a verticle scroll bar");
+        //ENG_LogInfo("Delete a verticle scroll bar");
         break;
 
     case scrHorizon:
     default:
 //        attachedCanvas->horizonScrollBar = NULL;
         //temp
-        ENG_LogInfo("Delete a verticle scroll bar");
+        //ENG_LogInfo("Delete a verticle scroll bar");
         break;
     }
 

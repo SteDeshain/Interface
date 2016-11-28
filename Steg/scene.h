@@ -89,9 +89,8 @@ public:
 	std::list<DrawableComp*> drawableComps;
 	std::list<GUI*> GUIComps;
 	GUI* selectedGUIComp;
-//	GUI* mouseOccupiedGUIComp;
 	GUI* pressedGUIComp;    //this should be handled by guiOperateHandler
-	std::list<SolidObj*> solidObjs;
+	std::list<SolidObj*> solidObjs; //scene comps
 
 private:
     int phyLastStartTick;
@@ -99,6 +98,8 @@ private:
 
     void OnCreateScrollBar(void* canvas, void* way);
     void OnDeleteScrollBar(void* canvas, void* way);
+
+    SDL_Texture* sceneCanvas = NULL;
 
 };
 

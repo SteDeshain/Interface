@@ -7,6 +7,8 @@
 #ifndef __STATUS_H__
 #define __STATUS_H__
 
+#include "SDL2/SDL.h"
+
 #define DBG_Status          Uint32
 
 #define DBG_OK              0x00000000
