@@ -1,7 +1,9 @@
 #ifndef __STEL_H__
 #define __STEL_H__
 
+#include <csetjmp>
 #include <string>
+#include <cstdarg>
 #include "status.h"
 #include "lua5.1/lua.h"
 #include "lua5.1/lauxlib.h"
@@ -10,11 +12,13 @@
 namespace steg
 {
 
+extern jmp_buf StelJmp;
 extern lua_State* L;
 
 DBG_Status LuaInit();
 void LuaQuit();
 
+// P: for protection mode
 DBG_Status PLuaDoScript(const char* scriptFile);
 
 DBG_Status PLuaGetGlobal(const char* name, int* value);				// int
@@ -33,6 +37,9 @@ DBG_Status PLuaGetFromGlobalTable(const char* table, const char* field, lua_CFun
 
 //call function already registered in global table LuaFunctions
 //DBG_Status PLuaCallRegisteredFunction(const char* luaFunctionName, ...);
+  
+// J: for long jump fake protection mode
+DBG_Status JLuaCallRegisteredFunction(const char* file, const char* functionPath, const char* argTypes, const char* retTypes, ...);
 
 }
 
