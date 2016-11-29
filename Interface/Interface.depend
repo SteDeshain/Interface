@@ -145,7 +145,7 @@
 	"game.h"
 	"game1.h"
 
-1480338472 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
+1480436157 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
 	"scene1.h"
 	"SDL2/SDL_ttf.h"
 	"stdio.h"
@@ -169,8 +169,10 @@
 
 1477988317 /home/stedeshain/Studio/Interface/Steg/config.h
 
-1480340183 /home/stedeshain/Studio/Interface/Steg/stel.h
+1480433682 /home/stedeshain/Studio/Interface/Steg/stel.h
+	<csetjmp>
 	<string>
+	<cstdarg>
 	"status.h"
 	"lua5.1/lua.h"
 	"lua5.1/lauxlib.h"

@@ -6,19 +6,16 @@ so I use this lua script as a interface
 and you should NOT overwrite any of them unless you can do it better
 --]]
 
--- all lua functions are registered in this table as a unique name like "enemy_wolf_attack_1" or "filePath&table1|table2|foo"?
+-- all lua functions are registered in this table as a unique name like "enemy_wolf_attack_1" or "table1|table2|table3|foo"?
 -- so that when the game needs to call it,
 -- the game will find it in this table with the unique name quickly ang call it
--- each element in this table is a table too
--- that table store three value: function to be called, nargs, nresults
--- so the functions in script to stored must return these three value
 LuaFunctions = {} --global
 
 Interface = {}  --global
 
--- store the files already were loaded as function by name of file's path
+-- restore the files already were loaded as function by name of file's path
 -- so if the readData function do a file, it'll check this table first
--- if the file to be done is already in this table, it'll call the function stored in this table
+-- if the file to be done is already in this table, it'll call the function restored in this table
 -- so it's not wise to edit script files during the game running
 Interface.loadedFiles = {}
 
@@ -72,28 +69,9 @@ function Interface.readData(file, field)
             end
         end
         res[length] = currentValue
-        --store funcitons
-        if type(currentValue) == "function" then
-            local key = file .. "&" .. singleField
-            fun, nargs, nresults = currentValue()
-            if type(fun) == "function" then
-                nargs = nargs or 0
-                nresults = nresults or 0
-                if type(nargs) ~= "number" then -- in case the currentValue returns non-number value
-                    nargs = 0
-                end
-                if type(nresults) ~= "number" then
-                    nresults = 0
-                end
-                LuaFunctions[key] = {}
-                LuaFunctions[key][1] = fun
-                LuaFunctions[key][2] = nargs
-                LuaFunctions[key][3] = nresults
-            else
-                LuaFunctions[key] = nil     -- if the newer one is not function, then overwrite old one
-            end
-            --LuaFunctions[key] = {}
-            --LuaFunctions[key][1], LuaFunctions[key][2], LuaFunctions[key][3] = currentValue()
+        --restore funcitons
+        if(type(currentValue) == "function") then
+            LuaFunctions[singleField] = currentValue
         end
     end
 --[[
@@ -109,12 +87,9 @@ end
 --[[
 --test
 print(Interface.readData("config.lua", "Config|window|width&Config|FPS&Config|tileWidth"))
-print(Interface.readData("script.lua", "s&t&a&b&funcs|foo"))
-for k, v in pairs(LuaFunctions) do
-    print(k, v)
-    for _, u in ipairs(v) do
-        print(u)
-    end
+print(Interface.readData("script.lua", "s&t&a&b&foo"))
+for _, v in pairs(LuaFunctions) do
+    print(v)
 end
 print(Interface.readData("config.lua", "Config|window|caption&Config|FPS"))
 --]]

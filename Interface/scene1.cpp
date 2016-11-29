@@ -249,6 +249,19 @@ DBG_Status Scene1::InitScene()
 	PLuaGetGlobal("t", &t);
 	std::cout << "t = " << (t ? "true" : "false") << std::endl;
 
+	PJLuaPushFromTable("b");
+	double tmp = 0;
+	PLuaPeek(&tmp);
+	std::cout << tmp << std::endl;
+
+	PJLuaPushFromTable("dffg");
+	PJLuaPushFromTable("t1");
+	PJLuaPushFromTable("t2");
+	PJLuaPushFromTable("t3");
+	PJLuaPushFromTable("v");
+	PLuaPeek(&tmp);
+	std::cout << tmp << std::endl;
+
 	return status;
 }
 

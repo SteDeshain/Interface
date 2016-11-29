@@ -3,6 +3,7 @@
 
 namespace steg
 {
+
 jmp_buf StelJmp;
 lua_State* L = NULL;
 
@@ -11,6 +12,12 @@ static int cLuaLoadLibs(lua_State* L)
 	luaL_openlibs(L);
 
 	return 0;
+}
+
+int PLuaPanic(lua_State* L)
+{
+    LUA_LogError(lua_tostring(L, -1));
+    longjmp(StelJmp, 1);
 }
 
 DBG_Status LuaInit()
@@ -29,6 +36,7 @@ DBG_Status LuaInit()
 	}
 	else
 	{
+	    lua_atpanic(L, PLuaPanic);  //it's safe here
 		if(lua_cpcall(L, cLuaLoadLibs, NULL))
 		{
 			//handle error
@@ -308,8 +316,114 @@ DBG_Status PLuaGetGlobal(const char* name, lua_CFunction* value)
 	return status;
 }
 
-DBG_Status JLuaCallRegisteredFunction(const char* file, const char* functionPath, const char* argTypes, const char* retTypes, ...)
+DBG_Status PJCallLuaFunction(const char* file, const char* functionPath, const char* argTypes, LuaRets** rets, ...)
 {
+//    LuaRets* newRets = NULL;
+//    if(rets != NULL)
+//    {
+//        //allocate new LuaRets as results
+//        //if any error happens in this function, I MUST remember to delete this object!!!
+//        newRets = new LuaRets();
+//    }
+//    else
+//    {
+//    }
 }
-	
+
+DBG_Status PJLuaPushFromTable(const char* field)    //[-0, +1]
+{
+    DBG_Status status = DBG_OK;
+
+    bool readFromGlobal = false;
+    if(lua_gettop(L) <= 0)
+    {
+        readFromGlobal = true;
+    }
+    else
+    {
+        if(!lua_istable(L, -1))
+        {
+            readFromGlobal = true;
+        }
+    }
+
+    if(readFromGlobal)
+    {
+        if(!setjmp(StelJmp))    // try
+        {
+            lua_getglobal(L, field);    //[-0, +1, e]
+        }
+        else                    // catch
+        {
+            //necessary?
+            LUA_LogError("thrown error catched, happenning in PJLuaPushFromTable, error message is at the previous line!");
+        }
+    }
+    else
+    {
+        if(!setjmp(StelJmp))    // try
+        {
+            lua_getfield(L, -1, field);     //[-0, +1, e]
+        }
+        else                    // catch
+        {
+            //necessary?
+            LUA_LogError("thrown error catched, happenning in PJLuaPushFromTable, error message is at the previous line!");
+        }
+    }
+
+    return status;
+}
+
+DBG_Status PLuaPeek(double* value)
+{
+    DBG_Status status = DBG_OK;
+
+    if(lua_gettop(L) <= 0)
+    {
+        LUA_LogError("Lua stack is empty, cannot peek!");
+        return DBG_LUA_ERR;
+    }
+
+    if(!lua_isnumber(L, -1))
+    {
+        LUA_LogError("Lua stack top is not a number, can't assign it to a double!");
+        return DBG_LUA_ERR;
+    }
+
+    *value = lua_tonumber(L, -1);
+
+    return status;
+}
+
+DBG_Status PLuaPeek(float* value)
+{
+    DBG_Status status = DBG_OK;
+
+    double tmp = 0;
+    status |= PLuaPeek(&tmp);
+
+    if(status == DBG_OK)
+    {
+        *value = (float)tmp;
+    }
+
+    return status;
+}
+
+DBG_Status PLuaPeek(int* value)
+{
+    DBG_Status status = DBG_OK;
+
+    double tmp = 0;
+    status |= PLuaPeek(&tmp);
+
+    if(status == DBG_OK)
+    {
+        *value = (int)tmp;
+    }
+
+    return status;
+}
+
 }
