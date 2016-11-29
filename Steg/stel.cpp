@@ -3,7 +3,7 @@
 
 namespace steg
 {
-
+jmp_buf StelJmp;
 lua_State* L = NULL;
 
 static int cLuaLoadLibs(lua_State* L)
@@ -308,4 +308,8 @@ DBG_Status PLuaGetGlobal(const char* name, lua_CFunction* value)
 	return status;
 }
 
+DBG_Status JLuaCallRegisteredFunction(const char* file, const char* functionPath, const char* argTypes, const char* retTypes, ...)
+{
+}
+	
 }
