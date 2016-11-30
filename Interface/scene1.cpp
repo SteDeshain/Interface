@@ -249,18 +249,47 @@ DBG_Status Scene1::InitScene()
 	PLuaGetGlobal("t", &t);
 	std::cout << "t = " << (t ? "true" : "false") << std::endl;
 
-	PJLuaPushFromTable("b");
+	std::cout << lua_gettop(steg::L) << std::endl;
+
+	PLuaPushFromTable_J("b");
 	double tmp = 0;
 	PLuaPeek(&tmp);
 	std::cout << tmp << std::endl;
 
-	PJLuaPushFromTable("dffg");
-	PJLuaPushFromTable("t1");
-	PJLuaPushFromTable("t2");
-	PJLuaPushFromTable("t3");
-	PJLuaPushFromTable("v");
-	PLuaPeek(&tmp);
+	PLuaPushFromTable_J("dffg");
+	PLuaPushFromTable_J("t1");
+	PLuaPushFromTable_J("t2");
+	PLuaPushFromTable_J("t3");
+	PLuaPushFromTable_J("v");
+	PLuaPop(&tmp);
+	PLuaPop();
 	std::cout << tmp << std::endl;
+
+	PLuaPop();
+	PLuaPop();
+	PLuaPop();
+	PLuaPop();
+
+	std::cout << lua_gettop(steg::L) << std::endl;
+
+	lua_newuserdata(steg::L, sizeof(steg::DrawableComp));
+	lua_setglobal(steg::L, "ud");
+
+	lua_pushlightuserdata(steg::L, (void*)"c string");
+	lua_setglobal(steg::L, "lud");
+
+	LuaResult* res;
+
+	PCallLuaFunctionWithUid_J("readData", "ss", NULL, "script.lua", "t1|t2|t3|v&t1|t2|t3|foo");
+	PCallLuaFunctionWithUid_J("readData", "ss", NULL, "config.lua", "Config|window|width&Config|FPS&Config|tileWidth");
+	PCallLuaFunctionWithUid_J("script.lua&t1|t2|t3|foo", "", &res);
+	PCallLuaFunctionWithUid_J("script.lua&t1|t2|t3|foo", "", NULL);
+	PCallLuaFunctionWithUid_J("readData", "ss", NULL, "script.lua", "t1|t2|t3|v&t1|t2|t3|foo");
+
+	res->PrintToStanderdOut();
+	delete res; //remember to delete it
+
+	std::cout << lua_gettop(steg::L) << std::endl;
 
 	return status;
 }

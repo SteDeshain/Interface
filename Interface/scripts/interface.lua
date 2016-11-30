@@ -6,13 +6,19 @@ so I use this lua script as a interface
 and you should NOT overwrite any of them unless you can do it better
 --]]
 
--- all lua functions are registered in this table as a unique name like "enemy_wolf_attack_1" or "filePath&table1|table2|foo"?
+-- all lua functions are registered in this table
+-- with a unique name like "enemy_wolf_attack_1" or "filePath|foo.lua&table1|table2|foo"
 -- so that when the game needs to call it,
 -- the game will find it in this table with the unique name quickly ang call it
 -- each element in this table is a table too
 -- that table store three value: function to be called, nargs, nresults
 -- so the functions in script to stored must return these three value
 LuaFunctions = {} --global
+
+-- all lua_CFunction are registered into this table
+-- as an interface lua use to interactive with the host program
+-- this table may have other tables in it, and the final c function is in some table in it
+CFunctions = {} --global
 
 Interface = {}  --global
 
@@ -86,9 +92,9 @@ function Interface.readData(file, field)
                     nresults = 0
                 end
                 LuaFunctions[key] = {}
-                LuaFunctions[key][1] = fun
-                LuaFunctions[key][2] = nargs
-                LuaFunctions[key][3] = nresults
+                LuaFunctions[key]["function"] = fun
+                LuaFunctions[key]["argNumber"] = nargs
+                LuaFunctions[key]["resNumber"] = nresults
             else
                 LuaFunctions[key] = nil     -- if the newer one is not function, then overwrite old one
             end
@@ -103,8 +109,16 @@ function Interface.readData(file, field)
         print(unpack(fieldsList[i]))
     end
 --]]
-    return unpack(res)
+
+    --return unpack(res)
+    return res  --return an array
 end
+
+-- register readData function
+LuaFunctions["readData"] = {}
+LuaFunctions["readData"]["function"] = Interface.readData
+LuaFunctions["readData"]["argNumber"] = 2
+LuaFunctions["readData"]["resNumber"] = 1
 
 --[[
 --test

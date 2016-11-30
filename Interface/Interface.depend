@@ -145,7 +145,7 @@
 	"game.h"
 	"game1.h"
 
-1480436157 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
+1480515948 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
 	"scene1.h"
 	"SDL2/SDL_ttf.h"
 	"stdio.h"
@@ -169,7 +169,7 @@
 
 1477988317 /home/stedeshain/Studio/Interface/Steg/config.h
 
-1480433682 /home/stedeshain/Studio/Interface/Steg/stel.h
+1480515559 /home/stedeshain/Studio/Interface/Steg/stel.h
 	<csetjmp>
 	<string>
 	<cstdarg>

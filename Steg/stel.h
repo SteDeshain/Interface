@@ -19,6 +19,8 @@ DBG_Status LuaInit();
 void LuaQuit();
 
 // P: for complete protection mode
+// J: for long jump fake protection mode
+
 DBG_Status PLuaDoScript(const char* scriptFile);
 
 DBG_Status PLuaGetGlobal(const char* name, double* value);			// double
@@ -37,57 +39,81 @@ DBG_Status PLuaGetFromGlobalTable(const char* table, const char* field, std::str
 DBG_Status PLuaGetFromGlobalTable(const char* table, const char* field, lua_CFunction* value);
 /**/
 
-// J: for long jump fake protection mode
+class LuaResult;  //pre-declaration
 
-class LuaRets;  //pre-declaration
-
-// before call this function, first declare a LuaRets* pointer to pass to this function
-// so that it can restore the results to this pointer
-// but the caller must delete the LuaRets object at this address after using it
+// before call this function, first declare a LuaResult** pointer to pass to this function
+// so that it can store the results to this pointer
+// but the user must delete the LuaResult object at this address after using it
 // if rets == NULL, then the function will not do anything about getting lua function's results
 // ***
 // the argTypes is a string may containing character like:
-// 's' for strnig; 'n' for number; 'b' for boolean; 'u' for userdata;
-// other characters in this string will be ignored
+// 's'     'n'     'b'      'u'       'N'
+// string, number, boolean, userdata, nil
+// other characters in this string will cause pushing a nil
 // the final arguments number will be the number stored in LuaFunction table
-DBG_Status PJCallLuaFunction(const char* file, const char* functionPath, const char* argTypes, LuaRets** rets, ...);
-DBG_Status PJCallLuaFunctionWithUid(const char* uniqueID, const char* argTypes, LuaRets** rets, ...);
+// ***
+// as for getting results, lua_pcall will push results by the number of nresults
+// and when PCallLuaFunction_J is getting results, it'll pop elemnts by number of nresults, the same number
+// do it's safe to operate the stack when getting results
+// ***
+// example: ..., "sNn", "a string", 100);    //push "a string", nil, 100 (if argNumber == 3)
+//               "", 1, 2, 3);               //push nil, nil (if argNumber == 2)
+DBG_Status PCallLuaFunction_J(const char* file, const char* functionPath, const char* argTypes, LuaResult** rets, ...);
+DBG_Status PCallLuaFunctionWithUid_J(const char* uniqueID, const char* argTypes, LuaResult** rets, ...);
 
 //******************************// Stack Operation //******************************//
 // if at the stack top is a table, then get the field from the top table, and push it onto stack
 // else, get the field from the _G table, and push it onto stack
 // if can't find field or any error happens, push nil onto stack
-DBG_Status PJLuaPushFromTable(const char* field);    // [-0, +1]
-
-DBG_Status PJLuaPop(double* value);                  // [-1, +0] (-0 only when the stack is empty)
-DBG_Status PJLuaPop(int* value);
-DBG_Status PJLuaPop(float* value);
-DBG_Status PJLuaPop(bool* value);
-DBG_Status PJLuaPop(std::string* value);
-DBG_Status PJLuaPop(lua_CFunction* value);
+DBG_Status PLuaPushFromTable_J(const char* field);    // [-0, +1]
 
 DBG_Status PLuaPeek(double* value);                 // [-0, +0]
 DBG_Status PLuaPeek(int* value);
 DBG_Status PLuaPeek(float* value);
 DBG_Status PLuaPeek(bool* value);
-DBG_Status PJLuaPeek(std::string* value);
+DBG_Status PLuaPeek_J(std::string* value);
 DBG_Status PLuaPeek(lua_CFunction* value);
+
+DBG_Status PLuaPop();                               // [-1, +0] pop one element from stack
+DBG_Status PLuaPop(double* value);                  // [-1, +0] (-0 only when the stack is empty)
+DBG_Status PLuaPop(int* value);
+DBG_Status PLuaPop(float* value);
+DBG_Status PLuaPop(bool* value);
+DBG_Status PLuaPop_J(std::string* value);
+DBG_Status PLuaPop(lua_CFunction* value);
 
 
 // lua may return: nil, number, string, boolean, table, function, thread, userdata (total: 8)
-// we can't express table, function(lua function), thread
-// so there are 5 left
-class LuaRets
+//                 'N'  'n'     's'     'b'      't'    'f'       'T'     'u'
+// we can't express table, function(lua function), thread in c++
+// so there are 5 left: nil, number, string, boolean, userdata
+class LuaResult
 {
 
 public:
-    LuaRets();
-    ~LuaRets();
+    struct Result
+    {
+        char type;
+        void* value;
+    };
+
+public:
+    LuaResult(unsigned int n);
+    ~LuaResult();
 
     int GetResultNumber();
 
+    DBG_Status PAddNewResult_J();   //use the lua stack top value to add(make a copy if necessary)
+                                    //if the currentIndex is beyond resultNumber, it'll do nothing and return, and log an error
+
+    Result* operator[](unsigned int i); //user can't delete the pointer returned
+
+    void PrintToStanderdOut();
+
 private:
-    int resultNumber = 0;
+    unsigned int resultNumber = 0;
+    unsigned int currentIndex = 0;  //inner use index the current element in AddNewResult
+    Result** ptr = NULL;    //array of Result*, each element point to a struct Result
 
 };
 
