@@ -137,6 +137,178 @@ DBG_Status PLuaDoScript(const char* scriptFile)
 	return status;
 }
 
+DBG_Status PRegisterLuaFunction_J(const char* file, const char* funPath)
+{
+    DBG_Status status = DBG_OK;
+
+    if(file == NULL || funPath == NULL)
+    {
+        LUA_LogError("Arguments can't be NULL!");
+        return DBG_ARG_ERR | DBG_NULL_PTR;
+    }
+
+    status |= PCallLuaFunctionWithUid_J("readData", "ss", NULL, file, funPath);
+
+    return status;
+}
+
+DBG_Status PRegisterLuaFunction_J(const char* file, const char* funPath, const char* funcitonName)
+{
+    DBG_Status status = DBG_OK;
+
+    if(file == NULL || funPath == NULL || funcitonName == NULL)
+    {
+        LUA_LogError("Arguments can't be NULL!");
+        return DBG_ARG_ERR | DBG_NULL_PTR;
+    }
+
+    status |= PCallLuaFunctionWithUid_J("readData", "ss", NULL, file, funPath);
+
+    lua_pushnil(L);                                                             // +1
+
+    std::string oldFunName = file;
+    oldFunName += '&';
+    oldFunName += funPath;
+
+    status |= PLuaPushFromTable_J("LuaFunctions");                              // +1
+    status |= PLuaPushFromTable_J(oldFunName.c_str());                          // +1
+
+    if(!setjmp(StelJmp))
+    {
+        lua_setfield(L, -2, funcitonName);                                      // -1
+    }
+    else
+    {
+        LUA_LogError("Cannot do lua_setfield!");
+        status |= DBG_LUA_ERR;
+    }
+
+    lua_pop(L, 1);                                                              // -1
+    lua_pop(L, 1);                                                              // -1
+
+    return status;
+}
+
+DBG_Status PRegisterCFunction_J(lua_CFunction func, const char* funcitonName)
+{
+    DBG_Status status = DBG_OK;
+
+    if(funcitonName == NULL)
+    {
+        LUA_LogError("funcitonName can't be NULL!");
+        return DBG_ARG_ERR | DBG_NULL_PTR;
+    }
+
+    lua_pushnil(L);                                                             // +1
+
+    status |= PLuaPushFromTable_J("CFunctions");                                // +1
+
+    if(!setjmp(StelJmp))
+    {
+        lua_pushcfunction(L, func);                                             // +1
+    }
+    else
+    {
+        LUA_LogError("Cannot do lua_pushcfunction!");
+        status |= DBG_LUA_ERR;
+    }
+
+    if(!setjmp(StelJmp))
+    {
+        lua_setfield(L, -2, funcitonName);                                      // -1
+    }
+    else
+    {
+        LUA_LogError("Cannot do lua_setfield!");
+        status |= DBG_LUA_ERR;
+    }
+
+    lua_pop(L, 1);                                                              // -1
+    lua_pop(L, 1);                                                              // -1
+
+    return status;
+}
+
+DBG_Status PLuaReadData_J(const char* file, const char* field, LuaResult** rets)
+{
+    DBG_Status status = DBG_OK;
+
+    if(file == NULL || field == NULL || rets == NULL)
+    {
+        LUA_LogError("Arguments can't be NULL!");
+        return DBG_ARG_ERR | DBG_NULL_PTR;
+    }
+
+    lua_pushnil(L);                                                     // +1
+    status |= PLuaPushFromTable_J("LuaFunctions");                      // +1
+    status |= PLuaPushFromTable_J("readData");                          // +1
+    status |= PLuaPushFromTable_J("function");                          // +1
+
+    if(!setjmp(StelJmp))
+    {
+        lua_pushstring(L, file);                                        // +1
+    }
+    else
+    {
+        LUA_LogError("Cannot do lua_pushstring!");
+    }
+
+    if(!setjmp(StelJmp))
+    {
+        lua_pushstring(L, field);                                       // +1
+    }
+    else
+    {
+        LUA_LogError("Cannot do lua_pushstring!");
+    }
+
+    if(lua_pcall(L, 2, 1, 0))                                           // -3
+    {
+        //hanle error                                       // +1
+        if(!setjmp(StelJmp))
+            LUA_LogErrors("Error when lua_pcall: ", lua_tostring(L, -1));
+        else
+            LUA_LogError("Cannot do lua_tostring when logging error!");
+
+        lua_pop(L, 1);                                      // -1
+
+        *rets = NULL;
+    }
+    else
+    {
+        //no error                                                      // +1 push the result table
+        if(!setjmp(StelJmp))
+            lua_getfield(L, -1, "length");      // +1
+        else
+            LUA_LogError("Cannot do lua_getfield!");
+
+        int resNumber = lua_tonumber(L, -1);
+        lua_pop(L, 1);                          // -1
+
+        LuaResult* finRes = new LuaResult(resNumber);
+        for(int i = resNumber - 1; i >= 0; i--)
+        {
+            lua_pushnumber(L, i + 1);           // +1
+            lua_gettable(L, -2);                // -1 +1
+            finRes->PAddNewResult_J();
+            lua_pop(L, 1);                      // -1
+        }
+
+        lua_pop(L, 1);                                                  // -1 pop the table
+
+        *rets = finRes;
+    }
+
+    //pop function
+    lua_pop(L, 1);
+    //pop readData
+    lua_pop(L, 1);
+    //pop LuaFunctions
+    lua_pop(L, 1);
+
+    return status;
+}
+
 struct typePtrPair
 {
 	const char* name;
@@ -321,6 +493,152 @@ DBG_Status PCallLuaFunction_J(const char* file, const char* functionPath, const 
 {
     DBG_Status status = DBG_OK;
 
+    if(file == NULL || functionPath == NULL || argTypes == NULL)
+    {
+        LUA_LogError("function name or argTypes can't be NULL!");
+        return DBG_ARG_ERR | DBG_NULL_PTR;
+    }
+
+    std::string uid = file;
+    uid += '&';
+    uid += functionPath;
+    const char* uniqueID = uid.c_str();
+
+    va_list vars;
+    va_start(vars, rets);
+
+    //push nil
+    lua_pushnil(L);                                                                             // +1
+
+    int argNumber = 0;
+    int resNumber = 0;
+
+    PLuaPushFromTable_J("LuaFunctions");                                                        // +1
+    PLuaPushFromTable_J(uniqueID);                                                              // +1
+    //now the table containing function and argNumber and resNumber is at stack top
+
+    if(lua_isnil(L, -1))
+    {
+        //no registration
+        LUA_LogErrors("Cannot find function, may not be registered! function: ", uniqueID);
+        lua_pop(L, 3);
+        *rets = NULL;
+        return DBG_LUA_ERR;
+    }
+
+    //get argNumber
+    PLuaPushFromTable_J("argNumber");   // +1
+    PLuaPop(&argNumber);                // -1
+    //get resNumber
+    PLuaPushFromTable_J("resNumber");   // +1
+    PLuaPop(&resNumber);                // -1
+    //push the function
+    PLuaPushFromTable_J("function");                                                            // +1
+    //now, the function is at stack top
+
+    //handle and push arguments
+    bool atArgTypesEnd = false;
+    for(int i = 0; i < argNumber; i++)                                                          // +argNumber
+    {
+        //once step into this loop, the argNumber is not less than 1 !
+        //every step in this loop must push a value!!!
+
+        if(!atArgTypesEnd)
+        {
+            char current = *(argTypes + i);
+            if(current == '\0')
+            {
+                atArgTypesEnd = true;
+                lua_pushnil(L);
+            }
+            else
+            {
+                switch(current)
+                {
+                case 'N':   // nil
+                    lua_pushnil(L);
+                    break;
+                case 'n':   // number
+                    lua_pushnumber(L, va_arg(vars, double));
+                    break;
+                case 's':   // string
+                    if(!setjmp(StelJmp))
+                        lua_pushstring(L, va_arg(vars, char*));
+                    else
+                    {
+                        LUA_LogError("Cannot push string onto stack!");
+                        status |= DBG_LUA_ERR;
+                    }
+                    break;
+                case 'b':   // boolean
+                    lua_pushboolean(L, va_arg(vars, bool));
+                    break;
+                case 'u':   // lightuserdata
+                    lua_pushlightuserdata(L, va_arg(vars, void*));
+                    break;
+                default:
+                    //push nil at wrong character
+                    lua_pushnil(L);
+                    break;
+                }
+            }
+        }
+        else
+        {
+            lua_pushnil(L);
+        }
+    }
+
+    //pcall
+    if(lua_pcall(L, argNumber, resNumber, 0))                                                   // -argNumber-1
+    {                                           // +1
+        //handle error
+        std::string  error;
+        PLuaPop_J(&error);                      // -1
+        LUA_LogErrors("Error when lua_pcall: ", error.c_str());
+    }
+    else    //pcall successfully                                                                // +resNumber
+    {
+        //get results
+        if(rets != NULL)                                                                        // -resNumber
+        {
+            //allocate new LuaResult as results
+            //if any error happens in this function, I MUST remember to delete this object!!!
+            LuaResult* resRets = NULL;
+            resRets = new LuaResult(resNumber);
+            if(resRets == NULL)
+            {
+                LUA_LogError("Cannot allocate LuaResult for resRets!");
+                lua_pop(L, resNumber);
+                *rets = NULL;
+            }
+            else
+            {
+                for(int i = 0; i < resNumber; i++)
+                {
+                    //every step in this loop must pop one element!
+                    resRets->PAddNewResult_J();
+                    lua_pop(L, 1);
+                }
+                *rets = resRets;
+            }
+        }
+        else
+        {
+            lua_pop(L, resNumber);
+        }
+
+    }
+
+    //pop function table
+    lua_pop(L, 1);                                                                              // -1
+    //pop LuaFunctions
+    lua_pop(L, 1);                                                                              // -1
+
+    lua_pop(L, 1);  //pop nil                                                                   // -1
+                                                                                                // balance
+    va_end(vars);
+
     return status;
 }
 
@@ -346,6 +664,15 @@ DBG_Status PCallLuaFunctionWithUid_J(const char* uniqueID, const char* argTypes,
     PLuaPushFromTable_J("LuaFunctions");                                                        // +1
     PLuaPushFromTable_J(uniqueID);                                                              // +1
     //now the table containing function and argNumber and resNumber is at stack top
+
+    if(lua_isnil(L, -1))
+    {
+        //no registration
+        LUA_LogErrors("Cannot find function, may not be registered! function: ", uniqueID);
+        lua_pop(L, 3);
+        *rets = NULL;
+        return DBG_LUA_ERR;
+    }
 
     //get argNumber
     PLuaPushFromTable_J("argNumber");   // +1
@@ -805,8 +1132,9 @@ DBG_Status LuaResult::PAddNewResult_J()
     if(currentIndex >= resultNumber)
         return DBG_OUT_OF_RANGE | DBG_LUA_ERR;
 
-    ptr[currentIndex] = new Result;
-    if(ptr[currentIndex] == NULL)
+    int i = resultNumber - currentIndex - 1;
+    ptr[i] = new Result;
+    if(ptr[i] == NULL)
     {
         LUA_LogError("Cannot allocate struct Result for each element in LuaResult!");
         return DBG_MEM_ERR;
@@ -814,8 +1142,8 @@ DBG_Status LuaResult::PAddNewResult_J()
     else
     {
         //default set as nil
-        ptr[currentIndex]->type = 'N';
-        ptr[currentIndex]->value = NULL;
+        ptr[i]->type = 'N';
+        ptr[i]->value = NULL;
     }
 
     switch(lua_type(L, -1))
@@ -824,33 +1152,33 @@ DBG_Status LuaResult::PAddNewResult_J()
         //do nothing, because ptr[currentIndex] was already set to nil as default
         break;
     case LUA_TNUMBER:
-        ptr[currentIndex]->type = 'n';
-        ptr[currentIndex]->value = new double;
-        if(ptr[currentIndex]->value == NULL)
+        ptr[i]->type = 'n';
+        ptr[i]->value = new double;
+        if(ptr[i]->value == NULL)
         {
             LUA_LogError("Cannot allocate double for struct Result!");
         }
         else
         {
-            *((double*)(ptr[currentIndex]->value)) = lua_tonumber(L, -1);
+            *((double*)(ptr[i]->value)) = lua_tonumber(L, -1);
         }
         break;
     case LUA_TBOOLEAN:
-        ptr[currentIndex]->type = 'b';
-        ptr[currentIndex]->value = new bool;
-        if(ptr[currentIndex]->value == NULL)
+        ptr[i]->type = 'b';
+        ptr[i]->value = new bool;
+        if(ptr[i]->value == NULL)
         {
             LUA_LogError("Cannot allocate bool for struct Result!");
         }
         else
         {
-            *((bool*)(ptr[currentIndex]->value)) = lua_toboolean(L, -1);
+            *((bool*)(ptr[i]->value)) = lua_toboolean(L, -1);
         }
         break;
     case LUA_TSTRING:
-        ptr[currentIndex]->type = 's';
-        ptr[currentIndex]->value = new std::string;
-        if(ptr[currentIndex]->value == NULL)
+        ptr[i]->type = 's';
+        ptr[i]->value = new std::string;
+        if(ptr[i]->value == NULL)
         {
             LUA_LogError("Cannot allocate std::string for struct Result!");
         }
@@ -858,27 +1186,28 @@ DBG_Status LuaResult::PAddNewResult_J()
         {
             if(!setjmp(StelJmp))    //try
             {
-                *((std::string*)(ptr[currentIndex]->value)) = lua_tostring(L, -1);
+                *((std::string*)(ptr[i]->value)) = lua_tostring(L, -1);
             }
             else                    //catch
             {
+                LUA_LogError("Lua cannot tostring!");
             }
         }
         break;
     case LUA_TUSERDATA:
     case LUA_TLIGHTUSERDATA:
-        ptr[currentIndex]->type = 'u';
-        ptr[currentIndex]->value = lua_touserdata(L, -1);   //no need to new
+        ptr[i]->type = 'u';
+        ptr[i]->value = lua_touserdata(L, -1);   //no need to new
         break;
 
     case LUA_TTABLE:
-        ptr[currentIndex]->type = 't';
+        ptr[i]->type = 't';
         break;
     case LUA_TFUNCTION:
-        ptr[currentIndex]->type = 'f';
+        ptr[i]->type = 'f';
         break;
     case LUA_TTHREAD:
-        ptr[currentIndex]->type = 'T';
+        ptr[i]->type = 'T';
         break;
     case LUA_TNONE:
     default:
@@ -904,7 +1233,35 @@ LuaResult::Result* LuaResult::operator[](unsigned int i)
 
 static void printResult(LuaResult::Result* r)
 {
-    std::cout << r->type << ": " << r->value;   //temp
+    switch(r->type)
+    {
+    case 'N':
+        std::cout << "nil";
+        break;
+    case 'n':
+        std::cout << "number: " << *((double*)(r->value));
+        break;
+    case 's':
+        std::cout << "string: " << *((std::string*)(r->value));
+        break;
+    case 'b':
+        std::cout << "boolean: " << *((bool*)(r->value));
+        break;
+    case 't':
+        std::cout << "table";
+        break;
+    case 'f':
+        std::cout << "function";
+        break;
+    case 'T':
+        std::cout << "thread";
+        break;
+    case 'u':
+        std::cout << "userdata: " << r->value;
+        break;
+    default:
+        break;
+    }
 }
 
 void LuaResult::PrintToStanderdOut()

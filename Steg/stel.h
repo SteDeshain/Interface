@@ -21,7 +21,15 @@ void LuaQuit();
 // P: for complete protection mode
 // J: for long jump fake protection mode
 
+class LuaResult;  //pre-declaration
+
 DBG_Status PLuaDoScript(const char* scriptFile);
+
+DBG_Status PRegisterLuaFunction_J(const char* file, const char* funPath, const char* funcitonName);   //register as a new name
+DBG_Status PRegisterLuaFunction_J(const char* file, const char* funPath);
+DBG_Status PRegisterCFunction_J(lua_CFunction func, const char* funcitonName);
+
+DBG_Status PLuaReadData_J(const char* file, const char* field, LuaResult** rets);
 
 DBG_Status PLuaGetGlobal(const char* name, double* value);			// double
 DBG_Status PLuaGetGlobal(const char* name, int* value);				// int
@@ -29,17 +37,6 @@ DBG_Status PLuaGetGlobal(const char* name, float* value);			// float
 DBG_Status PLuaGetGlobal(const char* name, bool* value);			// bool
 DBG_Status PLuaGetGlobal(const char* name, std::string* value);		// string
 DBG_Status PLuaGetGlobal(const char* name, lua_CFunction* value);	// c function
-
-/**
-DBG_Status PLuaGetFromGlobalTable(const char* table, const char* field, int* value);
-DBG_Status PLuaGetFromGlobalTable(const char* table, const char* field, double* value);
-DBG_Status PLuaGetFromGlobalTable(const char* table, const char* field, float* value);
-DBG_Status PLuaGetFromGlobalTable(const char* table, const char* field, bool* value);
-DBG_Status PLuaGetFromGlobalTable(const char* table, const char* field, std::string* value);
-DBG_Status PLuaGetFromGlobalTable(const char* table, const char* field, lua_CFunction* value);
-/**/
-
-class LuaResult;  //pre-declaration
 
 // before call this function, first declare a LuaResult** pointer to pass to this function
 // so that it can store the results to this pointer
@@ -106,7 +103,7 @@ public:
     DBG_Status PAddNewResult_J();   //use the lua stack top value to add(make a copy if necessary)
                                     //if the currentIndex is beyond resultNumber, it'll do nothing and return, and log an error
 
-    Result* operator[](unsigned int i); //user can't delete the pointer returned
+    Result* operator[](unsigned int i); //user can't delete the pointer returned by []
 
     void PrintToStanderdOut();
 

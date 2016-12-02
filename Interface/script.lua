@@ -27,12 +27,15 @@ t1 = {}
 t1.t2 = {}
 t1.t2.t3 = {}
 t1.t2.t3.v = 100
+t1.t2.t3.a = 200
 t1.t2.t3.foo = function()
     return
-        function()
+        function(a)
             print("succeed!!!")
+            x, y = CFunctions.test(a)
             return
                 1.5,
+                x, y,
                 nil,
                 {},
                 function() return 1 end,
@@ -41,7 +44,7 @@ t1.t2.t3.foo = function()
                 ud,
                 lud
         end,
-        0,
+        1,
         8
 end
 

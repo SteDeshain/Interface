@@ -145,7 +145,7 @@
 	"game.h"
 	"game1.h"
 
-1480515948 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
+1480675600 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
 	"scene1.h"
 	"SDL2/SDL_ttf.h"
 	"stdio.h"
@@ -156,6 +156,7 @@
 	"stel.h"
 	<string>
 	<iostream>
+	"c_api.h"
 
 1477989396 /home/stedeshain/Studio/Interface/Steg/event_handler.h
 	"SDL2/SDL.h"
@@ -169,11 +170,16 @@
 
 1477988317 /home/stedeshain/Studio/Interface/Steg/config.h
 
-1480515559 /home/stedeshain/Studio/Interface/Steg/stel.h
+1480675763 /home/stedeshain/Studio/Interface/Steg/stel.h
 	<csetjmp>
 	<string>
 	<cstdarg>
 	"status.h"
+	"lua5.1/lua.h"
+	"lua5.1/lauxlib.h"
+	"lua5.1/lualib.h"
+
+1480674824 /home/stedeshain/Studio/Interface/Steg/c_api.h
 	"lua5.1/lua.h"
 	"lua5.1/lauxlib.h"
 	"lua5.1/lualib.h"

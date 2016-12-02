@@ -8,6 +8,7 @@
 #include "stel.h"
 #include <string>
 #include <iostream>
+#include "c_api.h"
 
 namespace gameTest
 {
@@ -280,14 +281,24 @@ DBG_Status Scene1::InitScene()
 
 	LuaResult* res;
 
-	PCallLuaFunctionWithUid_J("readData", "ss", NULL, "script.lua", "t1|t2|t3|v&t1|t2|t3|foo");
-	PCallLuaFunctionWithUid_J("readData", "ss", NULL, "config.lua", "Config|window|width&Config|FPS&Config|tileWidth");
-	PCallLuaFunctionWithUid_J("script.lua&t1|t2|t3|foo", "", &res);
-	PCallLuaFunctionWithUid_J("script.lua&t1|t2|t3|foo", "", NULL);
-	PCallLuaFunctionWithUid_J("readData", "ss", NULL, "script.lua", "t1|t2|t3|v&t1|t2|t3|foo");
-
-	res->PrintToStanderdOut();
+	PLuaReadData_J("script.lua", "t1|t2|t3|v&t1|t2|t3|a", &res);
+    if(res)
+        res->PrintToStanderdOut();
 	delete res; //remember to delete it
+
+	PLuaReadData_J("config.lua", "Config|window|width&Config|FPS&Config|tileWidth", &res);
+    if(res)
+        res->PrintToStanderdOut();
+	delete res; //remember to delete it
+
+	PRegisterCFunction_J(Test, "test");
+
+	PRegisterLuaFunction_J("script.lua", "t1|t2|t3|foo", "foo");
+	PCallLuaFunctionWithUid_J("foo", "n", &res, 2.4);
+//	PCallLuaFunction_J("script.lua", "t1|t2|t3|foo", "n", &res, 2.4);
+    if(res)
+        res->PrintToStanderdOut();
+	delete res;
 
 	std::cout << lua_gettop(steg::L) << std::endl;
 

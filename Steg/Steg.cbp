@@ -46,6 +46,8 @@
 			<Add option="-DLINUX" />
 			<Add directory="../Stef" />
 		</Compiler>
+		<Unit filename="c_api.cpp" />
+		<Unit filename="c_api.h" />
 		<Unit filename="camera.cpp" />
 		<Unit filename="camera.h" />
 		<Unit filename="character.cpp" />
