@@ -9,6 +9,13 @@ namespace stef
 class Particle
 {
 
+public:
+    enum ParticleMode
+    {
+        Dynamic,
+        KeyFramed,
+    };
+
 protected:
     Vector3 position;
     Vector3 velocity;

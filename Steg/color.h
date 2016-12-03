@@ -169,7 +169,7 @@ namespace steg
 
 	unsigned int ToRGBA(RGBColor c);
 
-    SDL_Color GetColor(RGBColor c);
+    SDL_Color GetColor(RGBColor c = White);
 }
 
 #endif // __STE_COLOR_H__

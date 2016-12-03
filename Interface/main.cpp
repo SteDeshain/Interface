@@ -1,5 +1,5 @@
 #include "game.h"
-#include "game1.h"
+#include "interface_game.h"
 
 using namespace steg;
 using namespace gameTest;
@@ -8,9 +8,9 @@ int main(int argc, char *argv[])
 {
     Game::EngineInit();
 
-    Game1* game1 = new Game1();
+    InterfaceGame* interfaceGame = new InterfaceGame();
 
-    game1->Run();
+    interfaceGame->Run();
 
     Game::EngineQuit();
 

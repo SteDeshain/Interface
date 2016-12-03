@@ -15,12 +15,12 @@
 #include "config.h"
 
 //#define FPS                 100
-#define TICKS_PER_FRAME     (1000 / steg::FPS)
+#define TICKS_PER_FRAME     (1000 / steg::Game::FPS)
 
 namespace steg
 {
 
-extern int FPS;
+//extern int FPS;
 
 class Game
 {
@@ -28,7 +28,7 @@ public:
 	Game();
 	virtual ~Game();
 
-    virtual DBG_Status InitGame() = 0;  //init game sources and scenes etc.
+    virtual DBG_Status InitGame();  //init game sources and scenes etc.
 
 	virtual DBG_Status Run();
 
@@ -36,6 +36,7 @@ public:
 	static int windowWidth, windowHeight;
 	static const char* windowName;
 	static int tileWidth;
+	static int FPS;
 
     static DBG_Status EngineInit();     //init the whole system
     static DBG_Status EngineQuit();     //shut down the whole system

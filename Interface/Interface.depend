@@ -1,10 +1,10 @@
 # depslib dependency file v1.0
-1480314449 source:/home/stedeshain/Studio/Interface/Interface/game1.cpp
+1480742514 source:/home/stedeshain/Studio/Interface/Interface/game1.cpp
 	"game1.h"
 	"scene1.h"
 	"color.h"
 
-1477904592 /home/stedeshain/Studio/Interface/Interface/game1.h
+1480742275 /home/stedeshain/Studio/Interface/Interface/game1.h
 	"SDL2/SDL.h"
 	"SDL2/SDL_ttf.h"
 	"game.h"
@@ -12,8 +12,9 @@
 	"scene1.h"
 	"label.h"
 	"drawable_comp.h"
+	"stel.h"
 
-1480314382 /home/stedeshain/Studio/Interface/Steg/game.h
+1480742417 /home/stedeshain/Studio/Interface/Steg/game.h
 	<stack>
 	"SDL2/SDL.h"
 	"status.h"
@@ -42,7 +43,7 @@
 	"box.h"
 	<list>
 
-1477198075 /home/stedeshain/Studio/Interface/Stef/particle.h
+1480743473 /home/stedeshain/Studio/Interface/Stef/particle.h
 	"core.h"
 
 1477226183 /home/stedeshain/Studio/Interface/Stef/core.h
@@ -138,14 +139,14 @@
 1478070933 /home/stedeshain/Studio/Interface/Steg/character.h
 	"solid_obj.h"
 
-1477114343 /home/stedeshain/Studio/Interface/Steg/color.h
+1480769386 /home/stedeshain/Studio/Interface/Steg/color.h
 	"SDL2/SDL.h"
 
-1476948291 source:/home/stedeshain/Studio/Interface/Interface/main.cpp
+1480742730 source:/home/stedeshain/Studio/Interface/Interface/main.cpp
 	"game.h"
-	"game1.h"
+	"interface_game.h"
 
-1480675600 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
+1480770775 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
 	"scene1.h"
 	"SDL2/SDL_ttf.h"
 	"stdio.h"
@@ -183,4 +184,35 @@
 	"lua5.1/lua.h"
 	"lua5.1/lauxlib.h"
 	"lua5.1/lualib.h"
+
+1480769126 source:/home/stedeshain/Studio/Interface/Interface/interface_game.cpp
+	"interface_game.h"
+	"scene1.h"
+	"color.h"
+	"interface_scene.h"
+	"gui_scene.h"
+
+1480742275 /home/stedeshain/Studio/Interface/Interface/interface_game.h
+	"SDL2/SDL.h"
+	"SDL2/SDL_ttf.h"
+	"game.h"
+	"status.h"
+	"scene1.h"
+	"label.h"
+	"drawable_comp.h"
+	"stel.h"
+
+1480772883 source:/home/stedeshain/Studio/Interface/Interface/gui_scene.cpp
+	"gui_scene.h"
+
+1480746121 /home/stedeshain/Studio/Interface/Interface/gui_scene.h
+	"interface_scene.h"
+	"stel.h"
+
+1480745558 source:/home/stedeshain/Studio/Interface/Interface/interface_scene.cpp
+	"interface_scene.h"
+
+1480745568 /home/stedeshain/Studio/Interface/Interface/interface_scene.h
+	"scene.h"
+	<string>
 

@@ -46,8 +46,12 @@
 			<Add directory="../Stef" />
 			<Add directory="../Steg" />
 		</Compiler>
-		<Unit filename="game1.cpp" />
-		<Unit filename="game1.h" />
+		<Unit filename="gui_scene.cpp" />
+		<Unit filename="gui_scene.h" />
+		<Unit filename="interface_game.cpp" />
+		<Unit filename="interface_game.h" />
+		<Unit filename="interface_scene.cpp" />
+		<Unit filename="interface_scene.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="scene1.cpp" />
 		<Unit filename="scene1.h" />

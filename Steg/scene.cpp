@@ -123,14 +123,14 @@ Scene::Scene(int mapWidthNum, int mapHeightNum, SDL_Renderer* render)
     pWorld.GetContactGenerators().push_back(&groundContactGenerator);
 
     wallContactGenerator.Init(&pWorld.GetParticles());
-    wallContactGenerator.SetWalls(0, ToMeter(800), 0, ToMeter(480));    //temp
+    wallContactGenerator.SetWalls(0, ToMeter(mapWidthNum * Game::tileWidth),
+                                  0, ToMeter(mapHeightNum * Game::tileWidth));
     pWorld.GetContactGenerators().push_back(&wallContactGenerator);
 
     collisionDetector.Init(this);
     pWorld.GetContactGenerators().push_back(&collisionDetector);
 
     selectedGUIComp = NULL;
-//    mouseOccupiedGUIComp = NULL;
     pressedGUIComp = NULL;
 }
 

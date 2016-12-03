@@ -232,75 +232,75 @@ DBG_Status Scene1::InitScene()
 	sprintf(buffer, "resorted: %d", resortCt);
 	resortCount->ReloadTexture(buffer);
 
-	PLuaDoScript("script.lua");
-	//PLuaDoScript("./scripts/interface.lua");
-	std::string s;
-	PLuaGetGlobal("s", &s);
-	std::cout << s << std::endl;
-
-	int a;
-	PLuaGetGlobal("a", &a);
-	std::cout << "a = " << a << std::endl;
-
-	double b;
-	PLuaGetGlobal("b", &b);
-	std::cout << "b = " << b << std::endl;
-
-	bool t;
-	PLuaGetGlobal("t", &t);
-	std::cout << "t = " << (t ? "true" : "false") << std::endl;
-
-	std::cout << lua_gettop(steg::L) << std::endl;
-
-	PLuaPushFromTable_J("b");
-	double tmp = 0;
-	PLuaPeek(&tmp);
-	std::cout << tmp << std::endl;
-
-	PLuaPushFromTable_J("dffg");
-	PLuaPushFromTable_J("t1");
-	PLuaPushFromTable_J("t2");
-	PLuaPushFromTable_J("t3");
-	PLuaPushFromTable_J("v");
-	PLuaPop(&tmp);
-	PLuaPop();
-	std::cout << tmp << std::endl;
-
-	PLuaPop();
-	PLuaPop();
-	PLuaPop();
-	PLuaPop();
-
-	std::cout << lua_gettop(steg::L) << std::endl;
-
-	lua_newuserdata(steg::L, sizeof(steg::DrawableComp));
-	lua_setglobal(steg::L, "ud");
-
-	lua_pushlightuserdata(steg::L, (void*)"c string");
-	lua_setglobal(steg::L, "lud");
-
-	LuaResult* res;
-
-	PLuaReadData_J("script.lua", "t1|t2|t3|v&t1|t2|t3|a", &res);
-    if(res)
-        res->PrintToStanderdOut();
-	delete res; //remember to delete it
-
-	PLuaReadData_J("config.lua", "Config|window|width&Config|FPS&Config|tileWidth", &res);
-    if(res)
-        res->PrintToStanderdOut();
-	delete res; //remember to delete it
-
-	PRegisterCFunction_J(Test, "test");
-
-	PRegisterLuaFunction_J("script.lua", "t1|t2|t3|foo", "foo");
-	PCallLuaFunctionWithUid_J("foo", "n", &res, 2.4);
-//	PCallLuaFunction_J("script.lua", "t1|t2|t3|foo", "n", &res, 2.4);
-    if(res)
-        res->PrintToStanderdOut();
-	delete res;
-
-	std::cout << lua_gettop(steg::L) << std::endl;
+//	PLuaDoScript("script.lua");
+//	//PLuaDoScript("./scripts/interface.lua");
+//	std::string s;
+//	PLuaGetGlobal("s", &s);
+//	std::cout << s << std::endl;
+//
+//	int a;
+//	PLuaGetGlobal("a", &a);
+//	std::cout << "a = " << a << std::endl;
+//
+//	double b;
+//	PLuaGetGlobal("b", &b);
+//	std::cout << "b = " << b << std::endl;
+//
+//	bool t;
+//	PLuaGetGlobal("t", &t);
+//	std::cout << "t = " << (t ? "true" : "false") << std::endl;
+//
+//	std::cout << lua_gettop(steg::L) << std::endl;
+//
+//	PLuaPushFromTable_J("b");
+//	double tmp = 0;
+//	PLuaPeek(&tmp);
+//	std::cout << tmp << std::endl;
+//
+//	PLuaPushFromTable_J("dffg");
+//	PLuaPushFromTable_J("t1");
+//	PLuaPushFromTable_J("t2");
+//	PLuaPushFromTable_J("t3");
+//	PLuaPushFromTable_J("v");
+//	PLuaPop(&tmp);
+//	PLuaPop();
+//	std::cout << tmp << std::endl;
+//
+//	PLuaPop();
+//	PLuaPop();
+//	PLuaPop();
+//	PLuaPop();
+//
+//	std::cout << lua_gettop(steg::L) << std::endl;
+//
+//	lua_newuserdata(steg::L, sizeof(steg::DrawableComp));
+//	lua_setglobal(steg::L, "ud");
+//
+//	lua_pushlightuserdata(steg::L, (void*)"c string");
+//	lua_setglobal(steg::L, "lud");
+//
+//	LuaResult* res;
+//
+//	PLuaReadData_J("scripts/script.lua", "t1|t2|t3|v&t1|t2|t3|a", &res);
+//    if(res)
+//        res->PrintToStanderdOut();
+//	delete res; //remember to delete it
+//
+//	PLuaReadData_J("config.lua", "Config|window|width&Config|FPS&Config|tileWidth", &res);
+//    if(res)
+//        res->PrintToStanderdOut();
+//	delete res; //remember to delete it
+//
+//	PRegisterCFunction_J(Test, "test");
+//
+//	PRegisterLuaFunction_J("scripts/script.lua", "t1|t2|t3|foo", "foo");
+//	PCallLuaFunctionWithUid_J("foo", "n", &res, 2.4);
+////	PCallLuaFunction_J("scripts/script.lua", "t1|t2|t3|foo", "n", &res, 2.4);
+//    if(res)
+//        res->PrintToStanderdOut();
+//	delete res;
+//
+//	std::cout << lua_gettop(steg::L) << std::endl;
 
 	return status;
 }

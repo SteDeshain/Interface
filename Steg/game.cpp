@@ -11,13 +11,14 @@
 namespace steg
 {
 
-int FPS = 100;
+//int FPS = 100;
 
 SDL_Window* Game::mainWindow = NULL;
 int Game::windowWidth = 800;
 int Game::windowHeight = 480;
 const char* Game::windowName = "Steg Engine from SteDeshain";
 int Game::tileWidth = 64;
+int Game::FPS = 100;
 
 DBG_Status Game::EngineInit()
 {
@@ -44,6 +45,20 @@ DBG_Status Game::EngineQuit()
 
 Game::Game()
 {
+}
+
+Game::~Game()
+{
+	if(Game::mainWindow)
+	{
+		SDL_DestroyWindow(Game::mainWindow);
+	}
+}
+
+DBG_Status Game::InitGame()
+{
+    DBG_Status status = DBG_OK;
+
 	Game::mainWindow = SDL_CreateWindow(Game::windowName,
 										SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 										Game::windowWidth, Game::windowHeight,
@@ -53,14 +68,8 @@ Game::Game()
 		ENG_LogWarns("Cannot create window!", SDL_GetError());
 		SDL_ClearError();
 	}
-}
 
-Game::~Game()
-{
-	if(Game::mainWindow)
-	{
-		SDL_DestroyWindow(Game::mainWindow);
-	}
+    return status;
 }
 
 DBG_Status Game::Run()
