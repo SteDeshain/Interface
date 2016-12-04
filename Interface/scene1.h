@@ -18,7 +18,7 @@
 #include "multi_draw_solid_obj.h"
 #include "character.h"
 
-namespace gameTest
+namespace interface
 {
 
 using namespace steg;

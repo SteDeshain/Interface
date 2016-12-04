@@ -25,8 +25,8 @@ class GUI: public DrawableComp
     friend class GUIOperateHandler;
 
 public:
-    GUI(int x, int y, int textureNum, const char* imgFile = NULL, Canvas* canvas = NULL);
-    GUI(int x, int y, int drawIndex, Canvas* canvas = NULL);    //for textureNum == 1
+    GUI(int x, int y, int textureNum, const char* imgFile, Canvas* canvas = NULL);
+    GUI(int x, int y, int drawIndex, Canvas* canvas = NULL);    //for textureNum == 1, used by Lable
     GUI(int textureNum, const char* imgFile = NULL, Canvas* canvas = NULL);
 
     //get color picture

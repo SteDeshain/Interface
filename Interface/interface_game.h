@@ -7,7 +7,7 @@
 #include "drawable_comp.h"
 #include "stel.h"
 
-namespace gameTest
+namespace interface
 {
 
 class InterfaceGame: public steg::Game

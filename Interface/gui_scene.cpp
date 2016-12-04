@@ -1,7 +1,10 @@
 #include "gui_scene.h"
 
-GuiScene::GuiScene(SDL_Renderer* render, const char* name)
-    :InterfaceScene(0, 0, render, name)
+namespace interface
+{
+
+GuiScene::GuiScene(const char* name, SDL_Renderer* render)
+    :InterfaceScene(name, 0, 0, render)
 {
 }
 
@@ -68,4 +71,6 @@ DBG_Status GuiScene::UpdatePhysics(Uint32 reminingTick)
     //do nothing!
 
     return status;
+}
+
 }

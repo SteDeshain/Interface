@@ -1,6 +1,11 @@
 #include "interface_scene.h"
 
-InterfaceScene::InterfaceScene(int mapWidthNum, int mapHeightNum, SDL_Renderer* render, const char* name)
-    :steg::Scene(mapWidthNum, mapHeightNum, render), name(name)
+namespace interface
 {
+
+InterfaceScene::InterfaceScene(const char* name, int mapWidthNum, int mapHeightNum, SDL_Renderer* render)
+    :steg::Scene(mapWidthNum, mapHeightNum, render), Name(name)
+{
+}
+
 }

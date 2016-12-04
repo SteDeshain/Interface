@@ -12,7 +12,7 @@ end
 
 local function welcomeSceneInit(ud)
 	--...
-	print(welcomeScene.sources["canvas_1"])
+	print("welcomeScene!")
 end
 
 local function welcomeSceneUpdate(ud, dt)
@@ -27,7 +27,7 @@ end
 -- 在构建每一项时，根据"class"字段判断对象的类，以调用正确的构造函数，但在c++代码中，每一个变量都是GameComp*，但由于多态的便捷，会将不同类型的GameComp储存到正确的list中去
 welcomeScene.sources = {}
 welcomeScene.sources["length"] = 4
-welcomeScene.sources[1] = 
+welcomeScene.sources[1] =
 {
 	["name"] = "canvas_1",
 	["class"] = "Canvas",
@@ -40,7 +40,7 @@ welcomeScene.sources[1] =
 									-- canvasSize: whole window
 	[5] = nil,						-- motherCanvas: NULL
 }
-welcomeScene.sources[2] = 
+welcomeScene.sources[2] =
 {
 	["name"] = "gui_1",
 	["class"] = "GUI",
@@ -53,7 +53,7 @@ welcomeScene.sources[2] =
 										-- motherCanvas: canvas_1 (when constructing this gui, the canvas_1 already becomes a userdata pointing to the correct object)
 }
 
-welcomeScene.sources[3] = 
+welcomeScene.sources[3] =
 {
 	["name"] = "canvas_2",
 	["class"] = "Canvas",
@@ -64,7 +64,7 @@ welcomeScene.sources[3] =
 	[4] = {0, 0, Config.window.width, Config.window.height},
 	[5] = nil,
 }
-welcomeScene.sources[4] = 
+welcomeScene.sources[4] =
 {
 	["name"] = "gui_2",
 	["class"] = "GUI",

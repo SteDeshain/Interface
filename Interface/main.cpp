@@ -2,7 +2,7 @@
 #include "interface_game.h"
 
 using namespace steg;
-using namespace gameTest;
+using namespace interface;
 
 int main(int argc, char *argv[])
 {

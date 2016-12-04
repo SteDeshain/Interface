@@ -10,7 +10,7 @@
 #include <iostream>
 #include "c_api.h"
 
-namespace gameTest
+namespace interface
 {
 
 Scene1::Scene1(int mapWidthNum, int mapHeightNum, SDL_Renderer* render)

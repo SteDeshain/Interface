@@ -5,7 +5,7 @@
 #include "gui_scene.h"
 //#include <iostream>
 
-namespace gameTest
+namespace interface
 {
 
 using namespace steg;
@@ -36,7 +36,7 @@ DBG_Status InterfaceGame::InitGame()
     render = SDL_CreateRenderer(Game::mainWindow, -1, SDL_RENDERER_ACCELERATED);
 
     InterfaceScene* welcome;
-    welcome = new GuiScene(render, "welcomeScene");
+    welcome = new GuiScene("welcomeScene", render);
     welcome->InitScene();
 
 //    testScene = new Scene1(15, 10, render);

@@ -7,11 +7,14 @@
 #include "interface_scene.h"
 #include "stel.h"
 
+namespace interface
+{
+
 class GuiScene: public InterfaceScene
 {
 
 public:
-    GuiScene(SDL_Renderer* render, const char* name);
+    GuiScene(const char* name, SDL_Renderer* render);
     ~GuiScene();
 
     virtual DBG_Status InitScene();
@@ -19,5 +22,7 @@ public:
     virtual DBG_Status UpdatePhysics(Uint32 reminingTick);
 
 };
+
+}
 
 #endif // __GUI_SCENE_H__

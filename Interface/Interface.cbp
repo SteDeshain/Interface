@@ -48,8 +48,12 @@
 		</Compiler>
 		<Unit filename="gui_scene.cpp" />
 		<Unit filename="gui_scene.h" />
+		<Unit filename="interface_comp.cpp" />
+		<Unit filename="interface_comp.h" />
 		<Unit filename="interface_game.cpp" />
 		<Unit filename="interface_game.h" />
+		<Unit filename="interface_gui.cpp" />
+		<Unit filename="interface_gui.h" />
 		<Unit filename="interface_scene.cpp" />
 		<Unit filename="interface_scene.h" />
 		<Unit filename="main.cpp" />
