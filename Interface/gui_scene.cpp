@@ -28,59 +28,74 @@ DBG_Status GuiScene::InitScene()
     filePath += ".lua";
 
     //first, check naming collision
-    //...
+//    steg::StoreLuaStack();
+    if(!setjmp(steg::StelJmp))
+    {
+        lua_getglobal(steg::L, name.c_str());           // +1
+        while(!lua_isnil(steg::L, -1))
+        {
+            NameAddOne(name);
+            lua_pop(steg::L, 1);                    // -1
+            lua_getglobal(steg::L, name.c_str());   // +1
+        }
+        lua_pop(steg::L, 1);                            // -1
+    }
+    else
+    {
+        LUA_LogError("Cannot do lua_getglobal!");
+        //do not check, assuming no collision
+    }
+//    steg::ResumeLuaStack();
 
+    //and then, new one proxy
+    //...
     steg::PLuaDoScript(filePath.c_str());
     //now we have the className luaProxy class in lua global
-    lua_pushnil(steg::L);                                   // +1
-
     //create new table as proxy
     if(!setjmp(steg::StelJmp))
     {
-        lua_newtable(steg::L);                              // +1
+        lua_newtable(steg::L);                                      // +1
     }
     else
     {
         LUA_LogError("Cannot new table! no enough memory");
-        exit(EXIT_FAILURE);
+        status |= DBG_LUA_ERR | DBG_MEM_ERR;
     }
     int proxyTablePos = lua_gettop(steg::L);
 
-    steg::PLuaPushFromTable_J(className.c_str());           // +1
+    //no need to use PCallProxyFunction here
+    //because the code isn't very much
+    //
+    lua_pushnil(steg::L);                                           // +1
+    status |= steg::PLuaPushFromTable_J(className.c_str());         // +1
     int classTablePos = lua_gettop(steg::L);
     //the class table is on stack top
-    steg::PCallLuaFucntionFromTable_J("New", "ttu", NULL);
+    steg::PCallLuaFucntionFromTable_J("New", "ttu", NULL, classTablePos, proxyTablePos, this);
 
-    lua_pop(steg::L, 2);                                    // -2
+    //pop class table
+    lua_pop(steg::L, 1);                                            // -1
+    //pop nil
+    lua_pop(steg::L, 1);                                            // -1
 
+    //now, the proxy is on stack top
+    if(!setjmp(steg::StelJmp))
+    {
+        lua_setglobal(steg::L, name.c_str());
+    }
+    else
+    {
+        LUA_LogError("Cannot do lua_setglobal!");
+    }
 
-//    std::string funPath = name + "|init";
-//    std::string newFunName = name + "Init";
-//    steg::PRegisterLuaFunction_J(filePath.c_str(), funPath.c_str(), newFunName.c_str());
-//
-//    funPath = name + "|update";
-//    newFunName = name + "Update";
-//    steg::PRegisterLuaFunction_J(filePath.c_str(), funPath.c_str(), newFunName.c_str());
+    //tmp
+//    luaL_dostring(steg::L,
+//                  "print(welcomeScene_1)");
+//    std::string luaTasks = "print(";
+//    luaTasks += name;
+//    luaTasks += ".ud)";
+//    luaL_dostring(steg::L, luaTasks.c_str());
+//    std::cout << this << std::endl;
 
-//temp
-//**********************************************************************//
-//**********************************************************************//
-//    REMEMBER TO CHECK STACK HERE! BECAUSE HERE USES LOTS OF STACK
-//**********************************************************************//
-//**********************************************************************//
-    //init scene
-    //...
-//    newFunName = name + "Init";
-//    steg::PCallLuaFunctionWithUid_J(newFunName.c_str(), "", NULL);
-//    //make sure do that script
-//    steg::PLuaDoScript(filePath.c_str());
-//    //and then, get the sourecs table and construct them
-//    lua_pushnil(steg::L);                                                       // +1
-//    steg::PLuaPushFromTable_J(name.c_str());                                    // +1
-//    //now, the table is on the stack top
-//    //step into loop
-//
-//    lua_pop(steg::L, 2);                                                        // -2
     return status;
 }
 
@@ -91,7 +106,7 @@ DBG_Status GuiScene::Update(Uint32 deltTick)
     status |= InterfaceScene::Update(deltTick);
 
     //call lua script update
-//    steg::PCallLuaFunctionWithUid_J((name + "Update").c_str(), "un", NULL, this, deltTick);
+    steg::PCallProxyFunction_J(name.c_str(), "Update", "n", NULL, (double)deltTick);
 
     return status;
 }

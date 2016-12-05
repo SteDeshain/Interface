@@ -14,6 +14,7 @@ namespace steg
 
 extern jmp_buf StelJmp;
 extern lua_State* L;
+extern int stackSize;
 
 DBG_Status LuaInit();
 void LuaQuit();
@@ -22,6 +23,10 @@ void LuaQuit();
 // J: for long jump fake protection mode
 
 class LuaResult;  //pre-declaration
+
+//must be called in pair
+//void StoreLuaStack();
+//void ResumeLuaStack();
 
 DBG_Status PLuaDoScript(const char* scriptFile);
 
@@ -62,6 +67,9 @@ DBG_Status PCallLuaFunction_J(const char* file, const char* functionPath, const 
 //if stack top is a table, call function with funcitonName string in table
 //otherwise, call function from _G
 DBG_Status PCallLuaFucntionFromTable_J(const char* functionName, const char* argTypes, LuaResult** rets, ...);
+// when calling this function, you don't need to add 'u' at begining of "argTypes", and "this" at begining of "..."
+DBG_Status PCallProxyFunction_J(const char* name, const char* functionName,
+                                const char* argTypes, LuaResult** rets, ...);
 
 //******************************// Stack Operation //******************************//
 // if at the stack top is a table, then get the field from the top table, and push it onto stack
