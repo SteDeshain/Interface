@@ -59,6 +59,8 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="scene1.cpp" />
 		<Unit filename="scene1.h" />
+		<Unit filename="tools.cpp" />
+		<Unit filename="tools.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

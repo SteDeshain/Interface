@@ -23,4 +23,16 @@ Label::Label(const char* name, int x, int y, steg::LabelAnchor anchor,
 {
 }
 
+Canvas::Canvas(const char* name, const char* imgFile, float transparency,
+               SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas)
+    :steg::Canvas(imgFile, transparency, viewRect, canvasSize, motherCanvas), Name(name)
+{
+}
+
+Canvas::Canvas(const char* name, SDL_Color color, float transparency,
+               SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas)
+    :steg::Canvas(color, transparency, viewRect, canvasSize, motherCanvas), Name(name)
+{
+}
+
 }

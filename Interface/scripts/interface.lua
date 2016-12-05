@@ -111,8 +111,6 @@ function Interface.readData(file, field)
 --]]
 
     res["length"] = #res
-
---    return unpack(res)
     return res  --return an array
 end
 

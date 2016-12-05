@@ -576,6 +576,12 @@ DBG_Status PCallLuaFunction_J(const char* file, const char* functionPath, const 
                 case 'u':   // lightuserdata
                     lua_pushlightuserdata(L, va_arg(vars, void*));
                     break;
+                //stack position
+                case 't':   //table
+                case 'T':   //thread
+                case 'f':   //function
+                    lua_pushvalue(L, va_arg(vars, unsigned int));
+                    break;
                 default:
                     //push nil at wrong character
                     lua_pushnil(L);
@@ -654,6 +660,10 @@ DBG_Status PCallLuaFunctionWithUid_J(const char* uniqueID, const char* argTypes,
         LUA_LogError("function name or argTypes can't be NULL!");
         return DBG_ARG_ERR | DBG_NULL_PTR;
     }
+    if(rets)
+    {
+        *rets = NULL;   // init as NULL first
+    }
 
     //push nil
     lua_pushnil(L);                                                                             // +1
@@ -670,7 +680,6 @@ DBG_Status PCallLuaFunctionWithUid_J(const char* uniqueID, const char* argTypes,
         //no registration
         LUA_LogErrors("Cannot find function, may not be registered! function: ", uniqueID);
         lua_pop(L, 3);
-        *rets = NULL;
         return DBG_LUA_ERR;
     }
 
@@ -723,6 +732,12 @@ DBG_Status PCallLuaFunctionWithUid_J(const char* uniqueID, const char* argTypes,
                     break;
                 case 'u':   // lightuserdata
                     lua_pushlightuserdata(L, va_arg(vars, void*));
+                    break;
+                //stack position
+                case 't':   //table
+                case 'T':   //thread
+                case 'f':   //function
+                    lua_pushvalue(L, va_arg(vars, unsigned int));
                     break;
                 default:
                     //push nil at wrong character
@@ -787,6 +802,156 @@ DBG_Status PCallLuaFunctionWithUid_J(const char* uniqueID, const char* argTypes,
                                                                                                 // balance
     va_end(vars);
 
+    return status;
+}
+
+DBG_Status PCallLuaFucntionFromTable_J(const char* functionName, const char* argTypes, LuaResult** rets, ...)
+{
+    DBG_Status status = DBG_OK;
+
+    va_list vars;
+    va_start(vars, rets);
+
+    if(functionName == NULL || argTypes == NULL)
+    {
+        LUA_LogError("Arguments functionName or argTypes can't be NULL!");
+        return DBG_ARG_ERR | DBG_NULL_PTR;
+    }
+    if(rets)
+    {
+        *rets = NULL;
+    }
+
+    //first, push the function to be called onto the stack
+    status |= PLuaPushFromTable_J(functionName);                                            // +1
+    if(status != DBG_OK)
+        return status;
+
+    //now the table containing function and argNumber and resNumber is at stack top
+    //check nil
+    if(!lua_istable(L, -1))
+    {
+        //no registration
+        LUA_LogErrors("Cannot find function, may be wrong name! when try to call: ", functionName);
+        lua_pop(L, 1);
+        return DBG_LUA_ERR;
+    }
+
+    int argNumber = 0;
+    int resNumber = 0;
+    //get argNumber
+    PLuaPushFromTable_J("argNumber");   // +1
+    PLuaPop(&argNumber);                // -1
+    //get resNumber
+    PLuaPushFromTable_J("resNumber");   // +1
+    PLuaPop(&resNumber);                // -1
+    //push the function
+    PLuaPushFromTable_J("function");                                                        // +1
+    //now, the function is at stack top
+
+    //handle and push arguments
+    bool atArgTypesEnd = false;
+    for(int i = 0; i < argNumber; i++)                                                      // +argNumber
+    {
+        //once step into this loop, the argNumber is not less than 1 !
+        //every step in this loop must push a value!!!
+
+        if(!atArgTypesEnd)
+        {
+            char current = *(argTypes + i);
+            if(current == '\0')
+            {
+                atArgTypesEnd = true;
+                lua_pushnil(L);
+            }
+            else
+            {
+                switch(current)
+                {
+                case 'N':   // nil
+                    lua_pushnil(L);
+                    break;
+                case 'n':   // number
+                    lua_pushnumber(L, va_arg(vars, double));
+                    break;
+                case 's':   // string
+                    if(!setjmp(StelJmp))
+                        lua_pushstring(L, va_arg(vars, char*));
+                    else
+                    {
+                        LUA_LogError("Cannot push string onto stack!");
+                        status |= DBG_LUA_ERR;
+                    }
+                    break;
+                case 'b':   // boolean
+                    lua_pushboolean(L, va_arg(vars, bool));
+                    break;
+                case 'u':   // lightuserdata
+                    lua_pushlightuserdata(L, va_arg(vars, void*));
+                    break;
+                //stack position
+                case 't':   //table
+                case 'T':   //thread
+                case 'f':   //function
+                    lua_pushvalue(L, va_arg(vars, unsigned int));
+                    break;
+                default:
+                    //push nil at wrong character
+                    lua_pushnil(L);
+                    break;
+                }
+            }
+        }
+        else
+        {
+            lua_pushnil(L);
+        }
+    }
+
+    //pcall
+    if(lua_pcall(L, argNumber, resNumber, 0))                                               // -argNumber-1
+    {                                           // +1
+        //handle error
+        std::string  error;
+        PLuaPop_J(&error);                      // -1
+        LUA_LogErrors("Error when lua_pcall: ", error.c_str());
+    }
+    else    //pcall successfully                                                            // +resNumber
+    {
+        //get results
+        if(rets != NULL)                                                                    // -resNumber
+        {
+            //allocate new LuaResult as results
+            //if any error happens in this function, I MUST remember to delete this object!!!
+            LuaResult* resRets = NULL;
+            resRets = new LuaResult(resNumber);
+            if(resRets == NULL)
+            {
+                LUA_LogError("Cannot allocate LuaResult for resRets!");
+                lua_pop(L, resNumber);
+                *rets = NULL;
+            }
+            else
+            {
+                for(int i = 0; i < resNumber; i++)
+                {
+                    //every step in this loop must pop one element!
+                    resRets->PAddNewResult_J();
+                    lua_pop(L, 1);
+                }
+                *rets = resRets;
+            }
+        }
+        else
+        {
+            lua_pop(L, resNumber);
+        }
+
+    }
+
+    lua_pop(L, 1);                                                                          // -1
+
+    va_end(vars);
     return status;
 }
 

@@ -10,6 +10,8 @@ a = 100
 
 b = 2.3
 
+tab = {1, 2, "a string", true}
+
 funcs = {}
 function funcs.foo()
     return
@@ -19,6 +21,17 @@ function funcs.foo()
         1,
         1
 end
+
+foo2 = {}
+foo2["function"] = function(a, t, b)
+	print(a .. b)
+    print(unpack(t))
+	return 100
+end
+foo2["argNumber"] = 3
+foo2["resNumber"] = 1
+
+funcs["foo2"] = foo2
 
 --ud = 0
 --lud = 0

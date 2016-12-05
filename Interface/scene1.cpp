@@ -9,6 +9,7 @@
 #include <string>
 #include <iostream>
 #include "c_api.h"
+#include "tools.h"
 
 namespace interface
 {
@@ -232,7 +233,32 @@ DBG_Status Scene1::InitScene()
 	sprintf(buffer, "resorted: %d", resortCt);
 	resortCount->ReloadTexture(buffer);
 
-//	PLuaDoScript("script.lua");
+	std::cout << lua_gettop(steg::L) << std::endl;
+	PLuaDoScript("scripts/script.lua");
+
+	PLuaPushFromTable_J("tab");
+	unsigned int tablePos = lua_gettop(steg::L);
+
+	PLuaPushFromTable_J("funcs");
+
+	steg::LuaResult* res = NULL;
+	PCallLuaFucntionFromTable_J("foo2", "sts", &res, "a string.", tablePos, "b string.");
+	if(res)
+    {
+        res->PrintToStanderdOut();
+    }
+
+	PLuaPop();
+	PLuaPop();
+	std::cout << lua_gettop(steg::L) << std::endl;
+
+	std::string name = "asas_0000";
+	std::cout << LegalizeName(name) << std::endl;
+	std::cout << GetClassName(name) << std::endl;
+	std::cout << NameAddOne(name) << std::endl;
+	std::cout << NameAddOne(name) << std::endl;
+	std::cout << NameAddOne(name) << std::endl;
+
 //	//PLuaDoScript("./scripts/interface.lua");
 //	std::string s;
 //	PLuaGetGlobal("s", &s);

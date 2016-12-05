@@ -46,6 +46,8 @@ DBG_Status PLuaGetGlobal(const char* name, lua_CFunction* value);	// c function
 // the argTypes is a string may containing character like:
 // 's'     'n'     'b'      'u'       'N'
 // string, number, boolean, userdata, nil
+// 't'    'T'     'f'           these three types use an positive integer to show their position in stack
+// table, thread, function
 // other characters in this string will cause pushing a nil
 // the final arguments number will be the number stored in LuaFunction table
 // ***
@@ -55,8 +57,11 @@ DBG_Status PLuaGetGlobal(const char* name, lua_CFunction* value);	// c function
 // ***
 // example: ..., "sNn", "a string", 100);    //push "a string", nil, 100 (if argNumber == 3)
 //               "", 1, 2, 3);               //push nil, nil (if argNumber == 2)
-DBG_Status PCallLuaFunction_J(const char* file, const char* functionPath, const char* argTypes, LuaResult** rets, ...);
 DBG_Status PCallLuaFunctionWithUid_J(const char* uniqueID, const char* argTypes, LuaResult** rets, ...);
+DBG_Status PCallLuaFunction_J(const char* file, const char* functionPath, const char* argTypes, LuaResult** rets, ...);
+//if stack top is a table, call function with funcitonName string in table
+//otherwise, call function from _G
+DBG_Status PCallLuaFucntionFromTable_J(const char* functionName, const char* argTypes, LuaResult** rets, ...);
 
 //******************************// Stack Operation //******************************//
 // if at the stack top is a table, then get the field from the top table, and push it onto stack

@@ -146,7 +146,7 @@
 	"game.h"
 	"interface_game.h"
 
-1480838150 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
+1480928778 source:/home/stedeshain/Studio/Interface/Interface/scene1.cpp
 	"scene1.h"
 	"SDL2/SDL_ttf.h"
 	"stdio.h"
@@ -158,6 +158,7 @@
 	<string>
 	<iostream>
 	"c_api.h"
+	"tools.h"
 
 1477989396 /home/stedeshain/Studio/Interface/Steg/event_handler.h
 	"SDL2/SDL.h"
@@ -171,7 +172,7 @@
 
 1477988317 /home/stedeshain/Studio/Interface/Steg/config.h
 
-1480675763 /home/stedeshain/Studio/Interface/Steg/stel.h
+1480921049 /home/stedeshain/Studio/Interface/Steg/stel.h
 	<csetjmp>
 	<string>
 	<cstdarg>
@@ -185,7 +186,7 @@
 	"lua5.1/lauxlib.h"
 	"lua5.1/lualib.h"
 
-1480839923 source:/home/stedeshain/Studio/Interface/Interface/interface_game.cpp
+1480929336 source:/home/stedeshain/Studio/Interface/Interface/interface_game.cpp
 	"interface_game.h"
 	"scene1.h"
 	"color.h"
@@ -202,8 +203,9 @@
 	"drawable_comp.h"
 	"stel.h"
 
-1480840096 source:/home/stedeshain/Studio/Interface/Interface/gui_scene.cpp
+1480929166 source:/home/stedeshain/Studio/Interface/Interface/gui_scene.cpp
 	"gui_scene.h"
+	"tools.h"
 
 1480839909 /home/stedeshain/Studio/Interface/Interface/gui_scene.h
 	"interface_scene.h"
@@ -228,11 +230,19 @@
 	"multi_draw_solid_obj.h"
 	<string>
 
-1480843151 source:/home/stedeshain/Studio/Interface/Interface/interface_gui.cpp
+1480917240 source:/home/stedeshain/Studio/Interface/Interface/interface_gui.cpp
 	"interface_gui.h"
 
-1480843145 /home/stedeshain/Studio/Interface/Interface/interface_gui.h
+1480917144 /home/stedeshain/Studio/Interface/Interface/interface_gui.h
 	"gui.h"
 	"label.h"
 	"interface_comp.h"
+
+1480927308 /home/stedeshain/Studio/Interface/Interface/tools.h
+	<iostream>
+	<string>
+	<sstream>
+
+1480928669 source:/home/stedeshain/Studio/Interface/Interface/tools.cpp
+	"tools.h"
 

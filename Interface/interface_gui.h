@@ -30,6 +30,19 @@ public:
 
 };
 
+class Canvas: public steg::Canvas, public Name
+{
+
+public:
+    //picture mode
+    Canvas(const char* name, const char* imgFile, float transparency,
+           SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas);
+    //color mode
+    Canvas(const char* name, SDL_Color color, float transparency,
+           SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas);
+
+};
+
 }
 
 #endif // __INTERFACE_GUI_H__

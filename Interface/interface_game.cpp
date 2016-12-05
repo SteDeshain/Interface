@@ -36,7 +36,7 @@ DBG_Status InterfaceGame::InitGame()
     render = SDL_CreateRenderer(Game::mainWindow, -1, SDL_RENDERER_ACCELERATED);
 
     InterfaceScene* welcome;
-    welcome = new GuiScene("welcomeScene", render);
+    welcome = new GuiScene("welcomeScene_start", render);
     welcome->InitScene();
 
 //    testScene = new Scene1(15, 10, render);
