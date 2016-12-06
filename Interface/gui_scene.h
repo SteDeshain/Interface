@@ -6,6 +6,7 @@
 
 #include "interface_scene.h"
 #include "stel.h"
+#include "game_comp.h"
 
 namespace interface
 {
@@ -20,6 +21,8 @@ public:
     virtual DBG_Status InitScene();
 	virtual DBG_Status Update(Uint32 deltTick);
     virtual DBG_Status UpdatePhysics(Uint32 reminingTick);
+
+protected:
 
 };
 

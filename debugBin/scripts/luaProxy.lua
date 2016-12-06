@@ -2,8 +2,11 @@
 luaProxy = {}
 module("luaProxy", package.seeall)
 --require "fatherClass"
+require "tools"
 
 --fatherClass:new(luaProxy)
+
+luaProxy.__ref = true
 
 --每当在c++中new一个luaProxy，会在lua全局变量中注册一个唯一名字string作为key的table，作为该对象在lua中的代理
 --并在new函数中，把c++对象的地址作为lightuserdata储存在代理table的ud字段中，以便代理的调用
@@ -15,9 +18,13 @@ module("luaProxy", package.seeall)
 --		然后再查找重名，若有重名，则使后缀数字+1之后再查找重名，直到不重名为止
 --	若c++传入的名称为luaProxy，没有任何后缀，则先自动生成数字后缀"_1"加到名称后面，之后按照上面一条的情况查找重名
 function luaProxy:new(o, ud)
-	o = o or {}
+	local o = o or {}
 	setmetatable(o, self)
-	self.__index = self
+	self.__index = function(table, key)
+		local value = self[key]
+		table[key] = tools.deepCopy(value)
+		return table[key]
+	end
 	
 	--因此该new函数即可作为新建对象时使用，也可在子类中作为继承语句用
 	if ud ~= nil then

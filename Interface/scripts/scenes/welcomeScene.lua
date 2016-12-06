@@ -67,14 +67,16 @@ welcomeScene.sources[1] =
 							--但在全局变量中，相应的luaProxy的key很有可能和sources表中的key不同，因为在这里该命名可能不冲突，但放在全局中可能和其他的luaProxy冲突
 							--所以在c++代码中，会处理以防全局中的命名冲突
 	["class"] = "Canvas",
-	["length"] = 5,
-	[1] = {255, 255, 255, 255},		-- color: white
-	[2] = 0.0,						-- transparency: 0.0f
-	[3] = {0, 0, Config.window.width, Config.window.height},
+	["length"] = 7,
+	[1] = "color",					-- color mode
+	[2] = nil,						-- no script
+	[3] = {0, 128, 255, 255},		-- color: white
+	[4] = 8.0,						-- transparency: 0.0f
+	[5] = {0, 0, Config.window.width, Config.window.height},
 									-- viewRect: whole window
-	[4] = {0, 0, Config.window.width, Config.window.height},
+	[6] = {Config.window.width, Config.window.height},
 									-- canvasSize: whole window
-	[5] = nil,						-- motherCanvas: NULL
+	[7] = nil,						-- motherCanvas: NULL
 }
 welcomeScene.sources["gui_1"] = {}
 welcomeScene.sources[2] =
@@ -98,22 +100,27 @@ welcomeScene.sources[3] =
 {
 	["name"] = "canvas_2",
 	["class"] = "Canvas",
-	["length"] = 5,
-	[1] = {255, 255, 255, 255},
-	[2] = 0.0,
-	[3] = {0, 0, Config.window.width, Config.window.height},
-	[4] = {0, 0, Config.window.width, Config.window.height},
-	[5] = nil,
+	["length"] = 7,
+	[1] = "color",
+	[2] = nil,
+	[3] = {255, 255, 255, 255},
+	[4] = 0.0,
+	[5] = {0, 0, Config.window.width, Config.window.height},
+	[6] = {Config.window.width, Config.window.height},
+	[7] = nil,
 }
 welcomeScene.sources["gui_2"] = {}
 welcomeScene.sources[4] =
 {
 	["name"] = "gui_2",
 	["class"] = "GUI",
-	["length"] = 5,
-	[1] = Config.window.width / 2,
-	[2] = Config.window.height / 2,
-	[3] = 1,
-	[4] = "tiles.png",
-	[5] = welcomeScene.sources["canvas_2"].ud,
+	["length"] = 8,
+	[1] = "picture",
+	[2] = nil,
+	[3] = Config.window.width / 2,
+	[4] = Config.window.height / 2,
+	[5] = 1,
+	[6] = 1,
+	[7] = "tiles.png",
+	[8] = welcomeScene.sources["canvas_2"].ud,
 }

@@ -1273,6 +1273,11 @@ DBG_Status PLuaPeek_J(std::string* value)
         return DBG_LUA_ERR;
     }
 
+    if(lua_isnil(L, -1))
+    {
+        return DBG_LUA_ERR;
+    }
+
     if(!setjmp(StelJmp))    //try
     {
         *value = lua_tostring(L, -1);   //make a copy of string to value
@@ -1306,6 +1311,30 @@ DBG_Status PLuaPeek(lua_CFunction* value)
     }
 
     *value = lua_tocfunction(L, -1);
+
+    return status;
+}
+
+DBG_Status PLuaPeek(void** value)
+{
+    DBG_Status status = DBG_OK;
+
+    if(value == NULL)
+        return DBG_ARG_ERR | DBG_NULL_PTR;
+
+    if(lua_gettop(L) <= 0)
+    {
+        LUA_LogError("Lua stack is empty, cannot peek!");
+        return DBG_LUA_ERR;
+    }
+
+    if(!lua_isuserdata(L, -1))
+    {
+        LUA_LogError("Lua stack top is not a userdata, can't assign it to a void*!");
+        return DBG_LUA_ERR;
+    }
+
+    *value = lua_touserdata(L, -1);
 
     return status;
 }
@@ -1382,6 +1411,19 @@ DBG_Status PLuaPop_J(std::string* value)
 }
 
 DBG_Status PLuaPop(lua_CFunction* value)
+{
+    DBG_Status status = DBG_OK;
+
+    if(value == NULL)
+        return status;
+
+    status |= PLuaPeek(value);
+    lua_pop(L, 1);
+
+    return status;
+}
+
+DBG_Status PLuaPop(void** value)
 {
     DBG_Status status = DBG_OK;
 

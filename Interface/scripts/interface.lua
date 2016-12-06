@@ -112,4 +112,4 @@ LuaFunctions["readData"]["argNumber"] = 2
 LuaFunctions["readData"]["resNumber"] = 1
 
 --add the script path
-package.path = package.path .. [[;./scripts/?.lua;./scripts/?.so]]
+package.path = package.path .. [[;./scripts/?.lua]]

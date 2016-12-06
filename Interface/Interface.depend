@@ -172,7 +172,7 @@
 
 1477988317 /home/stedeshain/Studio/Interface/Steg/config.h
 
-1480943802 /home/stedeshain/Studio/Interface/Steg/stel.h
+1481037414 /home/stedeshain/Studio/Interface/Steg/stel.h
 	<csetjmp>
 	<string>
 	<cstdarg>
@@ -186,7 +186,7 @@
 	"lua5.1/lauxlib.h"
 	"lua5.1/lualib.h"
 
-1480941245 source:/home/stedeshain/Studio/Interface/Interface/interface_game.cpp
+1481036889 source:/home/stedeshain/Studio/Interface/Interface/interface_game.cpp
 	"interface_game.h"
 	"scene1.h"
 	"color.h"
@@ -203,14 +203,16 @@
 	"drawable_comp.h"
 	"stel.h"
 
-1480945162 source:/home/stedeshain/Studio/Interface/Interface/gui_scene.cpp
+1481039238 source:/home/stedeshain/Studio/Interface/Interface/gui_scene.cpp
 	"gui_scene.h"
 	"tools.h"
 	"stdlib.h"
+	"interface_gui.h"
 
-1480839909 /home/stedeshain/Studio/Interface/Interface/gui_scene.h
+1481031986 /home/stedeshain/Studio/Interface/Interface/gui_scene.h
 	"interface_scene.h"
 	"stel.h"
+	"game_comp.h"
 
 1480839864 source:/home/stedeshain/Studio/Interface/Interface/interface_scene.cpp
 	"interface_scene.h"

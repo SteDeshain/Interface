@@ -83,6 +83,7 @@ DBG_Status PLuaPeek(float* value);
 DBG_Status PLuaPeek(bool* value);
 DBG_Status PLuaPeek_J(std::string* value);
 DBG_Status PLuaPeek(lua_CFunction* value);
+DBG_Status PLuaPeek(void** value);
 
 DBG_Status PLuaPop();                               // [-1, +0] pop one element from stack
 DBG_Status PLuaPop(double* value);                  // [-1, +0] (-0 only when the stack is empty)
@@ -91,6 +92,7 @@ DBG_Status PLuaPop(float* value);
 DBG_Status PLuaPop(bool* value);
 DBG_Status PLuaPop_J(std::string* value);
 DBG_Status PLuaPop(lua_CFunction* value);
+DBG_Status PLuaPop(void** value);
 
 
 // lua may return: nil, number, string, boolean, table, function, thread, userdata (total: 8)

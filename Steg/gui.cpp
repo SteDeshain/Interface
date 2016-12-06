@@ -818,6 +818,8 @@ DBG_Status Canvas::InitInScene(Scene* scene)
 
     SDL_GetTextureAlphaMod(currentTexture, &textureAlpha);
 
+//    visible = true;
+
     return status;
 }
 

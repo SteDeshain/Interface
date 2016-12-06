@@ -1,6 +1,7 @@
 #include "gui_scene.h"
 #include "tools.h"
 #include "stdlib.h"
+#include "interface_gui.h"
 
 namespace interface
 {
@@ -12,6 +13,146 @@ GuiScene::GuiScene(const char* name, SDL_Renderer* render)
 
 GuiScene::~GuiScene()
 {
+}
+
+static steg::GameComp* LoadGameCompFromTable(int number)    //stack top is the sources table
+{
+    lua_pushnumber(steg::L, number);                // +1
+    if(!setjmp(steg::StelJmp))
+    {
+        lua_gettable(steg::L, -2);                  // -1+1
+    }
+    else
+    {
+        LUA_LogError("Cannot do lua_gettable!");
+    }
+    //now, the arguments table is on stack top
+    if(!setjmp(steg::StelJmp))
+    {
+        lua_getfield(steg::L, -1, "class");         // +1
+    }
+    else
+    {
+        LUA_LogError("Cannot do lua_gettable!");
+    }
+    std::string className;
+    steg::PLuaPop_J(&className);                    // -1
+    if(className == "Canvas")
+    {
+        std::string mode = "color";
+        lua_pushnumber(steg::L, 1);     // +1
+        lua_gettable(steg::L, -2);      // -1+1
+//        steg::PLuaPop_J(&mode);         // -1
+        if(!lua_isnil(steg::L, -1))     // -1
+            steg::PLuaPop_J(&mode);
+        else
+            lua_pop(steg::L, 1);
+
+        std::string scriptName = "";
+        lua_pushnumber(steg::L, 2);     // +1
+        lua_gettable(steg::L, -2);      // -1+1
+        if(!lua_isnil(steg::L, -1))     // -1
+            steg::PLuaPop_J(&scriptName);
+        else
+            lua_pop(steg::L, 1);
+
+        if(mode == "color")
+        {
+            SDL_Color color;
+            int value = 0;
+            lua_pushnumber(steg::L, 3); // +1
+            lua_gettable(steg::L, -2);  // -1+1
+            //color table on stack top
+            //r
+            lua_pushnumber(steg::L, 1); // +1
+            lua_gettable(steg::L, -2);  // -1+1
+            steg::PLuaPop(&value);      // -1
+            color.r = value;
+            //g
+            lua_pushnumber(steg::L, 2); // +1
+            lua_gettable(steg::L, -2);  // -1+1
+            steg::PLuaPop(&value);      // -1
+            color.g = value;
+            //b
+            lua_pushnumber(steg::L, 3); // +1
+            lua_gettable(steg::L, -2);  // -1+1
+            steg::PLuaPop(&value);      // -1
+            color.b = value;
+            //pop color table
+            lua_pop(steg::L, 1);        // -1
+
+            double transparency = 0.0f;
+            lua_pushnumber(steg::L, 4); // +1
+            lua_gettable(steg::L, -2);  // -1+1
+            steg::PLuaPop(&transparency);// -1
+
+            SDL_Rect viewRect;
+            lua_pushnumber(steg::L, 5); // +1
+            lua_gettable(steg::L, -2);  // -1+1
+            //viewRect table on stack top
+            //x
+            lua_pushnumber(steg::L, 1); // +1
+            lua_gettable(steg::L, -2);  // -1+1
+            steg::PLuaPop(&value);      // -1
+            viewRect.x = value;
+            //y
+            lua_pushnumber(steg::L, 2); // +1
+            lua_gettable(steg::L, -2);  // -1+1
+            steg::PLuaPop(&value);      // -1
+            viewRect.y = value;
+            //w
+            lua_pushnumber(steg::L, 3); // +1
+            lua_gettable(steg::L, -2);  // -1+1
+            steg::PLuaPop(&value);      // -1
+            viewRect.w = value;
+            //h
+            lua_pushnumber(steg::L, 4); // +1
+            lua_gettable(steg::L, -2);  // -1+1
+            steg::PLuaPop(&value);      // -1
+            viewRect.h = value;
+            //pop viewRect table
+            lua_pop(steg::L, 1);        // -1
+
+            SDL_Point canvasSize;
+            lua_pushnumber(steg::L, 6); // +1
+            lua_gettable(steg::L, -2);  // -1+1
+            //canvasSize table on stack top
+            //x
+            lua_pushnumber(steg::L, 1); // +1
+            lua_gettable(steg::L, -2);  // -1+1
+            steg::PLuaPop(&value);      // -1
+            canvasSize.x = value;
+            //y
+            lua_pushnumber(steg::L, 2); // +1
+            lua_gettable(steg::L, -2);  // -1+1
+            steg::PLuaPop(&value);      // -1
+            canvasSize.y = value;
+            //pop canvasSize table
+            lua_pop(steg::L, 1);        // -1
+
+            void* motherCanvas = NULL;
+            lua_pushnumber(steg::L, 7); // +1
+            lua_gettable(steg::L, -2);  // -1+1
+            if(!lua_isnil(steg::L, -1)) // -1
+                steg::PLuaPop(&motherCanvas);
+            else
+                lua_pop(steg::L, 1);
+
+            steg::GameComp* canvas = NULL;
+            canvas = new Canvas(scriptName.c_str(), color, transparency, viewRect, canvasSize, (Canvas*)motherCanvas);
+            return canvas;
+        }
+//        else
+//        {
+//        }
+    }
+    else if(className == "GUI")
+    {
+    }
+
+    //pop arguments table
+    lua_pop(steg::L, 1);                            // -1
+    return NULL;
 }
 
 DBG_Status GuiScene::InitScene()
@@ -87,15 +228,34 @@ DBG_Status GuiScene::InitScene()
         LUA_LogError("Cannot do lua_setglobal!");
     }
 
-    //tmp
-//    luaL_dostring(steg::L,
-//                  "print(welcomeScene_1)");
-//    std::string luaTasks = "print(";
-//    luaTasks += name;
-//    luaTasks += ".ud)";
-//    luaL_dostring(steg::L, luaTasks.c_str());
-//    std::cout << this << std::endl;
+    //now, load the GameComps registered in script's sources table
+    lua_pushnil(steg::L);                                           // +1
+    steg::PLuaPushFromTable_J(name.c_str());                        // +1
+    //now, the proxy table is on stack top
+    steg::PLuaPushFromTable_J("sources");                           // +1
+    //now, the proxy's sources table is on stack top
+    //get the GameComp number
+    int compNumber = 0;
+    steg::PLuaPushFromTable_J("length");    // +1
+    steg::PLuaPop(&compNumber);             // -1
 
+    steg::GameComp* comp = NULL;
+//    for(int i = 0; i < compNumber; i++)
+    for(int i = 0; i < 1; i++)
+    {
+        comp = LoadGameCompFromTable(i + 1);
+        if(comp)
+        {
+            (*this) << comp;
+        }
+    }
+
+    //pop sources table
+    lua_pop(steg::L, 1);                                            // -1
+    //pop proxy table
+    lua_pop(steg::L, 1);                                            // -1
+    //pop nil
+    lua_pop(steg::L, 1);                                            // -1
     return status;
 }
 

@@ -98,17 +98,8 @@ function Interface.readData(file, field)
             else
                 LuaFunctions[key] = nil     -- if the newer one is not function, then overwrite old one
             end
-            --LuaFunctions[key] = {}
-            --LuaFunctions[key][1], LuaFunctions[key][2], LuaFunctions[key][3] = currentValue()
         end
     end
---[[
-    --temp
-    print(unpack(res))
-    for i = 1, #fieldsList do
-        print(unpack(fieldsList[i]))
-    end
---]]
 
     res["length"] = #res
     return res  --return an array
@@ -120,15 +111,5 @@ LuaFunctions["readData"]["function"] = Interface.readData
 LuaFunctions["readData"]["argNumber"] = 2
 LuaFunctions["readData"]["resNumber"] = 1
 
---[[
---test
-print(Interface.readData("config.lua", "Config|window|width&Config|FPS&Config|tileWidth"))
-print(Interface.readData("script.lua", "s&t&a&b&funcs|foo"))
-for k, v in pairs(LuaFunctions) do
-    print(k, v)
-    for _, u in ipairs(v) do
-        print(u)
-    end
-end
-print(Interface.readData("config.lua", "Config|window|caption&Config|FPS"))
---]]
+--add the script path
+package.path = package.path .. [[;./scripts/?.lua]]
