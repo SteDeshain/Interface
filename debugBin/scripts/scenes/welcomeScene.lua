@@ -71,7 +71,7 @@ welcomeScene.sources[1] =
 	[1] = "color",					-- color mode
 	[2] = nil,						-- no script
 	[3] = {0, 128, 255, 255},		-- color: white
-	[4] = 8.0,						-- transparency: 0.0f
+	[4] = 0.2,						-- transparency: 0.0f
 	--[5] = {0, 0, Config.window.width, Config.window.height},
 	[5] = {100, 50, 300, 200},
 									-- viewRect: whole window

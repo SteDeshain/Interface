@@ -71,12 +71,15 @@ welcomeScene.sources[1] =
 	[1] = "color",					-- color mode
 	[2] = nil,						-- no script
 	[3] = {0, 128, 255, 255},		-- color: white
-	[4] = 8.0,						-- transparency: 0.0f
+	[4] = 0.8,						-- transparency: 0.0f
+---[[
 	[5] = {0, 0, Config.window.width, Config.window.height},
 									-- viewRect: whole window
 	[6] = {Config.window.width, Config.window.height},
 									-- canvasSize: whole window
+--]]
 	[7] = nil,						-- motherCanvas: NULL
+	[8] = false,					-- startVisible
 }
 welcomeScene.sources["gui_1"] = {}
 welcomeScene.sources[2] =
@@ -103,11 +106,12 @@ welcomeScene.sources[3] =
 	["length"] = 7,
 	[1] = "color",
 	[2] = nil,
-	[3] = {255, 255, 255, 255},
-	[4] = 0.0,
-	[5] = {0, 0, Config.window.width, Config.window.height},
-	[6] = {Config.window.width, Config.window.height},
+	[3] = {0, 0, 250, 255},
+	[4] = 0.9,
+	[5] = {100, 100, 100, 100},
+	[6] = {100, 101},
 	[7] = nil,
+	[8] = true,
 }
 welcomeScene.sources["gui_2"] = {}
 welcomeScene.sources[4] =

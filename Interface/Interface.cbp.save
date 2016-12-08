@@ -56,6 +56,8 @@
 		<Unit filename="interface_gui.h" />
 		<Unit filename="interface_scene.cpp" />
 		<Unit filename="interface_scene.h" />
+		<Unit filename="load_comps.cpp" />
+		<Unit filename="load_comps.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="scene1.cpp" />
 		<Unit filename="scene1.h" />

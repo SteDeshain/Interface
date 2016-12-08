@@ -172,7 +172,7 @@
 
 1477988317 /home/stedeshain/Studio/Interface/Steg/config.h
 
-1481037414 /home/stedeshain/Studio/Interface/Steg/stel.h
+1481184517 /home/stedeshain/Studio/Interface/Steg/stel.h
 	<csetjmp>
 	<string>
 	<cstdarg>
@@ -186,14 +186,14 @@
 	"lua5.1/lauxlib.h"
 	"lua5.1/lualib.h"
 
-1481036889 source:/home/stedeshain/Studio/Interface/Interface/interface_game.cpp
+1481183901 source:/home/stedeshain/Studio/Interface/Interface/interface_game.cpp
 	"interface_game.h"
 	"scene1.h"
 	"color.h"
 	"interface_scene.h"
 	"gui_scene.h"
 
-1480838136 /home/stedeshain/Studio/Interface/Interface/interface_game.h
+1481184133 /home/stedeshain/Studio/Interface/Interface/interface_game.h
 	"SDL2/SDL.h"
 	"SDL2/SDL_ttf.h"
 	"game.h"
@@ -202,14 +202,16 @@
 	"label.h"
 	"drawable_comp.h"
 	"stel.h"
+	<list>
 
-1481039238 source:/home/stedeshain/Studio/Interface/Interface/gui_scene.cpp
+1481185121 source:/home/stedeshain/Studio/Interface/Interface/gui_scene.cpp
 	"gui_scene.h"
 	"tools.h"
 	"stdlib.h"
 	"interface_gui.h"
+	"load_comps.h"
 
-1481031986 /home/stedeshain/Studio/Interface/Interface/gui_scene.h
+1481181701 /home/stedeshain/Studio/Interface/Interface/gui_scene.h
 	"interface_scene.h"
 	"stel.h"
 	"game_comp.h"
@@ -222,10 +224,10 @@
 	"interface_comp.h"
 	<string>
 
-1480840665 source:/home/stedeshain/Studio/Interface/Interface/interface_comp.cpp
+1481181715 source:/home/stedeshain/Studio/Interface/Interface/interface_comp.cpp
 	"interface_comp.h"
 
-1480840662 /home/stedeshain/Studio/Interface/Interface/interface_comp.h
+1481181720 /home/stedeshain/Studio/Interface/Interface/interface_comp.h
 	"game_comp.h"
 	"drawable_comp.h"
 	"multi_draw_comp.h"
@@ -233,10 +235,10 @@
 	"multi_draw_solid_obj.h"
 	<string>
 
-1480917240 source:/home/stedeshain/Studio/Interface/Interface/interface_gui.cpp
+1481182524 source:/home/stedeshain/Studio/Interface/Interface/interface_gui.cpp
 	"interface_gui.h"
 
-1480917144 /home/stedeshain/Studio/Interface/Interface/interface_gui.h
+1481176989 /home/stedeshain/Studio/Interface/Interface/interface_gui.h
 	"gui.h"
 	"label.h"
 	"interface_comp.h"
@@ -248,4 +250,15 @@
 
 1480928669 source:/home/stedeshain/Studio/Interface/Interface/tools.cpp
 	"tools.h"
+
+1481184225 source:/home/stedeshain/Studio/Interface/Interface/load_comps.cpp
+	"load_comps.h"
+	"stel.h"
+	"interface_game.h"
+
+1481181846 /home/stedeshain/Studio/Interface/Interface/load_comps.h
+	"log.h"
+	"status.h"
+	"interface_comp.h"
+	"interface_gui.h"
 

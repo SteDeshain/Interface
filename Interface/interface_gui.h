@@ -36,10 +36,16 @@ class Canvas: public steg::Canvas, public Name
 public:
     //picture mode
     Canvas(const char* name, const char* imgFile, float transparency,
-           SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas);
+           SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas, bool startVisible);
     //color mode
     Canvas(const char* name, SDL_Color color, float transparency,
-           SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas);
+           SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas, bool startVisible);
+
+protected:
+    DBG_Status InitInScene(steg::Scene* scene);
+
+private:
+    bool startVisible;
 
 };
 

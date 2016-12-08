@@ -75,7 +75,11 @@ DBG_Status PCallProxyFunction_J(const char* name, const char* functionName,
 // if at the stack top is a table, then get the field from the top table, and push it onto stack
 // else, get the field from the _G table, and push it onto stack
 // if can't find field or any error happens, push nil onto stack
-DBG_Status PLuaPushFromTable_J(const char* field);    // [-0, +1]
+DBG_Status PLuaPushFromTable_J(const char* field);  // [-0, +1]
+DBG_Status PLuaPushFromTable_J(int index);          // [-0, +1]
+
+bool PLuaTopIsNil();
+void PLuaPushNil();                                 // [-0, +1]
 
 DBG_Status PLuaPeek(double* value);                 // [-0, +0]
 DBG_Status PLuaPeek(int* value);
@@ -85,8 +89,8 @@ DBG_Status PLuaPeek_J(std::string* value);
 DBG_Status PLuaPeek(lua_CFunction* value);
 DBG_Status PLuaPeek(void** value);
 
-DBG_Status PLuaPop();                               // [-1, +0] pop one element from stack
-DBG_Status PLuaPop(double* value);                  // [-1, +0] (-0 only when the stack is empty)
+DBG_Status PLuaPop(int i = 1);                      // [-i, +0] pop i elements from stack
+DBG_Status PLuaPop(double* value);                  // [-1, +0]
 DBG_Status PLuaPop(int* value);
 DBG_Status PLuaPop(float* value);
 DBG_Status PLuaPop(bool* value);

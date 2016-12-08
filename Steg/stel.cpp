@@ -1127,6 +1127,8 @@ DBG_Status PLuaPushFromTable_J(const char* field)    //[-0, +1]
 {
     DBG_Status status = DBG_OK;
 
+    int originStackSize = lua_gettop(L);
+
     bool readFromGlobal = false;
     if(lua_gettop(L) <= 0)
     {
@@ -1167,7 +1169,118 @@ DBG_Status PLuaPushFromTable_J(const char* field)    //[-0, +1]
         }
     }
 
+    int stackChange = lua_gettop(L) - (originStackSize + 1);
+    if(stackChange == 0)
+    {
+        //correct! do nothing
+    }
+    else if(stackChange < 0)
+    {
+        //
+        if(stackChange == -1)
+        {
+            lua_pushnil(L);
+        }
+        else
+        {
+            LUA_LogError("Something unexpected happened! maybe fatal!");
+            exit(EXIT_FAILURE);
+        }
+    }
+    else    //stackChange > 0
+    {
+        //pop extra element
+        lua_pop(L, stackChange);
+    }
+
     return status;
+}
+
+DBG_Status PLuaPushFromTable_J(int index)
+{
+    DBG_Status status = DBG_OK;
+
+    int originStackSize = lua_gettop(L);
+
+    bool readFromGlobal = false;
+    if(lua_gettop(L) <= 0)
+    {
+        readFromGlobal = true;
+    }
+    else
+    {
+        if(!lua_istable(L, -1))
+        {
+            readFromGlobal = true;
+        }
+    }
+
+    lua_pushnumber(L, index);                   // +1
+    if(readFromGlobal)
+    {
+        if(!setjmp(StelJmp))
+        {
+            lua_gettable(L, LUA_GLOBALSINDEX);  //[-1, +1, e]
+        }
+        else
+        {
+            //necessary?
+            LUA_LogError("thrown error catched, happenning in PJLuaPushFromTable, error message is at the previous line!");
+            status |= DBG_LUA_ERR;
+        }
+    }
+    else
+    {
+        if(!setjmp(StelJmp))
+        {
+            lua_gettable(L, -2);                //[-1, +1, e]
+        }
+        else
+        {
+            //necessary?
+            LUA_LogError("thrown error catched, happenning in PJLuaPushFromTable, error message is at the previous line!");
+            status |= DBG_LUA_ERR;
+        }
+    }
+
+    int stackChange = lua_gettop(L) - (originStackSize + 1);
+    if(stackChange == 0)
+    {
+        //correct! do nothing
+    }
+    else if(stackChange < 0)
+    {
+        //
+        if(stackChange == -1)
+        {
+            lua_pushnil(L);
+        }
+        else
+        {
+            LUA_LogError("Something unexpected happened! maybe fatal!");
+            exit(EXIT_FAILURE);
+        }
+    }
+    else    //stackChange > 0
+    {
+        //pop extra element
+        lua_pop(L, stackChange);
+    }
+
+    return status;
+}
+
+bool PLuaTopIsNil()
+{
+    if(lua_isnil(L, -1))
+        return true;
+    else
+        return false;
+}
+
+void PLuaPushNil()
+{
+    lua_pushnil(L);
 }
 
 DBG_Status PLuaPeek(double* value)
@@ -1185,7 +1298,7 @@ DBG_Status PLuaPeek(double* value)
 
     if(!lua_isnumber(L, -1))
     {
-        LUA_LogError("Lua stack top is not a number, can't assign it to a double!");
+//        LUA_LogError("Lua stack top is not a number, can't assign it to a double!");
         return DBG_LUA_ERR;
     }
 
@@ -1245,7 +1358,7 @@ DBG_Status PLuaPeek(bool* value)
 
     if(!lua_isboolean(L, -1))
     {
-        LUA_LogError("Lua stack top is not a boolean, can't assign it to a bool!");
+//        LUA_LogError("Lua stack top is not a boolean, can't assign it to a bool!");
         return DBG_LUA_ERR;
     }
 
@@ -1269,7 +1382,7 @@ DBG_Status PLuaPeek_J(std::string* value)
 
     if(lua_type(L, -1) != LUA_TSTRING)  // using lua_isstring will treat number as a string too
     {
-        LUA_LogError("Lua stack top is not a string, can't assign it to a std::string!");
+//        LUA_LogError("Lua stack top is not a string, can't assign it to a std::string!");
         return DBG_LUA_ERR;
     }
 
@@ -1306,7 +1419,7 @@ DBG_Status PLuaPeek(lua_CFunction* value)
 
     if(!lua_iscfunction(L, -1))
     {
-        LUA_LogError("Lua stack top is not a cfunction, can't assign it to a lua_CFunction!");
+//        LUA_LogError("Lua stack top is not a cfunction, can't assign it to a lua_CFunction!");
         return DBG_LUA_ERR;
     }
 
@@ -1330,7 +1443,7 @@ DBG_Status PLuaPeek(void** value)
 
     if(!lua_isuserdata(L, -1))
     {
-        LUA_LogError("Lua stack top is not a userdata, can't assign it to a void*!");
+//        LUA_LogError("Lua stack top is not a userdata, can't assign it to a void*!");
         return DBG_LUA_ERR;
     }
 
@@ -1339,9 +1452,9 @@ DBG_Status PLuaPeek(void** value)
     return status;
 }
 
-DBG_Status PLuaPop()
+DBG_Status PLuaPop(int i)
 {
-    lua_pop(L, 1);
+    lua_pop(L, i);
     return DBG_OK;
 }
 

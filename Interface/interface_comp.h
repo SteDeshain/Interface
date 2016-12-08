@@ -16,6 +16,7 @@ class Name
 
 public:
     Name(const char* name);
+//    Name(std::string name);
 
     const char* GetName();
 

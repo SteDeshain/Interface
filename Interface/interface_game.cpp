@@ -10,6 +10,8 @@ namespace interface
 
 using namespace steg;
 
+std::list<std::string*> InterfaceGame::usedStrings;
+
 InterfaceGame::~InterfaceGame()
 {
     delete conf;

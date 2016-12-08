@@ -6,12 +6,20 @@
 #include "label.h"
 #include "drawable_comp.h"
 #include "stel.h"
+#include <list>
 
 namespace interface
 {
 
 class InterfaceGame: public steg::Game
 {
+
+public:
+    //when using a std::string to assign to a const char*,
+    //the origin std::string will be invalid after its scope(like a funciton)
+    //so I use a list to store them
+    //temp: remember to delete it and its all strings at game quit
+    static std::list<std::string*> usedStrings;
 
 public:
     ~InterfaceGame();
