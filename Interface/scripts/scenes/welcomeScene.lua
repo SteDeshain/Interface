@@ -69,7 +69,7 @@ welcomeScene.sources[1] =
 	["class"] = "Canvas",
 	["length"] = 7,
 	[1] = "color",					-- color mode
-	[2] = nil,						-- no script
+	[2] = "logoCanv",				-- no script
 	[3] = {0, 128, 255, 255},		-- color: white
 	[4] = 0.8,						-- transparency: 0.0f
 ---[[
@@ -105,7 +105,7 @@ welcomeScene.sources[3] =
 	["class"] = "Canvas",
 	["length"] = 7,
 	[1] = "color",
-	[2] = nil,
+	[2] = "logoCanv",
 	[3] = {0, 0, 250, 255},
 	[4] = 0.9,
 	[5] = {100, 100, 100, 100},

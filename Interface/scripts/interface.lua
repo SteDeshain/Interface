@@ -20,6 +20,9 @@ LuaFunctions = {} --global
 -- this table may have other tables in it, and the final c function is in some table in it
 CFunctions = {} --global
 
+-- for debug use
+Debug = {}
+
 Interface = {}  --global
 
 -- store the files already were loaded as function by name of file's path

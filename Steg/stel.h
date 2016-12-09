@@ -78,6 +78,16 @@ DBG_Status PCallProxyFunction_J(const char* name, const char* functionName,
 DBG_Status PLuaPushFromTable_J(const char* field);  // [-0, +1]
 DBG_Status PLuaPushFromTable_J(int index);          // [-0, +1]
 
+// if at the stack -2 position is a table, then set the stack top value to the table by name or index, and pop the value
+// otherwise, set the value to the _G table, and pop it
+DBG_Status PLuaSetToTable_J(const char* name);      // [-1, +0]
+DBG_Status PLuaSetToGlobal_J(const char* name);     // [-1, +0]
+DBG_Status PLuaSetToTable_J(int index);             // [-1, +0]
+
+int PLuaGetTop();
+
+DBG_Status PLuaPushNewTable_J();                    // [-0, +1]
+
 bool PLuaTopIsNil();
 void PLuaPushNil();                                 // [-0, +1]
 

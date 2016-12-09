@@ -1,4 +1,5 @@
 #include "tools.h"
+#include "stel.h"
 
 namespace interface
 {
@@ -152,6 +153,19 @@ std::string& NameAddOne(std::string& name)
         }
     }
     return name;
+}
+
+void PrintStackTop()
+{
+    int topPos = lua_gettop(steg::L);
+    steg::PLuaPushNil();                    // +1
+    steg::PLuaPushFromTable_J("Debug");     // +1
+    lua_pushvalue(steg::L, topPos);         // +1
+    steg::PLuaSetToTable_J("current");      // -1
+    luaL_dostring(steg::L,
+                  "if type(Debug.current) == \"table\" then print(unpack(Debug.current)) else print(Debug.current) end");
+
+    steg::PLuaPop(3);
 }
 
 }

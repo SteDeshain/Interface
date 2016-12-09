@@ -1,6 +1,7 @@
 #include "load_comps.h"
 #include "stel.h"
 #include "interface_game.h"
+#include "tools.h"
 
 namespace interface
 {
@@ -97,7 +98,7 @@ GameComp* PLoadGameCompFromSourcesTable_J(int number)
     }
     else if(className == "GUI")
     {
-        comp = PLoadGUI_J();
+        comp = (GameComp*)PLoadGUI_J();
     }
 
     steg::PLuaPop();                                // -1
@@ -180,6 +181,60 @@ DBG_Status PGetSDLColorFromTopTable_J(SDL_Color* color)
     status |= steg::PLuaPushFromTable_J(4);   // +1
     status |= steg::PLuaPop(&temp);           // -1
     color->a = temp;
+
+    return status;
+}
+
+DBG_Status NewLuaProxy(std::string& name, std::string& filePath, void* ud)
+{
+    DBG_Status status = DBG_OK;
+    if(ud == NULL)
+        return DBG_ARG_ERR | DBG_NULL_PTR;
+
+    LegalizeName(name);
+    std::string className = GetClassName(name);
+    if(filePath.empty())
+    {
+        filePath = "scripts/";
+    }
+    filePath += className;
+    filePath += ".lua";
+
+    //first, check naming collision
+    steg::PLuaPushNil();                                            // +1
+    status |= steg::PLuaPushFromTable_J(name.c_str());              // +1, actually, push from global
+    while(!steg::PLuaTopIsNil())
+    {
+        NameAddOne(name);
+        steg::PLuaPop();                            // -1
+        steg::PLuaPushFromTable_J(name.c_str());    // +1
+    }
+    steg::PLuaPop(2);                                               // -2
+
+    //and then, new one proxy
+    status |= steg::PLuaDoScript(filePath.c_str());
+    //now we have the className luaProxy class in lua global
+    //create new table as proxy
+    status |= steg::PLuaPushNewTable_J();                           // +1
+    int proxyTablePos = steg::PLuaGetTop();
+
+    //no need to use PCallProxyFunction here
+    //because the code isn't very much
+    steg::PLuaPushNil();                                            // +1
+    status |= steg::PLuaPushFromTable_J(className.c_str());         // +1
+    int classTablePos = steg::PLuaGetTop();
+    //the class table is on stack top
+//    PrintStackTop();
+    steg::PCallLuaFucntionFromTable_J("New", "ttu", NULL, classTablePos, proxyTablePos, ud);
+
+    //pop class table
+    steg::PLuaPop();                                                // -1
+    //pop nil
+    steg::PLuaPop();                                                // -1
+
+    //now, the proxy is on stack top
+    //register it to global
+    status |= steg::PLuaSetToGlobal_J(name.c_str());                // -1
 
     return status;
 }

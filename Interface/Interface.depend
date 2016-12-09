@@ -172,7 +172,7 @@
 
 1477988317 /home/stedeshain/Studio/Interface/Steg/config.h
 
-1481184517 /home/stedeshain/Studio/Interface/Steg/stel.h
+1481270804 /home/stedeshain/Studio/Interface/Steg/stel.h
 	<csetjmp>
 	<string>
 	<cstdarg>
@@ -204,7 +204,7 @@
 	"stel.h"
 	<list>
 
-1481185121 source:/home/stedeshain/Studio/Interface/Interface/gui_scene.cpp
+1481277145 source:/home/stedeshain/Studio/Interface/Interface/gui_scene.cpp
 	"gui_scene.h"
 	"tools.h"
 	"stdlib.h"
@@ -235,30 +235,36 @@
 	"multi_draw_solid_obj.h"
 	<string>
 
-1481182524 source:/home/stedeshain/Studio/Interface/Interface/interface_gui.cpp
+1481280318 source:/home/stedeshain/Studio/Interface/Interface/interface_gui.cpp
 	"interface_gui.h"
+	"tools.h"
+	"stel.h"
+	"load_comps.h"
 
 1481176989 /home/stedeshain/Studio/Interface/Interface/interface_gui.h
 	"gui.h"
 	"label.h"
 	"interface_comp.h"
 
-1480927308 /home/stedeshain/Studio/Interface/Interface/tools.h
+1481278399 /home/stedeshain/Studio/Interface/Interface/tools.h
 	<iostream>
 	<string>
 	<sstream>
 
-1480928669 source:/home/stedeshain/Studio/Interface/Interface/tools.cpp
+1481279008 source:/home/stedeshain/Studio/Interface/Interface/tools.cpp
 	"tools.h"
+	"stel.h"
 
-1481184225 source:/home/stedeshain/Studio/Interface/Interface/load_comps.cpp
+1481279058 source:/home/stedeshain/Studio/Interface/Interface/load_comps.cpp
 	"load_comps.h"
 	"stel.h"
 	"interface_game.h"
+	"tools.h"
 
-1481181846 /home/stedeshain/Studio/Interface/Interface/load_comps.h
+1481276897 /home/stedeshain/Studio/Interface/Interface/load_comps.h
 	"log.h"
 	"status.h"
 	"interface_comp.h"
 	"interface_gui.h"
+	"string"
 

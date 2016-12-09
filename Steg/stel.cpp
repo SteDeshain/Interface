@@ -1270,6 +1270,196 @@ DBG_Status PLuaPushFromTable_J(int index)
     return status;
 }
 
+DBG_Status PLuaSetToTable_J(const char* name)
+{
+    DBG_Status status = DBG_OK;
+    int originStackSize = lua_gettop(L);
+
+    if(originStackSize <= 0)    //no value to set
+    {
+        return DBG_ARG_ERR | DBG_LUA_ERR;
+    }
+
+    bool setToGlobal = false;
+    if(originStackSize < 2)
+    {
+        setToGlobal = true;
+    }
+    else
+    {
+        if(!lua_istable(L, -2))
+        {
+            setToGlobal = true;
+        }
+    }
+
+    if(setToGlobal)
+    {
+        if(!setjmp(StelJmp))
+        {
+            lua_setglobal(L, name);     // -1
+        }
+        else
+        {
+            LUA_LogError("Cannot do lua_setglobal!");
+        }
+    }
+    else
+    {
+        if(!setjmp(StelJmp))
+        {
+            lua_setfield(L, -2, name);  // -1
+        }
+        else
+        {
+            LUA_LogError("Cannot do lua_setfield!");
+        }
+    }
+
+    int stackChange = lua_gettop(L) - (originStackSize - 1);
+    if(stackChange == 0)
+    {
+        //do nothing
+    }
+    else if(stackChange < 0)
+    {
+        LUA_LogError("Something unexpected happened! maybe fatal!");
+        exit(EXIT_FAILURE);
+    }
+    else    //stackChange > 0
+    {
+        lua_pop(L, stackChange);
+    }
+    return status;
+}
+
+DBG_Status PLuaSetToGlobal_J(const char* name)
+{
+    DBG_Status status = DBG_OK;
+
+    if(lua_gettop(L) <= 0)    //no value to set
+    {
+        return DBG_ARG_ERR | DBG_LUA_ERR;
+    }
+
+    PLuaPushNil();                      // +1
+    lua_insert(L, -2);                  // -1 +1
+    status |= PLuaSetToTable_J(name);   // -1
+
+    //pop nil
+    PLuaPop();                          // -1
+
+    return status;
+}
+
+DBG_Status PLuaSetToTable_J(int index)
+{
+    DBG_Status status = DBG_OK;
+    int originStackSize = lua_gettop(L);
+
+    if(originStackSize <= 0)    //no value to set
+    {
+        return DBG_ARG_ERR | DBG_LUA_ERR;
+    }
+
+    bool setToGlobal = false;
+    if(originStackSize < 2)
+    {
+        setToGlobal = true;
+    }
+    else
+    {
+        if(!lua_istable(L, -2))
+        {
+            setToGlobal = true;
+        }
+    }
+
+    if(setToGlobal)
+    {
+        //better not do that!
+        LUA_LogError("You cannot set a value by index to global!");
+    }
+    else
+    {
+        lua_pushnumber(L, index);                       // +1
+        lua_insert(L, -2);                              // -1 +1
+        if(!setjmp(StelJmp))
+        {
+            lua_settable(L, -3);                        // -2
+        }
+        else
+        {
+            LUA_LogError("Cannot do lua_setfield!");
+        }
+    }
+
+    int stackChange = lua_gettop(L) - (originStackSize - 1);
+    if(stackChange == 0)
+    {
+        //do nothing
+    }
+    else if(stackChange < 0)
+    {
+        LUA_LogError("Something unexpected happened! maybe fatal!");
+        exit(EXIT_FAILURE);
+    }
+    else    //stackChange > 0
+    {
+        lua_pop(L, stackChange);
+    }
+    return status;
+}
+
+int PLuaGetTop()
+{
+    return lua_gettop(L);
+}
+
+DBG_Status PLuaPushNewTable_J()
+{
+    DBG_Status status = DBG_OK;
+
+    int originStackSize = lua_gettop(L);
+
+    //
+    if(!setjmp(StelJmp))
+    {
+        lua_newtable(L);
+    }
+    else
+    {
+        LUA_LogError("Cannot new table! no enough memory");
+        status |= DBG_LUA_ERR | DBG_MEM_ERR;
+    }
+
+    int stackChange = lua_gettop(L) - (originStackSize + 1);
+    if(stackChange == 0)
+    {
+        //do nothing
+    }
+    else if(stackChange < 0)
+    {
+        //
+        if(stackChange == -1)
+        {
+            lua_pushnil(L);
+        }
+        else
+        {
+            LUA_LogError("Something unexpected happened! maybe fatal!");
+            exit(EXIT_FAILURE);
+        }
+    }
+    else    //stackChange > 0
+    {
+        //pop extra element
+        lua_pop(L, stackChange);
+    }
+
+    return status;
+}
+
 bool PLuaTopIsNil()
 {
     if(lua_isnil(L, -1))

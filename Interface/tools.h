@@ -14,6 +14,8 @@ std::string GetClassName(std::string name);
 std::string& LegalizeName(std::string& name);
 std::string& NameAddOne(std::string& name);   // +1s
 
+void PrintStackTop();   //mostly it's a table
+
 }
 
 #endif // __TOOLS_H__
