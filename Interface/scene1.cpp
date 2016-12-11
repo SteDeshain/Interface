@@ -180,7 +180,8 @@ DBG_Status Scene1::InitScene()
 //    DragButton* but2 = new DragButton(100, 60, GetColor(LightGray), SDL_Point{60, 30}, NULL, NULL);
 
 //    GUI* pic = new GUI(50, 300, 1, "character.png", motherCanv);
-    GUI* pic = new GUI(50, 300, SDL_Point{30, 30}, GetColor(Cyan), 0.5f, motherCanv);
+//    GUI* pic = new GUI(50, 300, SDL_Point{30, 30}, GetColor(Cyan), 0.5f, motherCanv);
+    GUI* pic = new GUI(50, 300, SDL_Point{30, 30}, GetColor(Cyan), 0.5f, NULL);
 
 //    ScrollBar* horzScrollBar = new ScrollBar(canv, scrHorizon);
 //    ScrollBar* vertScrollBar = new ScrollBar(canv, scrVerticle);
@@ -234,7 +235,7 @@ DBG_Status Scene1::InitScene()
 	resortCount->ReloadTexture(buffer);
 
 	std::cout << lua_gettop(steg::L) << std::endl;
-	PLuaDoScript("scripts/script.lua");
+	PLuaDoScript_J("scripts/script.lua");
 
 	PLuaPushFromTable_J("tab");
 	unsigned int tablePos = lua_gettop(steg::L);

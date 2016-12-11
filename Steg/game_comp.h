@@ -3,6 +3,7 @@
 
 #include "SDL2/SDL.h"
 #include "status.h"
+#include <string>
 
 namespace steg
 {
@@ -15,10 +16,14 @@ class GameComp
 
 public:
 	GameComp();
+	GameComp(const char* name);
 	virtual ~GameComp();
 
 	void DisableComp();
 	void EnableComp();
+
+	std::string GetName();
+	const char* GetNameCStr();
 
 protected:
 	Scene *motherScene;
@@ -31,6 +36,8 @@ protected:
 	virtual void ResetErrors();
 	virtual DBG_Status InitInScene(Scene *scene);	//called after inserted into a Scene
 	virtual DBG_Status DumpOutOfScene();			//called after throwed out by a Scene
+
+	std::string name = "";
 
 private:
 };

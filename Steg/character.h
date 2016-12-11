@@ -7,6 +7,7 @@ namespace steg
 {
 
 class SenseComp: public SolidObj
+//class SenseComp: virtual public SolidObj
 {
     friend class Character;
 
@@ -31,6 +32,7 @@ protected:
 
 };
 
+//class Character: virtual public SolidObj
 class Character: public SolidObj
 {
 

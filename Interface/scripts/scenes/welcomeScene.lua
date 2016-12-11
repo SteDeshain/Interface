@@ -33,13 +33,39 @@ welcomeScene.New =
 
 --temp
 welcomeScene.n = 0
+welcomeScene.ct = 1
 
 function welcomeScene:update(dt)
 	--...
 	self.n = self.n + dt
-	if self.n >= 2000 then
-		print("2 seconds..." .. self.n)
-		self.n = 0
+	if self.ct == 1 then
+		if self.n >= 2000 then
+			print("2 seconds..." .. self.n)
+			--self.n = 0
+			CFunctions.showCanvas(self.sources.logoCanv_1.ud)
+			self.ct = self.ct + 1
+		end
+	elseif self.ct == 2 then
+		if self.n >= 4000 then
+			print("2 seconds..." .. self.n)
+			--self.n = 0
+			CFunctions.hideCanvas(self.sources.logoCanv_1.ud)
+			self.ct = self.ct + 1
+		end
+	elseif self.ct ==3 then
+		if self.n >= 6000 then
+			print("2 seconds..." .. self.n)
+			--self.n = 0
+			CFunctions.showCanvas(self.sources.logoCanv_2.ud)
+			self.ct = self.ct + 1
+		end
+	elseif self.ct == 4 then
+		if self.n >= 8000 then
+			print("2 seconds..." .. self.n)
+			self.n = 0
+			CFunctions.hideCanvas(self.sources.logoCanv_2.ud)
+			self.ct = 1
+		end
 	end
 end
 
@@ -60,71 +86,70 @@ welcomeScene.Update =
 welcomeScene.sources = {}
 welcomeScene.sources["length"] = 4
 
-welcomeScene.sources["canvas_1"] = {}
+welcomeScene.sources.logoCanv_1 = {}
 welcomeScene.sources[1] =
 {
-	["name"] = "canvas_1",	--脚本的编写者只负责在sources表中的命名不冲突，这对脚本编写者来说足够了
-							--但在全局变量中，相应的luaProxy的key很有可能和sources表中的key不同，因为在这里该命名可能不冲突，但放在全局中可能和其他的luaProxy冲突
-							--所以在c++代码中，会处理以防全局中的命名冲突
+	-- name registered in this table and global, and also is the script name
+	["name"] = "logoCanv_1",	--脚本的编写者只负责在sources表中的命名不冲突，这对脚本编写者来说足够了
+								--但在全局变量中，相应的luaProxy的key很有可能和sources表中的key不同，因为在这里该命名可能不冲突，但放在全局中可能和其他的luaProxy冲突
+								--所以在c++代码中，会处理以防全局中的命名冲突
+								--如果为nil，则不会把该对象注册在lua全局变量中，不会创建相应luaProxy
 	["class"] = "Canvas",
-	["length"] = 7,
 	[1] = "color",					-- color mode
-	[2] = "logoCanv",				-- no script
-	[3] = {0, 128, 255, 255},		-- color: white
-	[4] = 0.8,						-- transparency: 0.0f
+	[2] = {0, 128, 255, 255},		-- color: white
+	[3] = 0.8,						-- transparency: 0.0f
 ---[[
-	[5] = {0, 0, Config.window.width, Config.window.height},
+	[4] = {-100, -100, Config.window.width, Config.window.height},
 									-- viewRect: whole window
-	[6] = {Config.window.width, Config.window.height},
+	[5] = {Config.window.width, Config.window.height},
 									-- canvasSize: whole window
 --]]
-	[7] = nil,						-- motherCanvas: NULL
-	[8] = false,					-- startVisible
+	[6] = nil,						-- motherCanvas: NULL
+	[7] = false,					-- startVisible
 }
-welcomeScene.sources["gui_1"] = {}
+welcomeScene.sources.gui_1 = {}
 welcomeScene.sources[2] =
 {
 	["name"] = "gui_1",
 	["class"] = "GUI",
-	["length"] = 8,
 	[1] = "picture",					-- mode, not used in constructor, used in c++ to decide to use which constructor
-	[2] = nil,							-- name, nil for no script GameComp
-	[3] = Config.window.width / 2,		-- x
-	[4] = Config.window.height / 2,		-- y
-	[5] = 1,							-- textureNum
+	[2] = Config.window.width / 2,		-- x
+	[3] = Config.window.height / 2,		-- y
+	[4] = 1,							-- drawIndex
+	--[5] = nil,
+	[5] = ".sources.logoCanv_1.ud",		-- motherCanvas
+										-- 以点开头，表示先以该GameComp的motherScene为起始查找为止
+										-- 否则，在全局变量中开始查找
 	[6] = 1,							-- textureNum
-	[7] = "sheet.png",					-- fileName
-	[8] = welcomeScene.sources["canvas_1"].ud,
-										-- motherCanvas: canvas_1 (when constructing this gui, the canvas_1 already became a luaProxy pointing to the correct object)
+	[7] = "sources/textures/sheet.png",	-- fileName
 }
 
-welcomeScene.sources["canvas_2"] = {}
+welcomeScene.sources.logoCanv_2 = {}
 welcomeScene.sources[3] =
 {
-	["name"] = "canvas_2",
+	["name"] = "logoCanv_2",
 	["class"] = "Canvas",
-	["length"] = 7,
 	[1] = "color",
-	[2] = "logoCanv",
-	[3] = {0, 0, 250, 255},
-	[4] = 0.9,
-	[5] = {100, 100, 100, 100},
-	[6] = {100, 101},
-	[7] = nil,
-	[8] = true,
+	[2] = {0, 0, 250, 255},
+	--[1] = "picture",
+	--[2] = "sources/textures/tiles.png",
+	[3] = 0.5,
+	[4] = {100, 100, 400, 200},
+	[5] = {512, 256},
+	[6] = nil,
+	[7] = false,
 }
-welcomeScene.sources["gui_2"] = {}
+welcomeScene.sources.gui_2 = {}
 welcomeScene.sources[4] =
 {
 	["name"] = "gui_2",
 	["class"] = "GUI",
-	["length"] = 8,
-	[1] = "picture",
-	[2] = nil,
-	[3] = Config.window.width / 2,
-	[4] = Config.window.height / 2,
-	[5] = 1,
-	[6] = 1,
-	[7] = "tiles.png",
-	[8] = welcomeScene.sources["canvas_2"].ud,
+	[1] = "color",
+	[2] = 100,
+	[3] = 100,
+	[4] = 1,
+	[5] = ".sources.logoCanv_2.ud",
+	[6] = {100, 100},								-- picSize
+	[7] = {255, 0, 0, 0},						-- color
+	[8] = 0.8,									-- transparency
 }

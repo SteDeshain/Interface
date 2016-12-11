@@ -19,6 +19,7 @@ enum GUILayer
 
 class Canvas;
 
+//class GUI: virtual public DrawableComp
 class GUI: public DrawableComp
 {
     friend class Scene;
@@ -27,7 +28,14 @@ class GUI: public DrawableComp
 public:
     GUI(int x, int y, int textureNum, const char* imgFile, Canvas* canvas = NULL);
     GUI(int x, int y, int drawIndex, Canvas* canvas = NULL);    //for textureNum == 1, used by Lable
-    GUI(int textureNum, const char* imgFile = NULL, Canvas* canvas = NULL);
+    GUI(int textureNum, const char* imgFile, Canvas* canvas = NULL);
+    //full version
+    //picture mode
+    GUI(const char* name, int x, int y, int drawIndex,
+        int textureNum, const char* imgFile, steg::Canvas* canvas);
+    //color mode
+    GUI(const char* name, int x, int y, int drawIndex,
+        SDL_Point picSize, SDL_Color color, float transparency, steg::Canvas* canvas);
 
     //get color picture
     GUI(int x, int y, SDL_Point picSize, SDL_Color color, float transparency, Canvas* canvas = NULL);   //make a copy of color
@@ -108,6 +116,7 @@ struct CanvasState
 
 class ScrollBar;
 
+//class Canvas: virtual public GUI
 class Canvas: public GUI
 {
     friend class GUI;
@@ -117,6 +126,12 @@ class Canvas: public GUI
 //    friend DBG_Status ShowUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self);
 
 public:
+    //picture mode
+    Canvas(const char* name, const char* imgFile, float transparency,
+           SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas, bool startVisible);
+    //color mode
+    Canvas(const char* name, SDL_Color color, float transparency,
+           SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas, bool startVisible);
     Canvas(SDL_Color color, float transparency, SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas);
     Canvas(const char* imgFile, float transparency, SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas);
 
@@ -188,6 +203,8 @@ protected:
     float originExtraTrans; //restore origin extra trans value
     bool originVisible;     //restore origin visible value
 
+    bool startVisible = false;  //visible when insert into a scene
+
     //show process animation
     SlideInfo* slideInfo;
 
@@ -215,6 +232,7 @@ private:
 
 };
 
+//class Button: virtual public GUI
 class Button: public GUI
 {
 
@@ -241,6 +259,7 @@ protected:
 
 };
 
+//class DragButton: virtual public Button
 class DragButton: public Button
 {
     friend DBG_Status ShowUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self);
@@ -290,6 +309,7 @@ enum ScrollBarWay: int
     scrVerticle = 1,
 };
 
+//class ScrollBar: virtual public GameComp
 class ScrollBar: public GameComp
 {
 

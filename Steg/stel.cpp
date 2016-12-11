@@ -1,5 +1,6 @@
 #include "stel.h"
 #include "log.h"
+#include "c_api.h"
 #include <iostream>
 
 namespace steg
@@ -56,7 +57,10 @@ DBG_Status LuaInit()
 	}
 
     //load lua interface
-	status |= PLuaDoScript("./scripts/interface.lua");
+	status |= PLuaDoScript_J("./scripts/interface.lua");
+
+	//register necessary c functions
+	status |= RegisterFunctions();
 
     return status;
 }
@@ -113,7 +117,7 @@ static int cLuaDoFile(lua_State* L)
 	return 0;	//return values are discarded in cpcall
 }
 
-DBG_Status PLuaDoScript(const char* scriptFile)
+DBG_Status PLuaDoScript_J(const char* scriptFile)
 {
 	DBG_Status status = DBG_OK;
 
@@ -123,6 +127,32 @@ DBG_Status PLuaDoScript(const char* scriptFile)
 	}
 	else
 	{
+	    //check whether the script was alreday done
+	    PLuaPushNil();                                  // +1
+	    PLuaPushFromTable_J("DoneScripts");             // +1
+	    if(!PLuaTopIsNil())
+        {
+            PLuaPushFromTable_J(scriptFile);    // +1
+            if(!PLuaTopIsNil())
+            {
+                PLuaPop(3);                 // -3
+                return DBG_REP_OPR;
+            }
+            else
+            {
+                //pop nil
+                PLuaPop();                      // -1
+                lua_pushboolean(L, true);       // +1
+                PLuaSetToTable_J(scriptFile);   // -1
+                //pop DoneScripts table
+                PLuaPop();                      // -1
+                //pop nil
+                PLuaPop();                      // -1
+            }
+        }
+        else
+            PLuaPop(2);                                 // -2
+
 		if(lua_cpcall(L, cLuaDoFile, (void*)scriptFile))
 		{
 			//handle error
@@ -1634,6 +1664,9 @@ DBG_Status PLuaPeek(void** value)
     if(!lua_isuserdata(L, -1))
     {
 //        LUA_LogError("Lua stack top is not a userdata, can't assign it to a void*!");
+        //tmp
+//        std::string tp = lua_typename(steg::L, lua_type(steg::L, -1));
+
         return DBG_LUA_ERR;
     }
 

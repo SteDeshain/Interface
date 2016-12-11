@@ -2,88 +2,172 @@
 #include "stel.h"
 #include "interface_game.h"
 #include "tools.h"
+#include <vector>
 
 namespace interface
 {
 
 //assuming the arguments table is on stack top
-static Canvas* PLoadCanvas_J()
+static Canvas* PLoadCanvas_J(const std::string& sceneName)
 {
     Canvas* comp = NULL;
 
-    int tempInteger = 0;
+//    int tempInteger = 0;
 
     std::string mode = "color";
-    std::string scriptName = "";
+    std::string name = "";
     double transparency = 1.0f;
     SDL_Rect viewRect = {0, 0, 0, 0};
     SDL_Point canvasSize = {0, 0};
     void* motherCanvas = NULL;
     bool startVisible = true;
 
+    //name
+    steg::PLuaPushFromTable_J("name");   // +1
+    //if top is nil, the PLuaPop will not change the name, so it's safety
+    steg::PLuaPop_J(&name);   // -1
+
     //mode
     steg::PLuaPushFromTable_J(1);   // +1
     steg::PLuaPop_J(&mode);         // -1
 
-    //name
-    steg::PLuaPushFromTable_J(2);   // +1
-    //if top is nil, the PLuaPop will not change the scriptName, so it's safety
-    steg::PLuaPop_J(&scriptName);   // -1
-
     //transparency
-    steg::PLuaPushFromTable_J(4);   // +1
+    steg::PLuaPushFromTable_J(3);   // +1
     steg::PLuaPop(&transparency);   // -1
 
     //viewRect
-    steg::PLuaPushFromTable_J(5);   // +1
+    steg::PLuaPushFromTable_J(4);   // +1
     //now, the viewRect table is on stack top
     PGetSDLRectFromTopTable_J(&viewRect);
     steg::PLuaPop();                // -1
 
     //canvasSize
-    steg::PLuaPushFromTable_J(6);   // +1
+    steg::PLuaPushFromTable_J(5);   // +1
     PGetSDLPointFromTopTable_J(&canvasSize);
     steg::PLuaPop();                // -1
 
     //motherCanvas
-    steg::PLuaPushFromTable_J(7);   // +1
+    std::string findPath = "";
+    steg::PLuaPushFromTable_J(6);   // +1
     steg::PLuaPop(&motherCanvas);   // -1
 
     //startVisible
-    steg::PLuaPushFromTable_J(8);   // +1
+    steg::PLuaPushFromTable_J(7);   // +1
     steg::PLuaPop(&startVisible);   // -1
 
     if(mode == "color")
     {
         SDL_Color color = {0, 0, 0, 0};
-        steg::PLuaPushFromTable_J(3);       // +1
+        steg::PLuaPushFromTable_J(2);       // +1
         PGetSDLColorFromTopTable_J(&color);
         steg::PLuaPop();                    // -1
 
-        comp = new Canvas(scriptName.c_str(), color, transparency, viewRect, canvasSize, (Canvas*)motherCanvas, startVisible);
+        comp = new Canvas(name.c_str(), color, transparency, viewRect, canvasSize, (Canvas*)motherCanvas, startVisible);
     }
     else
     {
         std::string* imgFile = new std::string("");
         InterfaceGame::usedStrings.push_back(imgFile);
-        steg::PLuaPushFromTable_J(3);       // +1
-        steg::PLuaPop_J(imgFile);          // -1
+        steg::PLuaPushFromTable_J(2);       // +1
+        steg::PLuaPop_J(imgFile);           // -1
 
-        comp = new Canvas(scriptName.c_str(), imgFile->c_str(), transparency, viewRect, canvasSize,
+        comp = new Canvas(name.c_str(), imgFile->c_str(), transparency, viewRect, canvasSize,
                           (Canvas*)motherCanvas, startVisible);
     }
 
     return comp;
 }
 
-static GameComp* PLoadGUI_J()
+static GUI* PLoadGUI_J(const std::string& sceneName)
 {
-    GameComp* comp = NULL;
+    GUI* comp = NULL;
+
+//    int tempInteger = 0;
+
+    std::string name = "";
+    std::string mode = "color";
+    int x = 0;
+    int y = 0;
+    int drawIndex = 0;
+    void* motherCanvas = NULL;
+
+    //name
+    steg::PLuaPushFromTable_J("name");   // +1
+    //if top is nil, the PLuaPop will not change the name, so it's safety
+    steg::PLuaPop_J(&name);             // -1
+
+    //mode
+    steg::PLuaPushFromTable_J(1);   // +1
+    steg::PLuaPop_J(&mode);         // -1
+
+    //x, y
+    steg::PLuaPushFromTable_J(2);
+    steg::PLuaPop(&x);
+    steg::PLuaPushFromTable_J(3);
+    steg::PLuaPop(&y);
+
+    //drawIndex
+    steg::PLuaPushFromTable_J(4);
+    steg::PLuaPop(&drawIndex);
+
+    //motherCanvas
+    std::string findPath = "";
+    steg::PLuaPushFromTable_J(5);
+    steg::PLuaPop_J(&findPath);
+    PushFromFindPath(findPath, sceneName);      // +1
+    steg::PLuaPop(&motherCanvas);               // -1
+
+    //tmp:
+//    luaL_dostring(steg::L,
+//                  "print(welcomeScene_1.sources)");
+//    luaL_dostring(steg::L,
+//                  "print(unpack(welcomeScene_1.sources))");
+//    luaL_dostring(steg::L,
+//                  "print(welcomeScene_1.sources.logoCanv_1)");
+//    luaL_dostring(steg::L,
+//                  "print(welcomeScene_1.sources.logoCanv_1.ud)");
+
+    if(mode == "color")
+    {
+        //picSize
+        SDL_Point picSize = {0, 0};
+        steg::PLuaPushFromTable_J(6);
+        PGetSDLPointFromTopTable_J(&picSize);
+        steg::PLuaPop();
+
+        //color
+        SDL_Color color = {0, 0, 0, 0};
+        steg::PLuaPushFromTable_J(7);
+        PGetSDLColorFromTopTable_J(&color);
+        steg::PLuaPop();
+
+        //transparency
+        double transparency = 1.0f;
+        steg::PLuaPushFromTable_J(8);
+        steg::PLuaPop(&transparency);
+
+        comp = new GUI(name.c_str(), x, y, drawIndex, picSize, color, transparency, (Canvas*)motherCanvas);
+    }
+    else    //picture
+    {
+        //textureNum
+        int textureNum = 0;
+        steg::PLuaPushFromTable_J(6);
+        steg::PLuaPop(&textureNum);
+
+        //imgFile
+        std::string* imgFile = new std::string("");
+        InterfaceGame::usedStrings.push_back(imgFile);
+        steg::PLuaPushFromTable_J(7);
+        steg::PLuaPop_J(imgFile);
+
+        comp = new GUI(name.c_str(), x, y, drawIndex, textureNum, imgFile->c_str(), (Canvas*)motherCanvas);
+    }
 
     return comp;
 }
 
-GameComp* PLoadGameCompFromSourcesTable_J(int number)
+GameComp* PLoadGameCompFromSourcesTable_J(int number, const std::string& sceneName)
 {
     GameComp* comp = NULL;
 
@@ -94,11 +178,15 @@ GameComp* PLoadGameCompFromSourcesTable_J(int number)
     steg::PLuaPop_J(&className);                    // -1
     if(className == "Canvas")
     {
-        comp = (GameComp*)PLoadCanvas_J();
+//        comp = (GameComp*)PLoadCanvas_J(sceneName);
+        //当用到多重继承时，一定要用dynamic_cast进行转换，而不要用强制类型转换！！！切记！！！
+        Canvas* canv = PLoadCanvas_J(sceneName);
+        comp = dynamic_cast<GameComp*>(canv);
     }
     else if(className == "GUI")
     {
-        comp = (GameComp*)PLoadGUI_J();
+//        comp = (GameComp*)PLoadGUI_J(sceneName);
+        comp = dynamic_cast<GameComp*>(PLoadGUI_J(sceneName));
     }
 
     steg::PLuaPop();                                // -1
@@ -212,7 +300,7 @@ DBG_Status NewLuaProxy(std::string& name, std::string& filePath, void* ud)
     steg::PLuaPop(2);                                               // -2
 
     //and then, new one proxy
-    status |= steg::PLuaDoScript(filePath.c_str());
+    status |= steg::PLuaDoScript_J(filePath.c_str());
     //now we have the className luaProxy class in lua global
     //create new table as proxy
     status |= steg::PLuaPushNewTable_J();                           // +1
@@ -235,6 +323,69 @@ DBG_Status NewLuaProxy(std::string& name, std::string& filePath, void* ud)
     //now, the proxy is on stack top
     //register it to global
     status |= steg::PLuaSetToGlobal_J(name.c_str());                // -1
+
+    return status;
+}
+
+//temp: 合并之前的
+//SplitString() function code from http://blog.csdn.net/glt3953/article/details/11115485
+static std::vector<std::string> SplitString(std::string str, std::string pattern)
+{
+	std::vector<std::string> result;
+	std::string::size_type pos;
+	str += pattern;		//扩展字符串以方便操作
+	int size = str.size();
+
+	for(int i = 0; i < size; i++)
+	{
+		pos=str.find(pattern, i);
+		if(pos < size)
+		{
+			std::string s = str.substr(i, pos-i);
+			if(!s.empty())
+                result.push_back(s);
+			i = pos + pattern.size() - 1;
+		}
+	}
+	return result;
+}
+
+DBG_Status PushFromFindPath(const std::string& findPath, const std::string& sceneName)
+{
+    DBG_Status status = DBG_OK;
+
+    if(findPath.empty())
+        return DBG_ARG_ERR;
+
+    int top = steg::PLuaGetTop();
+
+    std::vector<std::string> paths = SplitString(findPath, ".");
+    if(findPath[0] == '.')  //find from motherScene luaProxy table
+    {
+        if(sceneName.empty())
+            return DBG_ARG_ERR;
+
+        steg::PLuaPushNil();                            // +1
+        steg::PLuaPushFromTable_J(sceneName.c_str());   // +1
+        for(int i = 0; i < paths.size(); i++)           // +size
+        {
+            steg::PLuaPushFromTable_J(paths[i].c_str());
+        }
+        lua_replace(steg::L, top + 1);                  // -1
+        steg::PLuaPop(paths.size());                    // -size
+    }
+    else                    //find from global
+    {
+        steg::PLuaPushNil();                                // +1
+        for(int i = 0; i < paths.size(); i++)
+        {
+            steg::PLuaPushFromTable_J(paths[i].c_str());    // +size
+        }
+        lua_replace(steg::L, top + 1);                      // -1
+        steg::PLuaPop(paths.size() - 1);                    // -size+1
+    }
+
+    int a = steg::PLuaGetTop();
 
     return status;
 }

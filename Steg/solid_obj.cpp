@@ -48,6 +48,12 @@ void SolidObjInfo::SetPosition(int x, int y, int altitude)
     this->altitude = altitude;
 }
 
+SolidObj::SolidObj(const char* name, SolidObjInfo info, const char* imgFile, int textureNum)
+    :SolidObj(info, imgFile, textureNum)
+{
+    this->name = name;
+}
+
 SolidObj::SolidObj(SolidObjInfo info)
     :SolidObj(info, NULL, 0)
 {

@@ -8,29 +8,29 @@
 namespace interface
 {
 
-class GUI: public steg::GUI, public Name
-{
+//class GUI: public steg::GUI, public Name
+//{
+//
+//public:
+//    //picture mode
+//    GUI(const char* name, int x, int y, int drawIndex,
+//        int textureNum, const char* imgFile, steg::Canvas* canvas);
+//    //color mode
+//    GUI(const char* name, int x, int y, int drawIndex,
+//        SDL_Point picSize, SDL_Color color, float transparency, steg::Canvas* canvas);
+//
+//};
 
-public:
-    //picture mode
-    GUI(const char* name, int x, int y, int drawIndex,
-        int textureNum, const char* imgFile, steg::Canvas* canvas);
-    //color mode
-    GUI(const char* name, int x, int y, int drawIndex,
-        SDL_Point picSize, SDL_Color color, float transparency, steg::Canvas* canvas);
+//class Label: public steg::Label
+//{
+//
+//public:
+//    Label(const char* name, int x, int y, steg::LabelAnchor anchor,
+//          const char* text, TTF_Font* font, SDL_Color color, int drawIndex, steg::Canvas* canvas);
+//
+//};
 
-};
-
-class Label: public steg::Label, public Name
-{
-
-public:
-    Label(const char* name, int x, int y, steg::LabelAnchor anchor,
-          const char* text, TTF_Font* font, SDL_Color color, int drawIndex, steg::Canvas* canvas);
-
-};
-
-class Canvas: public steg::Canvas, public Name
+class Canvas: public steg::Canvas
 {
 
 public:
@@ -42,10 +42,10 @@ public:
            SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas, bool startVisible);
 
 protected:
-    DBG_Status InitInScene(steg::Scene* scene);
+//    DBG_Status InitInScene(steg::Scene* scene);
 
 private:
-    bool startVisible;
+//    bool startVisible;
 
 };
 

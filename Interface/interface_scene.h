@@ -8,14 +8,14 @@
 namespace interface
 {
 
-class InterfaceScene: public steg::Scene, public Name
+class InterfaceScene: virtual public steg::Scene
 {
 
 public:
     InterfaceScene(const char* name, int mapWidthNum, int mapHeightNum, SDL_Renderer* render);
 
 protected:
-    //std::string name;   //lua load scripts according to this name
+    std::string name;   //lua load scripts according to this name
     std::list<std::string> stringList;  //stores strings used by scripts(get from lua stack)
 
 };

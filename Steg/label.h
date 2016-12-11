@@ -22,10 +22,13 @@ enum LabelAnchor
     RightTop,
 };
 
+//class Label: virtual public GUI
 class Label: public GUI
 {
 
 public:
+    Label(const char* name, int x, int y, steg::LabelAnchor anchor,
+          const char* text, TTF_Font* font, SDL_Color color, int drawIndex, steg::Canvas* canvas);
     //the x and y is the anchor point point
     Label(int x, int y, LabelAnchor anchor, const char* text, TTF_Font* font, SDL_Color color, int drawIndex, Canvas* canvas = NULL);
     ~Label();

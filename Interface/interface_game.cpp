@@ -37,18 +37,20 @@ DBG_Status InterfaceGame::InitGame()
     debugFont = TTF_OpenFont("calibri.ttf", 12);
     render = SDL_CreateRenderer(Game::mainWindow, -1, SDL_RENDERER_ACCELERATED);
 
+#if 0
+    testScene = new Scene1(15, 10, render);
+    testScene->debugFont = this->debugFont;
+    testScene->InitScene();
+    fps = new Label(0, 0, LeftTop, "hello world", debugFont, GetColor(Black), DebugUI, 0);
+    *testScene << fps;
+
+    scenes.push(testScene);
+#else
     InterfaceScene* welcome;
     welcome = new GuiScene("welcomeScene", render);
     welcome->InitScene();
-
-//    testScene = new Scene1(15, 10, render);
-//    testScene->debugFont = this->debugFont;
-//    testScene->InitScene();
-//    fps = new Label(0, 0, LeftTop, "hello world", debugFont, GetColor(Black), DebugUI, 0);
-//    *testScene << fps;
-
-//    scenes.push(testScene);
     scenes.push(welcome);
+#endif // 1
 //    scenes.push(testScene);
 
     return status;

@@ -21,6 +21,8 @@ class MultiDrawComp: virtual public DrawableComp
 
 public:
     //make a copy of destRects and sourceRects
+    MultiDrawComp(const char* name, int x, int y, int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects,
+                  int textureNum, const char* imgFiles, DrawableComp* attachedPlatform = NULL);
     MultiDrawComp(int x, int y, int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects, int textureNum, const char* imgFiles, DrawableComp* attachedPlatform = NULL);
     virtual ~MultiDrawComp();
 

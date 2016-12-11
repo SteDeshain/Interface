@@ -16,6 +16,14 @@ GameComp::GameComp()
 	updateErrored = false;
 }
 
+GameComp::GameComp(const char* name)
+{
+	motherScene = NULL;
+	enable = true;
+	updateErrored = false;
+	this->name = name;
+}
+
 GameComp::~GameComp()
 {
 
@@ -29,6 +37,16 @@ void GameComp::DisableComp()
 void GameComp::EnableComp()
 {
 	enable = true;
+}
+
+std::string GameComp::GetName()
+{
+    return name;
+}
+
+const char* GameComp::GetNameCStr()
+{
+    return name.c_str();
 }
 
 DBG_Status GameComp::Update(Uint32 deltTick)

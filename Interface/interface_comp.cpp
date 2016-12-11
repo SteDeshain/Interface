@@ -3,44 +3,56 @@
 namespace interface
 {
 
-Name::Name(const char* name)
-    :name(name)
-{
-}
+//Name::Name(const char* name)
+//    :name(name)
+//{
+////    this->name = name;
+//}
+//
+//const char* Name::GetName()
+//{
+//    return Name::name.c_str();
+//}
+//
+//std::string Name::GetNameString()
+//{
+//    return Name::name;
+//}
+//
+//bool Name::NameIsEmpty()
+//{
+//    bool a = Name::name.empty();
+//    return Name::name.empty();
+//}
+//
+//GameComp::GameComp(const char* name)
+//    :steg::GameComp(), Name(name)
+//{
+//}
+//
+//DrawableComp::DrawableComp(const char* name, int x, int y, unsigned int textureNum, const char* imgFiles,
+//                           DrawableComp* attachedPlatform)
+//    :steg::DrawableComp(x, y, textureNum, imgFiles, attachedPlatform), Name(name)
+//{
+//}
 
-const char* Name::GetName()
-{
-    return name.c_str();
-}
+//MultiDrawComp::MultiDrawComp(const char* name,
+//                             int x, int y, int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects,
+//                             int textureNum, const char* imgFiles, DrawableComp* attachedPlatform)
+//    :steg::MultiDrawComp(x, y, destNum, destRects, sourceRects, textureNum, imgFiles, attachedPlatform), Name(name)
+//{
+//}
 
-GameComp::GameComp(const char* name)
-    :steg::GameComp(), Name(name)
-{
-}
-
-DrawableComp::DrawableComp(const char* name, int x, int y, unsigned int textureNum, const char* imgFiles,
-                           DrawableComp* attachedPlatform)
-    :steg::DrawableComp(x, y, textureNum, imgFiles, attachedPlatform), Name(name)
-{
-}
-
-MultiDrawComp::MultiDrawComp(const char* name,
-                             int x, int y, int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects,
-                             int textureNum, const char* imgFiles, DrawableComp* attachedPlatform)
-    :steg::MultiDrawComp(x, y, destNum, destRects, sourceRects, textureNum, imgFiles, attachedPlatform), Name(name)
-{
-}
-
-SolidObj::SolidObj(const char* name, steg::SolidObjInfo info, const char* imgFile, int textureNum)
-    :steg::SolidObj(info, imgFile, textureNum), Name(name)
-{
-}
-
-MultiDrawSolidObj::MultiDrawSolidObj(const char* name, steg::SolidObjInfo info,
-                                     int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects,
-                                     const char* imgFile, int textureNum)
-    :steg::MultiDrawSolidObj(info, destNum, destRects, sourceRects, imgFile, textureNum), Name(name)
-{
-}
+//SolidObj::SolidObj(const char* name, steg::SolidObjInfo info, const char* imgFile, int textureNum)
+//    :steg::SolidObj(info, imgFile, textureNum), Name(name)
+//{
+//}
+//
+//MultiDrawSolidObj::MultiDrawSolidObj(const char* name, steg::SolidObjInfo info,
+//                                     int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects,
+//                                     const char* imgFile, int textureNum)
+//    :steg::MultiDrawSolidObj(info, destNum, destRects, sourceRects, imgFile, textureNum), Name(name)
+//{
+//}
 
 }

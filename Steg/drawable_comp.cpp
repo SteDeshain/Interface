@@ -48,6 +48,14 @@ DrawableComp::DrawableComp(const char* imgFile, DrawableComp* attachedPlatform)
 
 }
 
+DrawableComp::DrawableComp(const char* name, int x, int y, unsigned int textureNum,
+                           const char* imgFiles, DrawableComp* attachedPlatform)
+	:DrawableComp(textureNum, imgFiles, attachedPlatform)
+{
+	SetRelativePos(x, y);		//set default position as (x, y)
+    this->name = name;
+}
+
 DrawableComp::DrawableComp(int x, int y, unsigned int textureNum, const char* imgFiles, DrawableComp* attachedPlatform)
 	:DrawableComp(textureNum, imgFiles, attachedPlatform)
 {

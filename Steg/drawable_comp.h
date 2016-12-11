@@ -20,14 +20,17 @@
 namespace steg
 {
 
+//class DrawableComp: virtual public GameComp
 class DrawableComp: public GameComp
 {
 	friend class Scene;
 
 public:
+	DrawableComp(const char* name, int x, int y, unsigned int textureNum,
+                 const char* imgFiles = NULL, DrawableComp* attachedPlatform = NULL);
+	DrawableComp(int x, int y, unsigned int textureNum, const char* imgFiles = NULL, DrawableComp* attachedPlatform = NULL);
 	DrawableComp(unsigned textureNum, const char* imgFiles = NULL, DrawableComp* attachedPlatform = NULL);		//DrawableComp(3, "a.png|b.bmp|c.jpg");
 	DrawableComp(const char* imgFile = NULL, DrawableComp* attachedPlatform = NULL);
-	DrawableComp(int x, int y, unsigned int textureNum, const char* imgFiles = NULL, DrawableComp* attachedPlatform = NULL);
 	DrawableComp(int x, int y, const char* imgFile = NULL, DrawableComp* attachedPlatform = NULL);
 	virtual ~DrawableComp();
 

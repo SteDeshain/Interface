@@ -28,7 +28,8 @@ class LuaResult;  //pre-declaration
 //void StoreLuaStack();
 //void ResumeLuaStack();
 
-DBG_Status PLuaDoScript(const char* scriptFile);
+//DBG_Status PLuaDoScript(const char* scriptFile);
+DBG_Status PLuaDoScript_J(const char* scriptFile);
 
 DBG_Status PRegisterLuaFunction_J(const char* file, const char* funPath, const char* funcitonName);   //register as a new name
 DBG_Status PRegisterLuaFunction_J(const char* file, const char* funPath);

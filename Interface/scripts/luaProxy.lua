@@ -8,6 +8,9 @@ require "tools"
 
 luaProxy.__ref = true
 
+--maybe useless
+--luaProxy.name = nil	--the only name registered in global
+
 --每当在c++中new一个luaProxy，会在lua全局变量中注册一个唯一名字string作为key的table，作为该对象在lua中的代理
 --并在new函数中，把c++对象的地址作为lightuserdata储存在代理table的ud字段中，以便代理的调用
 --该唯一名字的规则是：

@@ -163,9 +163,19 @@ void PrintStackTop()
     lua_pushvalue(steg::L, topPos);         // +1
     steg::PLuaSetToTable_J("current");      // -1
     luaL_dostring(steg::L,
-                  "if type(Debug.current) == \"table\" then print(unpack(Debug.current)) else print(Debug.current) end");
+//                  "if type(Debug.current) == \"table\" then print(unpack(Debug.current)) else print(Debug.current) end");
+                  "print(Debug.current)");
 
-    steg::PLuaPop(3);
+    steg::PLuaPop(2);
+//    int fin = lua_gettop(steg::L);
+}
+
+void PrintAllGlobal()
+{
+    luaL_dostring(steg::L,
+                  "for k, v in pairs(_G) do \
+                        print(k, v)         \
+                    end");
 }
 
 }

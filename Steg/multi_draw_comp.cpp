@@ -3,6 +3,13 @@
 namespace steg
 {
 
+MultiDrawComp::MultiDrawComp(const char* name, int x, int y, int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects,
+                             int textureNum, const char* imgFiles, DrawableComp* attachedPlatform)
+    :MultiDrawComp(x, y, destNum, destRects, sourceRects, textureNum, imgFiles, attachedPlatform)
+{
+    this->name = name;
+}
+
 MultiDrawComp::MultiDrawComp(int x, int y, int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects, int textureNum, const char* imgFiles, DrawableComp* attachedPlatform)
     :DrawableComp(textureNum, imgFiles, attachedPlatform), destNum(destNum)
 {

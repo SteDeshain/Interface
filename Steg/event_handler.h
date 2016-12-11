@@ -63,14 +63,14 @@ enum sceneEventCode
 //enum event code
 enum guiEventCode
 {
-    evcSelectGUIComp,
+    evcSelectGUIComp = 0,
     evcUnSelectGUIComp,
 
     evcPressedButton,
     evcReleasedButton,
     evcDumpButton,
 
-    evcShowCanvas,
+    evcShowCanvas = 5,
     evcHideCanvas,
     evcResizeCanvas,
 };

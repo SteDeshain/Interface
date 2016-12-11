@@ -11,7 +11,7 @@
 namespace interface
 {
 
-class GuiScene: public InterfaceScene
+class GuiScene: virtual public InterfaceScene
 {
 
 public:
@@ -21,6 +21,7 @@ public:
     virtual DBG_Status InitScene();
 	virtual DBG_Status Update(Uint32 deltTick);
     virtual DBG_Status UpdatePhysics(Uint32 reminingTick);
+//    virtual DBG_Status HandleInput();
 
 protected:
 

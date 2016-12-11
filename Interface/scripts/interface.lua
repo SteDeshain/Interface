@@ -23,6 +23,9 @@ CFunctions = {} --global
 -- for debug use
 Debug = {}
 
+-- used by PLuaDoScript, if a script is already done, it won't be done again
+DoneScripts = {}
+
 Interface = {}  --global
 
 -- store the files already were loaded as function by name of file's path

@@ -3,6 +3,8 @@
 #include "color.h"
 #include "event_handler.h"
 #include "game.h"
+//tmp
+#include "stel.h"
 
 namespace steg
 {
@@ -56,6 +58,22 @@ GUI::GUI(int x, int y, SDL_Point picSize, SDL_Color color, float transparency, C
     {
         *(this->color) = color;
     }
+}
+
+GUI::GUI(const char* name, int x, int y, int drawIndex,
+         int textureNum, const char* imgFile, steg::Canvas* canvas)
+    :GUI(x, y, textureNum, imgFile, canvas)
+{
+    this->drawIndex = drawIndex;
+    this->name = name;
+}
+
+GUI::GUI(const char* name, int x, int y, int drawIndex,
+         SDL_Point picSize, SDL_Color color, float transparency, steg::Canvas* canvas)
+    :GUI(x, y, picSize, color, transparency, canvas)
+{
+    this->drawIndex = drawIndex;
+    this->name = name;
 }
 
 GUI::~GUI()
@@ -147,6 +165,8 @@ DBG_Status GUI::InitInScene(Scene *scene)
         SetDrawSize(colorTextureSize.x, colorTextureSize.y);
         sourceRect.x = sourceRect.y = 0;
         SetSourceSize(colorTextureSize.x, colorTextureSize.y);
+
+        visible = true;
     }
 
     entireSize = SDL_Point{sourceRect.w, sourceRect.h};
@@ -403,7 +423,22 @@ DBG_Status IdleHandleEvent(SDL_Event event, Canvas* canvas, CanvasState* self)
         if(!motherCanvas ||
            (motherCanvas && motherCanvas->IsVisible()))
         {
+//            lua_pushlightuserdata(L, canvas);   // +1
+//            PLuaSetToGlobal_J("__cur");         // -1
+//            void* tmpPtr = NULL;
+//            PLuaPushNil();                  // +1
+//            PLuaPushFromTable_J("__cur");   // +1
+//            PLuaPop(&tmpPtr);               // -1
+//            PLuaPop();                      // -1
+//            bool b1 = event.user.code == evcShowCanvas;
+////            void* c = (void*)(dynamic_cast<steg::Canvas*>(canvas));
+////            void* c = (void*)(static_cast<steg::Canvas*>(canvas));
+//            void* c = (reinterpret_cast<void*>(canvas));
+////            void* c = (void*)(canvas);
+//            void* d = (void*)(event.user.data1);
+//            bool b2 = d + 4 == c;
             if(event.user.code == evcShowCanvas && event.user.data1 == canvas)
+//            if(b1 && b2)
             {
                 if(!canvas->IsVisible())
                 {
@@ -484,6 +519,22 @@ static DBG_Status HideUpdate(Uint32 deltTick, Canvas* canvas, CanvasState* self)
 //{
 //    return DBG_OK;
 //}
+
+Canvas::Canvas(const char* name, const char* imgFile, float transparency,
+               SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas, bool startVisible)
+    :Canvas(imgFile, transparency, viewRect, canvasSize, motherCanvas)
+{
+    this->startVisible = startVisible;
+    this->name = name;
+}
+
+Canvas::Canvas(const char* name, SDL_Color color, float transparency,
+               SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas, bool startVisible)
+    :Canvas(color, transparency, viewRect, canvasSize, motherCanvas)
+{
+    this->startVisible = startVisible;
+    this->name = name;
+}
 
 Canvas::Canvas(SDL_Color color, float transparency, SDL_Rect viewRect, SDL_Point canvasSize, Canvas* motherCanvas)
     :GUI(1, NULL, motherCanvas),
@@ -818,7 +869,7 @@ DBG_Status Canvas::InitInScene(Scene* scene)
 
     SDL_GetTextureAlphaMod(currentTexture, &textureAlpha);
 
-//    visible = true;
+    SetVisible(startVisible);
 
     return status;
 }
@@ -1132,7 +1183,7 @@ DBG_Status Button::OnUnSelected()
 }
 
 DragButton::DragButton(int x, int y, SDL_Color color, SDL_Point buttonSize, SDL_Rect* area, Canvas* motherCanvas)
-    :Button(x, y, color, buttonSize, motherCanvas)
+    :Button(x, y, color, buttonSize, motherCanvas)//, GUI(x, y, 1, NULL, motherCanvas)
 {
     this->area = new SDL_Rect;
     if(this->area == NULL)
@@ -1159,7 +1210,7 @@ DragButton::DragButton(int x, int y, SDL_Color color, SDL_Point buttonSize, SDL_
 }
 
 DragButton::DragButton(int x, int y, const char* imgFile, SDL_Rect* area, Canvas* motherCanvas)
-    :Button(x, y, imgFile, motherCanvas)
+    :Button(x, y, imgFile, motherCanvas)//, GUI(x, y, 1, imgFile, motherCanvas)
 {
     this->area = new SDL_Rect;
     if(this->area == NULL)

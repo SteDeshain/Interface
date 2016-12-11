@@ -3,12 +3,14 @@
 #include "stdlib.h"
 #include "interface_gui.h"
 #include "load_comps.h"
+//tmp
+//#include "event_handler.h"
 
 namespace interface
 {
 
 GuiScene::GuiScene(const char* name, SDL_Renderer* render)
-    :InterfaceScene(name, 0, 0, render)
+    :InterfaceScene(name, 0, 0, render), steg::Scene(0, 0, render)
 {
 }
 
@@ -38,10 +40,40 @@ DBG_Status GuiScene::InitScene()
     steg::GameComp* comp = NULL;
     for(int i = 0; i < compNumber; i++)
     {
-        comp = PLoadGameCompFromSourcesTable_J(i + 1);
+        comp = PLoadGameCompFromSourcesTable_J(i + 1, name);
         if(comp)
         {
             (*this) << comp;
+            //register to sources table
+//            std::string name = comp->GetNameString();
+//            std::string name = comp->name;
+            if(!(comp->GetName()).empty())    //empty name?
+            {
+                std::string tableKeyName = "";
+                steg::PLuaPushFromTable_J(i + 1);           // +1
+                steg::PLuaPushFromTable_J("name");          // +1
+                steg::PLuaPop_J(&tableKeyName);             // -1
+                steg::PLuaPop();                            // -1
+
+                steg::PLuaPushNil();                            // +1
+                //get object luaProxy table
+//                steg::PLuaPushFromTable_J(comp->GetName());     // +1
+                steg::PLuaPushFromTable_J(comp->GetNameCStr());
+                //remove nil
+                lua_remove(steg::L, -2);                        // -1
+                steg::PLuaSetToTable_J(tableKeyName.c_str());   // -1
+
+                //tmp:
+//                luaL_dostring(steg::L,
+//                              "print(welcomeScene_1.sources)");
+//                luaL_dostring(steg::L,
+//                              "print(unpack(welcomeScene_1.sources))");
+//                luaL_dostring(steg::L,
+//                              "print(welcomeScene_1.sources.logoCanv_1)");
+//                luaL_dostring(steg::L,
+//                              "print(welcomeScene_1.sources.logoCanv_1.ud)");
+
+            }
         }
     }
 
@@ -74,5 +106,31 @@ DBG_Status GuiScene::UpdatePhysics(Uint32 reminingTick)
 
     return status;
 }
+
+//DBG_Status GuiScene::HandleInput()
+//{
+//    using namespace steg;
+//
+//    DBG_Status status = DBG_OK;
+//
+//    status |= InterfaceScene::HandleInput();
+//
+//    //...
+//    //tmp
+//    void* canvas = NULL;
+//    PLuaPushNil();                          // +1
+//    PLuaPushFromTable_J("welcomeScene_1");
+//    PLuaPushFromTable_J("sources");
+//    PLuaPushFromTable_J("logoCanv_1");
+//    PLuaPushFromTable_J("ud");
+//    PLuaPop(&canvas);
+//    PLuaPop(4);
+//    if(inputHandler->KeyPressed(SDL_SCANCODE_Z))
+//        PushHideCanvasEvent(canvas);
+//    if(inputHandler->KeyPressed(SDL_SCANCODE_X))
+//        PushShowCanvasEvent(canvas);
+//
+//    return status;
+//}
 
 }

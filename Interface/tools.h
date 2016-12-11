@@ -15,6 +15,7 @@ std::string& LegalizeName(std::string& name);
 std::string& NameAddOne(std::string& name);   // +1s
 
 void PrintStackTop();   //mostly it's a table
+void PrintAllGlobal();
 
 }
 

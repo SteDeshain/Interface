@@ -3,6 +3,14 @@
 namespace steg
 {
 
+MultiDrawSolidObj::MultiDrawSolidObj(const char* name, SolidObjInfo info,
+                                     int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects,
+                                     const char* imgFile, int textureNum)
+    :MultiDrawSolidObj(info, destNum, destRects, sourceRects, imgFile, textureNum)
+{
+    this->name = name;
+}
+
 MultiDrawSolidObj::MultiDrawSolidObj(SolidObjInfo info, int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects,
                                      const char* imgFile, int textureNum)
     :DrawableComp(textureNum, imgFile, NULL),

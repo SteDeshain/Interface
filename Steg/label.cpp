@@ -6,6 +6,13 @@
 namespace steg
 {
 
+Label::Label(const char* name, int x, int y, steg::LabelAnchor anchor,
+             const char* text, TTF_Font* font, SDL_Color color, int drawIndex, steg::Canvas* canvas)
+    :Label(x, y, anchor, text, font, color, drawIndex, canvas)
+{
+    this->name = name;
+}
+
 Label::Label(int x, int y, LabelAnchor anchor, const char* text, TTF_Font* font, SDL_Color color, int drawIndex, Canvas* canvas)
     :GUI(0, 0, drawIndex, canvas), anchor(anchor), text(text), font(font), color(color)
 {

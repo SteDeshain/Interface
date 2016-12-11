@@ -78,6 +78,7 @@ class SolidObj: virtual public DrawableComp
     friend class CollisionDetector;
 
 public:
+    SolidObj(const char* name, SolidObjInfo info, const char* imgFile, int textureNum = 1);   //visible
     SolidObj(SolidObjInfo info);    //invisible object
     SolidObj(SolidObjInfo info, const char* imgFile, int textureNum = 1);   //visible
     ~SolidObj();

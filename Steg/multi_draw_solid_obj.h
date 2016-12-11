@@ -7,10 +7,13 @@
 namespace steg
 {
 
+//class MultiDrawSolidObj: virtual public MultiDrawComp, virtual public SolidObj
 class MultiDrawSolidObj: public MultiDrawComp, public SolidObj
 {
 
 public:
+    MultiDrawSolidObj(const char* name, SolidObjInfo info, int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects,
+                      const char* imgFile, int textureNum = 1);
     MultiDrawSolidObj(SolidObjInfo info, int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects,
                       const char* imgFile, int textureNum = 1);
 

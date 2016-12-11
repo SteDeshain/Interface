@@ -11,63 +11,65 @@
 namespace interface
 {
 
-class Name
-{
+//class Name
+//{
+//
+//public:
+//    Name(const char* name);
+////    Name(std::string name);
+//
+//    const char* GetName();
+//    std::string GetNameString();
+//    bool NameIsEmpty();
+//
+//protected:
+//    std::string name;
+//
+//};
 
-public:
-    Name(const char* name);
-//    Name(std::string name);
+//class GameComp: public steg::GameComp
+//{
+//
+//public:
+//    GameComp(const char* name);
+//
+//};
 
-    const char* GetName();
+//class DrawableComp: public steg::DrawableComp
+//{
+//
+//public:
+//    DrawableComp(const char* name, int x, int y, unsigned int textureNum, const char* imgFiles,
+//                 DrawableComp* attachedPlatform);
+//
+//};
 
-protected:
-    std::string name;
+//class MultiDrawComp: public steg::MultiDrawComp, public Name
+//{
+//
+//public:
+//    MultiDrawComp(const char* name,
+//                  int x, int y, int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects,
+//                  int textureNum, const char* imgFiles, DrawableComp* attachedPlatform);
+//
+//};
 
-};
+//class SolidObj: public steg::SolidObj, public Name
+//{
+//
+//public:
+//    SolidObj(const char* name, steg::SolidObjInfo info, const char* imgFile, int textureNum);
+//
+//};
 
-class GameComp: public steg::GameComp, public Name
-{
-
-public:
-    GameComp(const char* name);
-
-};
-
-class DrawableComp: public steg::DrawableComp, public Name
-{
-
-public:
-    DrawableComp(const char* name, int x, int y, unsigned int textureNum, const char* imgFiles,
-                 DrawableComp* attachedPlatform);
-
-};
-
-class MultiDrawComp: public steg::MultiDrawComp, public Name
-{
-
-public:
-    MultiDrawComp(const char* name,
-                  int x, int y, int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects,
-                  int textureNum, const char* imgFiles, DrawableComp* attachedPlatform);
-
-};
-
-class SolidObj: public steg::SolidObj, public Name
-{
-
-public:
-    SolidObj(const char* name, steg::SolidObjInfo info, const char* imgFile, int textureNum);
-
-};
-
-class MultiDrawSolidObj: public steg::MultiDrawSolidObj, public Name
-{
-
-public:
-    MultiDrawSolidObj(const char* name, steg::SolidObjInfo info, int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects,
-                      const char* imgFile, int textureNum);
-
-};
+//class MultiDrawSolidObj: public steg::MultiDrawSolidObj, public Name
+//{
+//
+//public:
+//    MultiDrawSolidObj(const char* name, steg::SolidObjInfo info, int destNum, SDL_Rect* destRects, SDL_Rect* sourceRects,
+//                      const char* imgFile, int textureNum);
+//
+//};
 
 }
 
